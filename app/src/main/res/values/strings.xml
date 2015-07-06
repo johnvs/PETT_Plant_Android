@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2015 john van strien
+
+     License info goes here.
+
+-->
+
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Pett Plant</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!--  PETT Plant Buttons and other controls  -->
+    <string name="entrainment_mode">Entrainment Mode</string>
+    <string name="select_entrainment_mode">Select an entrainment mode</string>
+    <string name="run">Run</string>
+    <string name="stop">Stop</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="loop">Loop</string>
+    <string-array name="entrainment_array">
+        <item>Meditate</item>
+        <item>Sleep</item>
+        <item>Lucid Dream</item>
+        <item>Stay Awake</item>
+    </string-array>
+
+    <string name="color_mode">Color Mode</string>
+    <string name="speed_leds">Speed</string>
+    <string name="hold_pattern">Hold</string>
+    <string-array name="color_mode_array">
+        <item>Sound Responsive</item>
+        <item>Rainbow Cycle 1</item>
+        <item>Rainbow Cycle 2</item>
+        <item>Preset 1</item>
+        <item>Preset 2</item>
+        <item>Preset 3</item>
+        <item>Preset 4</item>
+        <item>Preset 5</item>
+    </string-array>
+
+    <!--  Bluetooth connection messages  -->
+    <string name="not_connected">You are not connected to a device</string>
+    <string name="bt_not_enabled_leaving">Bluetooth was not enabled. Try again.</string>
+    <string name="title_connecting">connecting...</string>
+    <string name="title_connected_to">connected to <xliff:g id="device_name">%1$s</xliff:g></string>
+    <string name="title_not_connected">Not connected to plant</string>
+
+    <!--  DeviceListActivity -->
+    <string name="scanning">scanning for devices...</string>
+    <string name="select_device">Select a device to connect</string>
+    <string name="none_paired">No devices have been paired</string>
+    <string name="none_found">No devices found</string>
+    <string name="title_paired_devices">Paired Devices</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">Scan for devices</string>
+
+    <!-- Options Menu -->
+    <string name="insecure_connect">Connect to your PETT Plant</string>
+    <string name="help">Help</string>
+    <string name="done">Done</string>
+
+    <!-- Help Text -->
+    <string name="cant_find_help_text">There is no help for this topic.</string>
+
+    <!--  Main Fragments -->
+    <string name="PettPlantFragment"><![CDATA[<p><u>Entrainment Mode</u>: To start a brain wave
+        entrainment cycle, select the desired sequence from the Entrainment Mode drop down list and
+        tap the Run button to begin. Tap the Stop button to stop the current entrainment cycle and
+        return the cycle to the beginning. Tap the Pause button if you wish to pause the current
+        cycle and resume from that same point later.</p>
+        <p><u>Color Mode</u>: To select the color pattern that your PETT will display, select one
+        from the Color Mode drop down list. Use the Speed slider to adjust the rate at which the
+        colors change. The Hold button will freeze the colors at any given point. Tap the Hold
+        button again to resume the animation.</p>
+        <p><u>Hint</u>: The brain wave entrainment mode will run with any color pattern you
+        select. For the best results in maximizing the stroboscopic effect, we recommend choosing
+        one of the first 3 Rainbow cycle presets that turn all of the LEDs on full bright, and
+        placing your PETT in a fully darkened room.</p>
+        <p>Enjoy!</p>]]></string>
+
+</resources>
