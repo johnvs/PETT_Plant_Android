@@ -39,9 +39,9 @@ import java.util.UUID;
  * incoming connections, a thread for connecting with a device, and a
  * thread for performing data transmissions when connected.
  */
-public class BluetoothClientService {
+public class BluetoothClient {
     // Debugging
-    private static final String TAG = "BluetoothClientService";
+    private static final String TAG = "BluetoothClient";
 
     // Name for the SDP record when creating server socket
 //    private static final String NAME_SECURE = "BluetoothChatSecure";
@@ -70,14 +70,14 @@ public class BluetoothClientService {
     public static final int STATE_CONNECTING = 2;    // now initiating an outgoing connection
     public static final int STATE_CONNECTED  = 3;    // now connected to a remote device
 
-    // BluetoothClientService Handler message types
+    // BluetoothClient Handler message types
     public static final int MESSAGE_STATE_CHANGE  = 1;
     public static final int MESSAGE_READ          = 2;
     public static final int MESSAGE_WRITE         = 3;
     public static final int MESSAGE_DEVICE_NAME   = 4;
     public static final int MESSAGE_TOAST         = 5;
 
-    // Key names received from the BluetoothClientService Handler
+    // Key names received from the BluetoothClient Handler
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
 
@@ -87,7 +87,7 @@ public class BluetoothClientService {
      * @param context The UI Activity Context
      * @param handler A Handler to send messages back to the UI Activity
      */
-    public BluetoothClientService(Context context, Handler handler) {
+    public BluetoothClient(Context context, Handler handler) {
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
         mHandler = handler;
@@ -279,7 +279,7 @@ public class BluetoothClientService {
         mHandler.sendMessage(msg);
 
         // Start the service over to restart listening mode
-        BluetoothClientService.this.start();
+        BluetoothClient.this.start();
     }
 
     /**
@@ -294,7 +294,7 @@ public class BluetoothClientService {
         mHandler.sendMessage(msg);
 
         // Start the service over to restart listening mode
-        BluetoothClientService.this.start();
+        BluetoothClient.this.start();
     }
 
     /**
@@ -343,7 +343,7 @@ public class BluetoothClientService {
 
                 // If a connection was accepted
                 if (socket != null) {
-                    synchronized (BluetoothClientService.this) {
+                    synchronized (BluetoothClient.this) {
                         switch (mState) {
                             case STATE_LISTEN:
                             case STATE_CONNECTING:
@@ -432,7 +432,7 @@ public class BluetoothClientService {
             }
 
             // Reset the ConnectThread because we're done
-            synchronized (BluetoothClientService.this) {
+            synchronized (BluetoothClient.this) {
                 mConnectThread = null;
             }
 
@@ -494,7 +494,7 @@ public class BluetoothClientService {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
                     // Start the service over to restart listening mode
-                    BluetoothClientService.this.start();
+                    BluetoothClient.this.start();
                     break;
                 }
             }
