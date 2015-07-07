@@ -1,12 +1,13 @@
 package com.biotronisis.pettplant.activity;
 
+import android.content.Intent;
+import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.biotronisis.pettplant.R;
-
+import com.biotronisis.pettplant.activity.fragment.PettPlantFragment;
 
 public class MainActivity extends AbstractBaseActivity {
 
@@ -26,19 +27,20 @@ public class MainActivity extends AbstractBaseActivity {
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
-   }
-
-   @Override
-   public boolean onCreateOptionsMenu(Menu menu) {
-      // Inflate the menu; this adds items to the action bar if it is present.
-      getMenuInflater().inflate(R.menu.menu_main, menu);
 
       if (savedInstanceState == null) {
          FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
          PettPlantFragment fragment = new PettPlantFragment();
-         transaction.replace(R.id.sample_content_fragment, fragment);
+         transaction.replace(R.id.pett_plant_fragment, fragment);
          transaction.commit();
       }
+   }
+
+   @Override
+   public boolean onCreateOptionsMenu(Menu menu) {
+      // Inflate the menu; this adds items to the action bar.
+      getMenuInflater().inflate(R.menu.menu_main, menu);
+//      super.onCreateOptionsMenu(menu);
 
       return true;
    }
@@ -48,11 +50,13 @@ public class MainActivity extends AbstractBaseActivity {
       // Handle action bar item clicks here. The action bar will
       // automatically handle clicks on the Home/Up button, so long
       // as you specify a parent activity in AndroidManifest.xml.
-      int id = item.getItemId();
 
-      //noinspection SimplifiableIfStatement
-      if (id == R.id.action_settings) {
-         return true;
+      switch (item.getItemId()) {
+         case R.id.action_help: {
+            Intent intent = HelpActivity.createIntent(this, getActivityName(), fragmentName);
+            startActivity(intent);
+            return true;
+         }
       }
 
       return super.onOptionsItemSelected(item);

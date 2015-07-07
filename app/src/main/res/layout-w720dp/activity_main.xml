@@ -35,7 +35,7 @@
     </LinearLayout>
 
     <FrameLayout
-          android:id="@+id/sample_content_fragment"
+          android:id="@+id/pett_plant_fragment"
           android:layout_weight="2"
           android:layout_width="0px"
           android:layout_height="match_parent" />

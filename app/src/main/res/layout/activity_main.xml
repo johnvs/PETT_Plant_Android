@@ -6,7 +6,7 @@
     android:id="@+id/sample_main_layout">
 
     <FrameLayout
-        android:id="@+id/sample_content_fragment"
+        android:id="@+id/pett_plant_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
