@@ -27,7 +27,8 @@
 
     <string name="color_mode">Color Mode</string>
     <string name="speed_leds">Speed</string>
-    <string name="hold_pattern">Hold</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
     <string-array name="color_mode_array">
         <item>Sound Responsive</item>
         <item>Rainbow Cycle 1</item>

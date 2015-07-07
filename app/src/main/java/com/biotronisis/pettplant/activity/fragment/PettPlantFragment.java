@@ -16,7 +16,6 @@
 
 package com.biotronisis.pettplant.activity.fragment;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -27,6 +26,9 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,12 +43,11 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.pett.plant.common.logger.Log;
-import com.pett.plant.pettplant.R;
-import com.pett.plant.pettplant.activity.AbstractBaseActivity;
-import com.pett.plant.pettplant.activity.HelpActivity;
-import com.pett.plant.pettplant.communication.BluetoothClientService;
-import com.pett.plant.pettplant.activity.DeviceListActivity;
+//import com.pett.plant.common.logger.Log;
+import com.biotronisis.pettplant.R;
+import com.biotronisis.pettplant.activity.AbstractBaseActivity;
+import com.biotronisis.pettplant.activity.DeviceListActivity;
+import com.biotronisis.pettplant.communication.BluetoothClient;
 
 /**
  * This fragment controls Bluetooth to communicate with other devices.
@@ -64,13 +65,14 @@ public class PettPlantFragment extends Fragment {
    // Entrainment Layout Views
    private Spinner entrainmentSpinner;
    private CheckBox loopCheckbox;
-   private Button runStopButton;
-   private Button pauseResumeButton;
+   private Button entrainRunStopButton;
+   private Button entrainPauseResumeButton;
 
    // Color Mode Layout Views
    private Spinner colorModeSpinner;
    private SeekBar colorModeSeekbar;
-   private Button holdButton;
+   private Button colorOnOffButton;
+   private Button colorPauseResumeButton;
 
    private ArrayAdapter<CharSequence> entrainmentAdapter;
    private ArrayAdapter<CharSequence> colorModeAdapter;
@@ -88,7 +90,7 @@ public class PettPlantFragment extends Fragment {
    private BluetoothAdapter mBluetoothAdapter = null;
 
    // Member object for the bluetooth services
-   private BluetoothClientService bluetoothClientService = null;
+   private BluetoothClient bluetoothClient = null;
 
    static final String STATE_ENTRAINMENT_MODE = "entrainmentMode";
    static final String STATE_COLOR_MODE = "colorMode";
@@ -141,7 +143,7 @@ public class PettPlantFragment extends Fragment {
          Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
          startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
          // Otherwise, setup the chat session
-      } else if (bluetoothClientService == null) {
+      } else if (bluetoothClient == null) {
          setupChat();
       }
    }
@@ -149,8 +151,8 @@ public class PettPlantFragment extends Fragment {
    @Override
    public void onDestroy() {
       super.onDestroy();
-      if (bluetoothClientService != null) {
-         bluetoothClientService.stop();
+      if (bluetoothClient != null) {
+         bluetoothClient.stop();
       }
    }
 
@@ -161,11 +163,11 @@ public class PettPlantFragment extends Fragment {
       // Performing this check in onResume() covers the case in which BT was
       // not enabled during onStart(), so we were paused to enable it...
       // onResume() will be called when ACTION_REQUEST_ENABLE activity returns.
-      if (bluetoothClientService != null) {
+      if (bluetoothClient != null) {
          // Only if the state is STATE_NONE, do we know that we haven't started already
-         if (bluetoothClientService.getState() == BluetoothClientService.STATE_NONE) {
-            // Start the Bluetooth chat services
-            bluetoothClientService.start();
+         if (bluetoothClient.getState() == BluetoothClient.STATE_NONE) {
+            // Start the Bluetooth client
+            bluetoothClient.start();
          }
       }
    }
@@ -202,8 +204,8 @@ public class PettPlantFragment extends Fragment {
          }
       });
 
-      runStopButton = (Button) view.findViewById(R.id.button_run_stop);
-      pauseResumeButton = (Button) view.findViewById(R.id.button_pause_resume);
+      entrainRunStopButton = (Button) view.findViewById(R.id.button_run_stop);
+      entrainPauseResumeButton = (Button) view.findViewById(R.id.button_pause_resume);
       loopCheckbox = (CheckBox) view.findViewById(R.id.checkbox_loop);
 
       colorModeSpinner = (Spinner) view.findViewById(R.id.spinner_color_mode);
@@ -230,11 +232,13 @@ public class PettPlantFragment extends Fragment {
       });
 
       colorModeSeekbar = (SeekBar) view.findViewById(R.id.seekbar_speed);
-      holdButton = (Button) view.findViewById(R.id.button_hold);
+      colorOnOffButton = (Button) view.findViewById(R.id.button_color_on_off);
+      colorPauseResumeButton = (Button) view.findViewById(R.id.button_color_pause_resume);
    }
 
    @Override
    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+      super.onCreateOptionsMenu(menu, inflater);
       inflater.inflate(R.menu.menu_pett_plant, menu);
    }
 
@@ -245,13 +249,6 @@ public class PettPlantFragment extends Fragment {
             // Launch the DeviceListActivity to see devices and do scan
             Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
             startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
-            return true;
-         }
-
-         case R.id.help_button: {
-//            Intent intent = HelpActivity.createIntent(getActivity(), getActivityName(), fragmentName);
-            Intent intent = HelpActivity.createIntent(getActivity(), AbstractBaseActivity.fragmentName);
-            startActivity(intent);
             return true;
          }
       }
@@ -265,7 +262,7 @@ public class PettPlantFragment extends Fragment {
       Log.d(TAG, "setupChat()");
 
       // Initialize view controls listeners
-      runStopButton.setOnClickListener(new View.OnClickListener() {
+      entrainRunStopButton.setOnClickListener(new View.OnClickListener() {
          public void onClick(View v) {
             // Send a message using content of the edit text widget
             View view = getView();
@@ -276,8 +273,8 @@ public class PettPlantFragment extends Fragment {
          }
       });
 
-      // Initialize the BluetoothClientService to perform bluetooth connections
-      bluetoothClientService = new BluetoothClientService(getActivity(), mHandler);
+      // Initialize the BluetoothClient to perform bluetooth connections
+      bluetoothClient = new BluetoothClient(getActivity(), mHandler);
 
       // Initialize the buffer for outgoing messages
       mOutStringBuffer = new StringBuffer("");
@@ -302,16 +299,16 @@ public class PettPlantFragment extends Fragment {
     */
    private void sendMessage(String message) {
       // Check that we're actually connected before trying anything
-      if (bluetoothClientService.getState() != BluetoothClientService.STATE_CONNECTED) {
+      if (bluetoothClient.getState() != BluetoothClient.STATE_CONNECTED) {
          Toast.makeText(getActivity(), R.string.not_connected, Toast.LENGTH_SHORT).show();
          return;
       }
 
       // Check that there's actually something to send
       if (message.length() > 0) {
-         // Get the message bytes and tell the BluetoothClientService to write
+         // Get the message bytes and tell the BluetoothClient to write
          byte[] send = message.getBytes();
-         bluetoothClientService.write(send);
+         bluetoothClient.write(send);
 
          // Reset out string buffer to zero and clear the edit text field
          mOutStringBuffer.setLength(0);
@@ -339,11 +336,12 @@ public class PettPlantFragment extends Fragment {
     * @param resId a string resource ID
     */
    private void setStatus(int resId) {
-      FragmentActivity activity = getActivity();
+      AppCompatActivity activity = (AppCompatActivity) getActivity();
       if (null == activity) {
          return;
       }
-      final ActionBar actionBar = activity.getActionBar();
+
+      final ActionBar actionBar = activity.getSupportActionBar();
       if (null == actionBar) {
          return;
       }
@@ -356,11 +354,12 @@ public class PettPlantFragment extends Fragment {
     * @param subTitle status
     */
    private void setStatus(CharSequence subTitle) {
-      FragmentActivity activity = getActivity();
+      AppCompatActivity activity = (AppCompatActivity) getActivity();
       if (null == activity) {
          return;
       }
-      final ActionBar actionBar = activity.getActionBar();
+
+      final ActionBar actionBar = activity.getSupportActionBar();
       if (null == actionBar) {
          return;
       }
@@ -368,51 +367,51 @@ public class PettPlantFragment extends Fragment {
    }
 
    /**
-    * The Handler that gets information back from the BluetoothClientService
+    * The Handler that gets information back from the BluetoothClient
     */
    private final Handler mHandler = new Handler() {
       @Override
       public void handleMessage(Message msg) {
          FragmentActivity activity = getActivity();
          switch (msg.what) {
-            case BluetoothClientService.MESSAGE_STATE_CHANGE:
+            case BluetoothClient.MESSAGE_STATE_CHANGE:
                switch (msg.arg1) {
-                  case BluetoothClientService.STATE_CONNECTED:
+                  case BluetoothClient.STATE_CONNECTED:
                      setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
 //                            mConversationArrayAdapter.clear();
                      break;
-                  case BluetoothClientService.STATE_CONNECTING:
+                  case BluetoothClient.STATE_CONNECTING:
                      setStatus(R.string.title_connecting);
                      break;
-                  case BluetoothClientService.STATE_LISTEN:
-                  case BluetoothClientService.STATE_NONE:
+                  case BluetoothClient.STATE_LISTEN:
+                  case BluetoothClient.STATE_NONE:
                      setStatus(R.string.title_not_connected);
                      break;
                }
                break;
-            case BluetoothClientService.MESSAGE_WRITE:
+            case BluetoothClient.MESSAGE_WRITE:
 //                    byte[] writeBuf = (byte[]) msg.obj;
                // construct a string from the buffer
 //                    String writeMessage = new String(writeBuf);
 //                    mConversationArrayAdapter.add("Me:  " + writeMessage);
                break;
-            case BluetoothClientService.MESSAGE_READ:
+            case BluetoothClient.MESSAGE_READ:
 //                    byte[] readBuf = (byte[]) msg.obj;
                // construct a string from the valid bytes in the buffer
 //                    String readMessage = new String(readBuf, 0, msg.arg1);
 //                    mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
                break;
-            case BluetoothClientService.MESSAGE_DEVICE_NAME:
+            case BluetoothClient.MESSAGE_DEVICE_NAME:
                // save the connected device's name
-               mConnectedDeviceName = msg.getData().getString(BluetoothClientService.DEVICE_NAME);
+               mConnectedDeviceName = msg.getData().getString(BluetoothClient.DEVICE_NAME);
                if (null != activity) {
                   Toast.makeText(activity, "Connected to "
                         + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
                }
                break;
-            case BluetoothClientService.MESSAGE_TOAST:
+            case BluetoothClient.MESSAGE_TOAST:
                if (null != activity) {
-                  Toast.makeText(activity, msg.getData().getString(BluetoothClientService.TOAST),
+                  Toast.makeText(activity, msg.getData().getString(BluetoothClient.TOAST),
                         Toast.LENGTH_SHORT).show();
                }
                break;
@@ -452,17 +451,17 @@ public class PettPlantFragment extends Fragment {
    /**
     * Establish connection with other divice
     *
-    * @param data   An {@link Intent} with {@link com.pett.plant.pettplant.activity.DeviceListActivity#EXTRA_DEVICE_ADDRESS} extra.
+    * @param data   An {@link Intent} with {@link com.biotronisis.pettplant.activity.DeviceListActivity#EXTRA_DEVICE_ADDRESS} extra.
     * @param secure Socket Security type - Secure (true) , Insecure (false)
     */
    private void connectDevice(Intent data, boolean secure) {
       // Get the device MAC address
       String address = data.getExtras()
-            .getString(com.pett.plant.pettplant.activity.DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+            .getString(com.biotronisis.pettplant.activity.DeviceListActivity.EXTRA_DEVICE_ADDRESS);
       // Get the BluetoothDevice object
       BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
       // Attempt to connect to the device
-      bluetoothClientService.connect(device, secure);
+      bluetoothClient.connect(device, secure);
    }
 
 }

@@ -136,12 +136,23 @@
         android:layout_below="@+id/title_speed" />
 
     <Button
-        android:id="@+id/button_hold"
+        android:id="@+id/button_color_on_off"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginStart="20dp"
         android:layout_below="@+id/seekbar_speed"
-        android:text="@string/hold_pattern" />
+        android:text="@string/on" />
+
+    <Button
+        android:id="@+id/button_color_pause_resume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_toRightOf="@+id/button_color_on_off"
+        android:layout_toEndOf="@+id/button_color_on_off"
+        android:layout_alignBaseline="@+id/button_color_on_off"
+        android:text="@string/pause" />
 
 </RelativeLayout>
