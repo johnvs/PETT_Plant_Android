@@ -49,6 +49,8 @@ import com.biotronisis.pettplant.activity.AbstractBaseActivity;
 import com.biotronisis.pettplant.activity.DeviceListActivity;
 import com.biotronisis.pettplant.communication.BluetoothClient;
 
+import java.lang.ref.WeakReference;
+
 /**
  * This fragment controls Bluetooth to communicate with other devices.
  */
@@ -138,13 +140,13 @@ public class PettPlantFragment extends Fragment {
    public void onStart() {
       super.onStart();
       // If BT is not on, request that it be enabled.
-      // setupChat() will then be called during onActivityResult
+      // setupBluetoothClient() will then be called during onActivityResult
       if (!mBluetoothAdapter.isEnabled()) {
          Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
          startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
          // Otherwise, setup the chat session
       } else if (bluetoothClient == null) {
-         setupChat();
+         setupBluetoothClient();
       }
    }
 
@@ -258,8 +260,8 @@ public class PettPlantFragment extends Fragment {
    /**
     * Set up the UI and background operations for chat.
     */
-   private void setupChat() {
-      Log.d(TAG, "setupChat()");
+   private void setupBluetoothClient() {
+      Log.d(TAG, "setupBluetoothClient()");
 
       // Initialize view controls listeners
       entrainRunStopButton.setOnClickListener(new View.OnClickListener() {
@@ -274,23 +276,12 @@ public class PettPlantFragment extends Fragment {
       });
 
       // Initialize the BluetoothClient to perform bluetooth connections
-      bluetoothClient = new BluetoothClient(getActivity(), mHandler);
+//      bluetoothClient = new BluetoothClient(getActivity(), PettPlantFragment.mHandler);
+      bluetoothClient = new BluetoothClient(mHandler);
 
       // Initialize the buffer for outgoing messages
       mOutStringBuffer = new StringBuffer("");
    }
-
-   /**
-    * Makes this device discoverable.
-    */
-//    private void ensureDiscoverable() {
-//        if (mBluetoothAdapter.getScanMode() !=
-//                BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
-//            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-//            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-//            startActivity(discoverableIntent);
-//        }
-//    }
 
    /**
     * Sends a message.
@@ -369,23 +360,32 @@ public class PettPlantFragment extends Fragment {
    /**
     * The Handler that gets information back from the BluetoothClient
     */
-   private final Handler mHandler = new Handler() {
+   static class MyInnerHandler extends Handler {
+      AppCompatActivity mActivity;
+      WeakReference<PettPlantFragment> mFrag;
+
+      MyInnerHandler(AppCompatActivity aActivity, PettPlantFragment aFrag) {
+         mActivity = aActivity;
+         mFrag = new WeakReference<PettPlantFragment>(aFrag);
+      }
+
       @Override
       public void handleMessage(Message msg) {
-         FragmentActivity activity = getActivity();
+//         FragmentActivity activity = getActivity();
+         PettPlantFragment theFrag = mFrag.get();
+
          switch (msg.what) {
             case BluetoothClient.MESSAGE_STATE_CHANGE:
                switch (msg.arg1) {
                   case BluetoothClient.STATE_CONNECTED:
-                     setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
-//                            mConversationArrayAdapter.clear();
+                     theFrag.setStatus(theFrag.getString(R.string.title_connected_to, theFrag.mConnectedDeviceName));
                      break;
                   case BluetoothClient.STATE_CONNECTING:
-                     setStatus(R.string.title_connecting);
+                     theFrag.setStatus(R.string.title_connecting);
                      break;
                   case BluetoothClient.STATE_LISTEN:
                   case BluetoothClient.STATE_NONE:
-                     setStatus(R.string.title_not_connected);
+                     theFrag.setStatus(R.string.title_not_connected);
                      break;
                }
                break;
@@ -403,47 +403,46 @@ public class PettPlantFragment extends Fragment {
                break;
             case BluetoothClient.MESSAGE_DEVICE_NAME:
                // save the connected device's name
-               mConnectedDeviceName = msg.getData().getString(BluetoothClient.DEVICE_NAME);
-               if (null != activity) {
-                  Toast.makeText(activity, "Connected to "
-                        + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+               theFrag.mConnectedDeviceName = msg.getData().getString(BluetoothClient.DEVICE_NAME);
+               if (mActivity != null) {
+                  Toast.makeText(mActivity, "Connected to "
+                        + theFrag.mConnectedDeviceName, Toast.LENGTH_SHORT).show();
                }
                break;
             case BluetoothClient.MESSAGE_TOAST:
-               if (null != activity) {
-                  Toast.makeText(activity, msg.getData().getString(BluetoothClient.TOAST),
+               if (mActivity != null) {
+                  Toast.makeText(mActivity, msg.getData().getString(BluetoothClient.TOAST),
                         Toast.LENGTH_SHORT).show();
                }
                break;
          }
       }
-   };
+   }
+
+   MyInnerHandler mHandler = new MyInnerHandler((AppCompatActivity) getActivity(), this);
+//   private static final Handler mHandler = new Handler() {
+
+//   };
 
    public void onActivityResult(int requestCode, int resultCode, Intent data) {
       switch (requestCode) {
-//            case REQUEST_CONNECT_DEVICE_SECURE:
-//                // When DeviceListActivity returns with a device to connect
-//                if (resultCode == Activity.RESULT_OK) {
-//                    connectDevice(data, true);
-//                }
-//                break;
          case REQUEST_CONNECT_DEVICE_INSECURE:
             // When DeviceListActivity returns with a device to connect
             if (resultCode == Activity.RESULT_OK) {
                connectDevice(data, false);
             }
             break;
+
          case REQUEST_ENABLE_BT:
             // When the request to enable Bluetooth returns
             if (resultCode == Activity.RESULT_OK) {
                // Bluetooth is now enabled, so set up a chat session
-               setupChat();
+               setupBluetoothClient();
             } else {
                // User did not enable Bluetooth or an error occurred
                Log.d(TAG, "BT not enabled");
                Toast.makeText(getActivity(), R.string.bt_not_enabled_leaving,
                      Toast.LENGTH_SHORT).show();
-//               getActivity().finish();
             }
       }
    }

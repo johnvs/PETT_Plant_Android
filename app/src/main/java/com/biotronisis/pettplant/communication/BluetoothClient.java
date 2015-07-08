@@ -40,25 +40,18 @@ import java.util.UUID;
  * thread for performing data transmissions when connected.
  */
 public class BluetoothClient {
-    // Debugging
     private static final String TAG = "BluetoothClient";
 
     // Name for the SDP record when creating server socket
-//    private static final String NAME_SECURE = "BluetoothChatSecure";
     private static final String NAME_INSECURE = "BluetoothChatInsecure";
 
-    // Unique UUID for this application
-//    private static final UUID MY_UUID_SECURE =
-//            UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
+    // Unique UUID for this application used for SPP profile
     private static final UUID MY_UUID_INSECURE =
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-//    private static final UUID MY_UUID_INSECURE =
-//            UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
 
     // Member fields
     private final BluetoothAdapter mAdapter;
     private final Handler mHandler;
-//    private AcceptThread mSecureAcceptThread;
     private AcceptThread mInsecureAcceptThread;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
@@ -87,7 +80,8 @@ public class BluetoothClient {
      * @param context The UI Activity Context
      * @param handler A Handler to send messages back to the UI Activity
      */
-    public BluetoothClient(Context context, Handler handler) {
+//    public BluetoothClient(Context context, Handler handler) {
+    public BluetoothClient(Handler handler) {
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
         mHandler = handler;
