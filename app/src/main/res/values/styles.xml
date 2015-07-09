@@ -7,4 +7,24 @@
 
     <!-- Customize your theme here. -->
 
+    <style name="TitleTextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentLeft">true</item>
+        <!--<item name="android:layout_alignParentStart">true</item>-->
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="AppButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">20sp</item>
+        <!--<item name="android:layout_marginStart">20sp</item>-->
+        <item name="android:layout_marginRight">20sp</item>
+        <!--<item name="android:layout_marginEnd">20sp</item>-->
+        <item name="android:textSize">18sp</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+
 </resources>
