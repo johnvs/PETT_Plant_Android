@@ -6,19 +6,18 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.ftdi.j2xx.D2xxManager;
+import com.ftdi.j2xx.FT_Device;
+import com.zlscorp.ultragrav.R;
+import com.zlscorp.ultragrav.debug.MyDebug;
+import com.zlscorp.ultragrav.file.ErrorHandler;
+import com.zlscorp.ultragrav.meter.MeterService;
+
 import java.util.logging.Level;
 
 //import java.math.BigInteger;
 //import java.text.DecimalFormat;
-
-import com.ftdi.j2xx.D2xxManager;
-import com.ftdi.j2xx.FT_Device;
-
-import com.zlscorp.ultragrav.R;
 //import com.zlscorp.ultragrav.communication.CommunicationManager.CommunicationManagerListener;
-import com.zlscorp.ultragrav.debug.MyDebug;
-import com.zlscorp.ultragrav.file.ErrorHandler;
-import com.zlscorp.ultragrav.meter.MeterService;
 
 public class UsbCommAdapter implements ICommAdapter {
 

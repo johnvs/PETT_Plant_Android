@@ -1,8 +1,8 @@
 package com.biotronisis.pettplant.model;
 
-import java.io.Serializable;
-
 import com.j256.ormlite.field.DatabaseField;
+
+import java.io.Serializable;
 
 public abstract class AbstractDomainObject implements Serializable {
 	private static final long serialVersionUID = 1L;

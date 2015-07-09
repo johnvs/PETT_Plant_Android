@@ -3,8 +3,8 @@ package com.biotronisis.pettplant.model;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import com.zlscorp.ultragrav.type.CommunicationType;
-//import com.zlscorp.ultragrav.type.ObservationType;
+
+import com.biotronisis.pettplant.type.CommunicationType;
 
 @DatabaseTable(tableName = "communicationParams")
 public class CommunicationParams extends AbstractParamsObject {
@@ -49,9 +49,9 @@ public class CommunicationParams extends AbstractParamsObject {
 		this.address = address;
 	}
 
-	@Override
+//	@Override
 	public String toString() {
-		return "CommunitationParams [name=" + name + ", communicationType=" + communicationType + ", address=" + address + "]";
+		return "CommunicationParams [name=" + name + ", communicationType=" + communicationType + ", address=" + address + "]";
 	}
 	
 }

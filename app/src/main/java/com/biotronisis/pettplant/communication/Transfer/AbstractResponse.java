@@ -1,4 +1,4 @@
-package com.biotronisis.pettplant.communication.Transfer;
+package com.biotronisis.pettplant.communication.transfer;
 
 import java.io.Serializable;
 
@@ -24,6 +24,7 @@ public abstract class AbstractResponse implements Serializable {
 		return myInt;
 	}
 	
+/*
 	public boolean validateChecksum(byte[] bytes) {
 		boolean result = true;
 		
@@ -47,10 +48,10 @@ public abstract class AbstractResponse implements Serializable {
 			result = false;
 //			return false;
 		}
-		
 		return result;
 //		return true;
 	}
-	
+*/
+
 }
 

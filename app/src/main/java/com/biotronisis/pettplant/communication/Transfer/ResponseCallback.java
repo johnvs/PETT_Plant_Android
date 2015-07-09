@@ -1,6 +1,6 @@
-package com.biotronisis.pettplant.communication.Transfer;
+package com.biotronisis.pettplant.communication.transfer;
 
-import com.zlscorp.ultragrav.communication.CommunicationErrorType;
+import com.biotronisis.pettplant.communication.CommunicationErrorType;
 
 public interface ResponseCallback<R extends AbstractResponse> {
 	

@@ -1,5 +1,23 @@
 package com.biotronisis.pettplant.communication;
 
+import android.annotation.SuppressLint;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.util.Log;
+
+//import com.biotronisis.pettplant.R;
+import com.biotronisis.pettplant.communication.ICommAdapter.CommAdapterListener;
+import com.biotronisis.pettplant.communication.transfer.AbstractCommand;
+import com.biotronisis.pettplant.communication.transfer.AbstractResponse;
+import com.biotronisis.pettplant.communication.transfer.EmptyResponse;
+import com.biotronisis.pettplant.communication.transfer.ResponseCallback;
+import com.biotronisis.pettplant.debug.MyDebug;
+//import com.biotronisis.pettplant.file.ErrorHandler;
+//import com.biotronisis.pettplant.meter.MeterService;
+import com.biotronisis.pettplant.model.CommunicationParams;
+import com.biotronisis.pettplant.type.CommunicationType;
+
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,24 +25,7 @@ import java.util.logging.Level;
 
 //import android.app.AlertDialog;
 //import android.content.DialogInterface;
-import android.annotation.SuppressLint;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.util.Log;
 //import android.view.WindowManager;
-
-import com.zlscorp.ultragrav.R;
-import com.zlscorp.ultragrav.communication.ICommAdapter.CommAdapterListener;
-import com.zlscorp.ultragrav.communication.transfer.AbstractCommand;
-import com.zlscorp.ultragrav.communication.transfer.AbstractResponse;
-import com.zlscorp.ultragrav.communication.transfer.EmptyResponse;
-import com.zlscorp.ultragrav.communication.transfer.ResponseCallback;
-import com.zlscorp.ultragrav.debug.MyDebug;
-import com.zlscorp.ultragrav.file.ErrorHandler;
-import com.zlscorp.ultragrav.meter.MeterService;
-import com.zlscorp.ultragrav.model.CommunicationParams;
-import com.zlscorp.ultragrav.type.CommunicationType;
 
 /**
  * Establish and manage communications with the Burris gravity meter via bluetooth or USB.

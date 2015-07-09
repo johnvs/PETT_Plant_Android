@@ -1,12 +1,8 @@
-package com.biotronisis.pettplant.communication.Transfer;
+package com.biotronisis.pettplant.communication.transfer;
 
-import com.zlscorp.ultragrav.debug.MyDebug;
-import com.zlscorp.ultragrav.file.ErrorHandler;
-
-import android.util.Log;
+//import com.biotronisis.pettplant.file.ErrorHandler;
 
 import java.io.Serializable;
-import java.util.logging.Level;
 
 public abstract class AbstractCommand<R extends AbstractResponse> implements Serializable {
 
@@ -24,13 +20,13 @@ public abstract class AbstractCommand<R extends AbstractResponse> implements Ser
 	public abstract Byte getResponseId();
 	public abstract Class<R> getResponseClass();
 	
-	public Byte getIntervalEndCommandId() {
-		return null;
-	}
+//	public Byte getIntervalEndCommandId() {
+//		return null;
+//	}
 	
-	public boolean isInterval() {
-		return getIntervalEndCommandId() != null;
-	}
+//	public boolean isInterval() {
+//		return getIntervalEndCommandId() != null;
+//	}
 	
 	public long getResponseTimeoutMs() {
 		return RESPONSE_TIMEOUT;
@@ -44,8 +40,9 @@ public abstract class AbstractCommand<R extends AbstractResponse> implements Ser
 		return (byte)((number & 0x0000FF00) >> 8);
 	}
 	
+/*
 	public byte computeChecksum(byte[] bytes) {
-		
+
         StringBuilder bytesStrBldr = new StringBuilder();
         if (bytes.length > 0) {
             for (byte b : bytes) {
@@ -59,9 +56,9 @@ public abstract class AbstractCommand<R extends AbstractResponse> implements Ser
         }
 	    
 		if (bytes[0] < 2 || bytes[0]  != bytes.length-1) {
-		    ErrorHandler errorHandler = ErrorHandler.getInstance();
-	        errorHandler.logError(Level.SEVERE, this.getClass().getSimpleName() + ".computeChecksum(): " +
-	        		"Command bytes is too short: " + byteStr, 0, 0);
+//		    ErrorHandler errorHandler = ErrorHandler.getInstance();
+//	        errorHandler.logError(Level.SEVERE, this.getClass().getSimpleName() + ".computeChecksum(): " +
+//	        		"Command bytes is too short: " + byteStr, 0, 0);
 		}
 		
 		byte checksum = 0;
@@ -71,11 +68,12 @@ public abstract class AbstractCommand<R extends AbstractResponse> implements Ser
 		
 		return checksum;
 	}
-	
-	public void setResponseCallback(ResponseCallback<R> responseCallback) {
-		this.responseCallback = responseCallback;
-	}
-	public ResponseCallback<R> getResponseCallback() {
-		return responseCallback;
-	}
+*/
+
+   public void setResponseCallback(ResponseCallback<R> responseCallback) {
+      this.responseCallback = responseCallback;
+   }
+   public ResponseCallback<R> getResponseCallback() {
+      return responseCallback;
+   }
 }
