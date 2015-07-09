@@ -20,7 +20,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -50,12 +49,12 @@ public class BluetoothClient {
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     // Member fields
-    private final BluetoothAdapter mAdapter;
+    private final BluetoothAdapter bluetoothAdapter;
     private final Handler mHandler;
     private AcceptThread mInsecureAcceptThread;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
-    private int mState;
+    private ConnectionState connectionState;
 
     // Constants that indicate the current connection state
     public static final int STATE_NONE       = 0;    // we're doing nothing
@@ -82,8 +81,8 @@ public class BluetoothClient {
      */
 //    public BluetoothClient(Context context, Handler handler) {
     public BluetoothClient(Handler handler) {
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
-        mState = STATE_NONE;
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        connectionState = ConnectionState.NONE;  // STATE_NONE;
         mHandler = handler;
     }
 
@@ -92,9 +91,9 @@ public class BluetoothClient {
      *
      * @param state An integer defining the current connection state
      */
-    private synchronized void setState(int state) {
-        Log.d(TAG, "setState() " + mState + " -> " + state);
-        mState = state;
+    private synchronized void setState(ConnectionState state) {
+        Log.d(TAG, "setState() " + connectionState + " -> " + state);
+        connectionState = state;
 
         // Give the new state to the Handler so the UI Activity can update
         mHandler.obtainMessage(MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
@@ -103,8 +102,8 @@ public class BluetoothClient {
     /**
      * Return the current connection state.
      */
-    public synchronized int getState() {
-        return mState;
+    public synchronized ConnectionState getState() {
+        return connectionState;
     }
 
     /**
@@ -126,7 +125,7 @@ public class BluetoothClient {
             mConnectedThread = null;
         }
 
-        setState(STATE_LISTEN);
+        setState(ConnectionState.LISTENING);
 
         // Start the thread to listen on a BluetoothServerSocket
 //        if (mSecureAcceptThread == null) {
@@ -149,7 +148,7 @@ public class BluetoothClient {
         Log.d(TAG, "connect to: " + device);
 
         // Cancel any thread attempting to make a connection
-        if (mState == STATE_CONNECTING) {
+        if (connectionState == ConnectionState.CONNECTING) {
             if (mConnectThread != null) {
                 mConnectThread.cancel();
                 mConnectThread = null;
@@ -165,7 +164,7 @@ public class BluetoothClient {
         // Start the thread to connect with the given device
         mConnectThread = new ConnectThread(device, secure);
         mConnectThread.start();
-        setState(STATE_CONNECTING);
+        setState(ConnectionState.CONNECTING);
     }
 
     /**
@@ -211,7 +210,7 @@ public class BluetoothClient {
         msg.setData(bundle);
         mHandler.sendMessage(msg);
 
-        setState(STATE_CONNECTED);
+        setState(ConnectionState.ESTABLISHED);
     }
 
     /**
@@ -240,7 +239,7 @@ public class BluetoothClient {
             mInsecureAcceptThread.cancel();
             mInsecureAcceptThread = null;
         }
-        setState(STATE_NONE);
+        setState(ConnectionState.NONE);
     }
 
     /**
@@ -254,7 +253,7 @@ public class BluetoothClient {
         ConnectedThread r;
         // Synchronize a copy of the ConnectedThread
         synchronized (this) {
-            if (mState != STATE_CONNECTED) return;
+            if (connectionState != ConnectionState.ESTABLISHED) return;
             r = mConnectedThread;
         }
         // Perform the write unsynchronized
@@ -308,7 +307,7 @@ public class BluetoothClient {
             // Create a new listening server socket
             try {
                 if (!secure) {
-                    tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(
+                    tmp = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(
                             NAME_INSECURE, MY_UUID_INSECURE);
                 }
             } catch (IOException e) {
@@ -325,7 +324,7 @@ public class BluetoothClient {
             BluetoothSocket socket = null;
 
             // Listen to the server socket if we're not connected
-            while (mState != STATE_CONNECTED) {
+            while (connectionState != ConnectionState.ESTABLISHED) {
                 try {
                     // This is a blocking call and will only return on a
                     // successful connection or an exception
@@ -338,15 +337,15 @@ public class BluetoothClient {
                 // If a connection was accepted
                 if (socket != null) {
                     synchronized (BluetoothClient.this) {
-                        switch (mState) {
-                            case STATE_LISTEN:
-                            case STATE_CONNECTING:
+                        switch (connectionState) {
+                            case LISTENING:
+                            case CONNECTING:
                                 // Situation normal. Start the connected thread.
                                 connected(socket, socket.getRemoteDevice(),
                                         mSocketType);
                                 break;
-                            case STATE_NONE:
-                            case STATE_CONNECTED:
+                            case NONE:
+                            case ESTABLISHED:
                                 // Either not ready or already connected. Terminate new socket.
                                 try {
                                     socket.close();
@@ -406,7 +405,7 @@ public class BluetoothClient {
             setName("ConnectThread" + mSocketType);
 
             // Always cancel discovery because it will slow down a connection
-            mAdapter.cancelDiscovery();
+            bluetoothAdapter.cancelDiscovery();
 
             // Make a connection to the BluetoothSocket
             try {

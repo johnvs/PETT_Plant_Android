@@ -48,6 +48,9 @@ import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.AbstractBaseActivity;
 import com.biotronisis.pettplant.activity.DeviceListActivity;
 import com.biotronisis.pettplant.communication.BluetoothClient;
+import com.biotronisis.pettplant.communication.ConnectionState;
+import com.biotronisis.pettplant.type.ColorMode;
+import com.biotronisis.pettplant.type.EntrainmentMode;
 
 import java.lang.ref.WeakReference;
 
@@ -81,6 +84,8 @@ public class PettPlantFragment extends Fragment {
 
    private int lastEntrainmentPos;
    private int lastColorModePos;
+//   private EntrainmentMode lastEntrainmentPos;
+//   private ColorMode lastColorModePos;
 
    // Name of the connected device
    private String mConnectedDeviceName = null;
@@ -99,7 +104,7 @@ public class PettPlantFragment extends Fragment {
 
    @Override
    public void onSaveInstanceState(Bundle savedInstanceState) {
-      // Save the user's current game state
+      // Save the fragment state
       savedInstanceState.putInt(STATE_ENTRAINMENT_MODE, lastEntrainmentPos);
       savedInstanceState.putInt(STATE_COLOR_MODE, lastColorModePos);
 
@@ -167,7 +172,7 @@ public class PettPlantFragment extends Fragment {
       // onResume() will be called when ACTION_REQUEST_ENABLE activity returns.
       if (bluetoothClient != null) {
          // Only if the state is STATE_NONE, do we know that we haven't started already
-         if (bluetoothClient.getState() == BluetoothClient.STATE_NONE) {
+         if (bluetoothClient.getState() == ConnectionState.NONE) {
             // Start the Bluetooth client
             bluetoothClient.start();
          }
@@ -191,9 +196,20 @@ public class PettPlantFragment extends Fragment {
       entrainmentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
          @Override
          public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
             // The if is needed because the listener fires when the app starts
             if (position != lastEntrainmentPos) {
                lastEntrainmentPos = position;
+               if (position < EntrainmentMode.values().length) {  // Check your bounds!
+                  EntrainmentMode whichMode = EntrainmentMode.values()[position];
+
+                  switch (whichMode) {
+                     case MEDITATE:
+
+
+                  }
+
+               }
                Toast entrainmentToast = Toast.makeText(getActivity(),
                      parent.getItemAtPosition(position) + " selected",
                      Toast.LENGTH_LONG);
@@ -206,7 +222,9 @@ public class PettPlantFragment extends Fragment {
          }
       });
 
+
       entrainRunStopButton = (Button) view.findViewById(R.id.button_run_stop);
+
       entrainPauseResumeButton = (Button) view.findViewById(R.id.button_pause_resume);
       loopCheckbox = (CheckBox) view.findViewById(R.id.checkbox_loop);
 
@@ -290,7 +308,7 @@ public class PettPlantFragment extends Fragment {
     */
    private void sendMessage(String message) {
       // Check that we're actually connected before trying anything
-      if (bluetoothClient.getState() != BluetoothClient.STATE_CONNECTED) {
+      if (bluetoothClient.getState() != ConnectionState.ESTABLISHED) {
          Toast.makeText(getActivity(), R.string.not_connected, Toast.LENGTH_SHORT).show();
          return;
       }
