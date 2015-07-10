@@ -6,7 +6,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.Log;
 
-//import com.biotronisis.pettplant.R;
+import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.communication.ICommAdapter.CommAdapterListener;
 import com.biotronisis.pettplant.communication.transfer.AbstractCommand;
 import com.biotronisis.pettplant.communication.transfer.AbstractResponse;
@@ -14,8 +14,8 @@ import com.biotronisis.pettplant.communication.transfer.EmptyResponse;
 import com.biotronisis.pettplant.communication.transfer.ResponseCallback;
 import com.biotronisis.pettplant.debug.MyDebug;
 //import com.biotronisis.pettplant.file.ErrorHandler;
-//import com.biotronisis.pettplant.meter.MeterService;
 import com.biotronisis.pettplant.model.CommunicationParams;
+import com.biotronisis.pettplant.service.PettPlantService;
 import com.biotronisis.pettplant.type.CommunicationType;
 
 import java.math.BigInteger;
@@ -34,7 +34,7 @@ public class CommunicationManager {
 	
 	private static final String TAG = "CommunicationManager";
 	
-	private MeterService meterService;
+	private PettPlantService pettPlantService;
 	
 	private CommunicationParams communicationParams;
 	
@@ -60,20 +60,20 @@ public class CommunicationManager {
 	// maps the end interval command id to the waitingCommand id
 	private Map<Byte, Byte> endCommandIdToStartCommandId;
 	
-	private boolean justEndedInterval;
+   private boolean justEndedInterval;
 
-    @SuppressLint("UseSparseArrays")
-    public CommunicationManager(MeterService meterService, CommunicationParams communicationParams) {
-		
-		this.meterService = meterService;
+   @SuppressLint("UseSparseArrays")
+   public CommunicationManager(PettPlantService pettPlantService, CommunicationParams communicationParams) {
+
+		this.pettPlantService = pettPlantService;
 		this.communicationParams = communicationParams;
-		
-        HandlerThread backgroundThread = new HandlerThread("meter-service");
-        backgroundThread.start();
-        this.backgroundHandler = new Handler(backgroundThread.getLooper());
 
-        this.uiHandler = new Handler(Looper.getMainLooper());
-		
+		HandlerThread backgroundThread = new HandlerThread("meter-service");
+		backgroundThread.start();
+		this.backgroundHandler = new Handler(backgroundThread.getLooper());
+
+		this.uiHandler = new Handler(Looper.getMainLooper());
+
 		this.responseIdToWaitingCommands = new HashMap<Byte, AbstractCommand<?>>();
 		this.commandIdToWaitingCommands = new HashMap<Byte, AbstractCommand<?>>();
 		this.waitingCommandsToTimeouts = new HashMap<AbstractCommand<?>, TimeoutBackgroundRunnable>();
@@ -86,17 +86,17 @@ public class CommunicationManager {
 				this.commAdapter = new MockCommAdapter(commResponseListener);
 				break;
             case BLUETOOTH:
-                this.commAdapter = new BluetoothCommAdapter(commResponseListener, this.meterService);
+                this.commAdapter = new BluetoothCommAdapter(commResponseListener, this.pettPlantService);
                 break;
             case USB:
-                this.commAdapter = new UsbCommAdapter(commResponseListener, this.meterService);
+                this.commAdapter = new UsbCommAdapter(commResponseListener, this.pettPlantService);
                 break;
 			default:
-			    ErrorHandler errorHandler = ErrorHandler.getInstance(this.meterService);
-			    errorHandler.logError(Level.WARNING, "CommunicationManager.CommunicationManager(): " +
-			    		"unknown CommunicationType - " + communicationParams.getCommunicationType(),
-			    		R.string.communication_type_error_title,
-			    		R.string.communication_type_error_message);
+//			    ErrorHandler errorHandler = ErrorHandler.getInstance(this.pettPlantService);
+//			    errorHandler.logError(Level.WARNING, "CommunicationManager.CommunicationManager(): " +
+//			    		"unknown CommunicationType - " + communicationParams.getCommunicationType(),
+//			    		R.string.communication_type_error_title,
+//			    		R.string.communication_type_error_message);
 		}
 	}
 	
@@ -105,7 +105,7 @@ public class CommunicationManager {
 	            commAdapter.isReConnectingToDevice(address));
 	}
 	
-    public boolean isUsbDeviceAttached(MeterService meter) {
+    public boolean isUsbDeviceAttached(PettPlantService meter) {
         return UsbCommAdapter.isUsbDeviceAttached(meter);
     }
     
@@ -115,7 +115,7 @@ public class CommunicationManager {
 						communicationParams.getAddress());
         }
 		if (commAdapter == null) {
-		    ErrorHandler errorHandler = ErrorHandler.getInstance(meterService);
+		    ErrorHandler errorHandler = ErrorHandler.getInstance(pettPlantService);
             errorHandler.logError(Level.SEVERE, "CommunicationManager.connect(): " +
             		"commAdapter does not exist.",
             		R.string.bluetooth_adapter_error_title,
@@ -160,13 +160,13 @@ public class CommunicationManager {
 	private void sendCommandBackground(AbstractCommand<? extends AbstractResponse> command) {
 		Byte commandId = command.getCommandId();
 		if (commandIdToWaitingCommands.containsKey(commandId)) {
-			meterService.dispatchCommError(CommunicationErrorType.TRANSMIT_FAILED, 
+			pettPlantService.dispatchCommError(CommunicationErrorType.TRANSMIT_FAILED,
 			        "a command with this same command id is already in progress", commandId);
 			return;
 		}
 		Byte responseId = command.getResponseId();
 		if (responseId != null && responseIdToWaitingCommands.containsKey(responseId)) {
-			meterService.dispatchCommError(CommunicationErrorType.TRANSMIT_FAILED, 
+			pettPlantService.dispatchCommError(CommunicationErrorType.TRANSMIT_FAILED,
 			        "a command with this same response id is already in progress", commandId);
 			return;
 		}
@@ -218,7 +218,7 @@ public class CommunicationManager {
 			}
 		}
 		
-		meterService.dispatchCommSent();
+		pettPlantService.dispatchCommSent();
 	}
 	
 	private void handleResponseBytes(final byte[] responseBytes) {
@@ -243,14 +243,14 @@ public class CommunicationManager {
         }
 		
 		if (responseBytes.length < 3) {
-			meterService.dispatchCommError(CommunicationErrorType.MALFORMED_RESPONSE, 
+			pettPlantService.dispatchCommError(CommunicationErrorType.MALFORMED_RESPONSE,
 			        "response length too short", null);
 			return;
 		}
 		
 		byte msgLength = responseBytes[0];
 		if (responseBytes.length < msgLength) {
-			meterService.dispatchCommError(CommunicationErrorType.MALFORMED_RESPONSE, 
+			pettPlantService.dispatchCommError(CommunicationErrorType.MALFORMED_RESPONSE,
 			        "response length too short", null);
 			return;
 		}
@@ -272,7 +272,7 @@ public class CommunicationManager {
 		        if (MyDebug.LOG) {
 		            Log.d("EndObsRaceCond", "Obs data set sent after response removed from list");
 		        }
-	            meterService.dispatchCommError(CommunicationErrorType.UNEXPECTED_RESPONSE, 
+	            pettPlantService.dispatchCommError(CommunicationErrorType.UNEXPECTED_RESPONSE,
 	                    "received response but none requested", responseId);
 
 	            // can't call onFailed on a callback, because we don't know who this belongs to
@@ -285,13 +285,13 @@ public class CommunicationManager {
 			Class<?> responseClass = waitingCommand.getResponseClass();
 			response = (AbstractResponse) responseClass.newInstance();
 		} catch(Exception ex) {
-			meterService.dispatchCommError(CommunicationErrorType.UNKNOWN_RESPONSE, 
+			pettPlantService.dispatchCommError(CommunicationErrorType.UNKNOWN_RESPONSE,
 			        "unable to create response instance", null);
 			return;
 		}
 		
 		if (!response.validateChecksum(responseBytes)) {
-			meterService.dispatchCommError(CommunicationErrorType.MALFORMED_RESPONSE, 
+			pettPlantService.dispatchCommError(CommunicationErrorType.MALFORMED_RESPONSE,
 			        "response checksum did not match", null);
 			return;
 		}
@@ -300,7 +300,7 @@ public class CommunicationManager {
 		response.fromResponseBytes(responseBytes);
 		
 		// notify all listeners data has been received
-		meterService.dispatchCommRecieved();
+		pettPlantService.dispatchCommRecieved();
 		
 		TimeoutBackgroundRunnable timeout = waitingCommandsToTimeouts.get(waitingCommand);
 		backgroundHandler.removeCallbacks(timeout);
@@ -392,16 +392,16 @@ public class CommunicationManager {
 			
 			switch (connectionState) {
 				case ESTABLISHED:
-					meterService.onCommConnected();
+					pettPlantService.onCommConnected();
 					break;
 				case CONNECTING:
-					meterService.onCommConnecting();
+					pettPlantService.onCommConnecting();
 					break;
                 case NONE:
-                    meterService.onCommDisconnected();
+                    pettPlantService.onCommDisconnected();
                     break;
                 case FAILED:
-                    meterService.onCommFailed();
+                    pettPlantService.onCommFailed();
                     break;
 				default:
 					break;

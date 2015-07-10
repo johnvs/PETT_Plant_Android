@@ -47,7 +47,7 @@ import android.widget.Toast;
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.AbstractBaseActivity;
 import com.biotronisis.pettplant.activity.DeviceListActivity;
-import com.biotronisis.pettplant.communication.BluetoothClient;
+import com.biotronisis.pettplant.communication.BluetoothCommAdapter;
 import com.biotronisis.pettplant.communication.ConnectionState;
 import com.biotronisis.pettplant.type.ColorMode;
 import com.biotronisis.pettplant.type.EntrainmentMode;
@@ -97,7 +97,7 @@ public class PettPlantFragment extends Fragment {
    private BluetoothAdapter mBluetoothAdapter = null;
 
    // Member object for the bluetooth services
-   private BluetoothClient bluetoothClient = null;
+   private BluetoothCommAdapter bluetoothCommAdapter = null;
 
    static final String STATE_ENTRAINMENT_MODE = "entrainmentMode";
    static final String STATE_COLOR_MODE = "colorMode";
@@ -150,7 +150,7 @@ public class PettPlantFragment extends Fragment {
          Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
          startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
          // Otherwise, setup the chat session
-      } else if (bluetoothClient == null) {
+      } else if (bluetoothCommAdapter == null) {
          setupBluetoothClient();
       }
    }
@@ -158,8 +158,8 @@ public class PettPlantFragment extends Fragment {
    @Override
    public void onDestroy() {
       super.onDestroy();
-      if (bluetoothClient != null) {
-         bluetoothClient.stop();
+      if (bluetoothCommAdapter != null) {
+         bluetoothCommAdapter.stop();
       }
    }
 
@@ -170,11 +170,11 @@ public class PettPlantFragment extends Fragment {
       // Performing this check in onResume() covers the case in which BT was
       // not enabled during onStart(), so we were paused to enable it...
       // onResume() will be called when ACTION_REQUEST_ENABLE activity returns.
-      if (bluetoothClient != null) {
+      if (bluetoothCommAdapter != null) {
          // Only if the state is STATE_NONE, do we know that we haven't started already
-         if (bluetoothClient.getState() == ConnectionState.NONE) {
+         if (bluetoothCommAdapter.getState() == ConnectionState.NONE) {
             // Start the Bluetooth client
-            bluetoothClient.start();
+            bluetoothCommAdapter.start();
          }
       }
    }
@@ -293,9 +293,9 @@ public class PettPlantFragment extends Fragment {
          }
       });
 
-      // Initialize the BluetoothClient to perform bluetooth connections
-//      bluetoothClient = new BluetoothClient(getActivity(), PettPlantFragment.mHandler);
-      bluetoothClient = new BluetoothClient(mHandler);
+      // Initialize the BluetoothCommAdapter to perform bluetooth connections
+//      bluetoothCommAdapter = new BluetoothCommAdapter(getActivity(), PettPlantFragment.mHandler);
+      bluetoothCommAdapter = new BluetoothCommAdapter(mHandler);
 
       // Initialize the buffer for outgoing messages
       mOutStringBuffer = new StringBuffer("");
@@ -308,16 +308,16 @@ public class PettPlantFragment extends Fragment {
     */
    private void sendMessage(String message) {
       // Check that we're actually connected before trying anything
-      if (bluetoothClient.getState() != ConnectionState.ESTABLISHED) {
+      if (bluetoothCommAdapter.getState() != ConnectionState.ESTABLISHED) {
          Toast.makeText(getActivity(), R.string.not_connected, Toast.LENGTH_SHORT).show();
          return;
       }
 
       // Check that there's actually something to send
       if (message.length() > 0) {
-         // Get the message bytes and tell the BluetoothClient to write
+         // Get the message bytes and tell the BluetoothCommAdapter to write
          byte[] send = message.getBytes();
-         bluetoothClient.write(send);
+         bluetoothCommAdapter.write(send);
 
          // Reset out string buffer to zero and clear the edit text field
          mOutStringBuffer.setLength(0);
@@ -376,7 +376,7 @@ public class PettPlantFragment extends Fragment {
    }
 
    /**
-    * The Handler that gets information back from the BluetoothClient
+    * The Handler that gets information back from the BluetoothCommAdapter
     */
    static class MyInnerHandler extends Handler {
       AppCompatActivity mActivity;
@@ -393,43 +393,43 @@ public class PettPlantFragment extends Fragment {
          PettPlantFragment theFrag = mFrag.get();
 
          switch (msg.what) {
-            case BluetoothClient.MESSAGE_STATE_CHANGE:
+            case BluetoothCommAdapter.MESSAGE_STATE_CHANGE:
                switch (msg.arg1) {
-                  case BluetoothClient.STATE_CONNECTED:
+                  case BluetoothCommAdapter.STATE_CONNECTED:
                      theFrag.setStatus(theFrag.getString(R.string.title_connected_to, theFrag.mConnectedDeviceName));
                      break;
-                  case BluetoothClient.STATE_CONNECTING:
+                  case BluetoothCommAdapter.STATE_CONNECTING:
                      theFrag.setStatus(R.string.title_connecting);
                      break;
-                  case BluetoothClient.STATE_LISTEN:
-                  case BluetoothClient.STATE_NONE:
+                  case BluetoothCommAdapter.STATE_LISTEN:
+                  case BluetoothCommAdapter.STATE_NONE:
                      theFrag.setStatus(R.string.title_not_connected);
                      break;
                }
                break;
-            case BluetoothClient.MESSAGE_WRITE:
+            case BluetoothCommAdapter.MESSAGE_WRITE:
 //                    byte[] writeBuf = (byte[]) msg.obj;
                // construct a string from the buffer
 //                    String writeMessage = new String(writeBuf);
 //                    mConversationArrayAdapter.add("Me:  " + writeMessage);
                break;
-            case BluetoothClient.MESSAGE_READ:
+            case BluetoothCommAdapter.MESSAGE_READ:
 //                    byte[] readBuf = (byte[]) msg.obj;
                // construct a string from the valid bytes in the buffer
 //                    String readMessage = new String(readBuf, 0, msg.arg1);
 //                    mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
                break;
-            case BluetoothClient.MESSAGE_DEVICE_NAME:
+            case BluetoothCommAdapter.MESSAGE_DEVICE_NAME:
                // save the connected device's name
-               theFrag.mConnectedDeviceName = msg.getData().getString(BluetoothClient.DEVICE_NAME);
+               theFrag.mConnectedDeviceName = msg.getData().getString(BluetoothCommAdapter.DEVICE_NAME);
                if (mActivity != null) {
                   Toast.makeText(mActivity, "Connected to "
                         + theFrag.mConnectedDeviceName, Toast.LENGTH_SHORT).show();
                }
                break;
-            case BluetoothClient.MESSAGE_TOAST:
+            case BluetoothCommAdapter.MESSAGE_TOAST:
                if (mActivity != null) {
-                  Toast.makeText(mActivity, msg.getData().getString(BluetoothClient.TOAST),
+                  Toast.makeText(mActivity, msg.getData().getString(BluetoothCommAdapter.TOAST),
                         Toast.LENGTH_SHORT).show();
                }
                break;
@@ -478,7 +478,7 @@ public class PettPlantFragment extends Fragment {
       // Get the BluetoothDevice object
       BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
       // Attempt to connect to the device
-      bluetoothClient.connect(device, secure);
+      bluetoothCommAdapter.connect(device, secure);
    }
 
 }
