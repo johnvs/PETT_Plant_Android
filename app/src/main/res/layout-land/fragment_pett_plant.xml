@@ -140,7 +140,7 @@
             android:layout_below="@+id/spinner_color_mode"
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
-            android:text="@string/speed_leds"
+            android:text="@string/speed"
             android:textSize="18sp" />
 
         <SeekBar
