@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright 2014 john van strien
+-->
+<!-- From RelativeLayout
+    xmlns:tools="http://schemas.android.com/tools"
+-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="10dp"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp" >
+
+    <TextView
+        android:id="@+id/title_entrainment"
+        style="@style/TitleTextView"
+        android:layout_alignParentTop="true"
+        android:text="@string/entrainment_mode" />
+
+    <Spinner
+        android:id="@+id/spinner_entrainment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:prompt="@string/select_entrainment_mode"
+        android:layout_below="@+id/title_entrainment" />
+
+    <TextView
+        android:id="@+id/description_entrainment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_below="@+id/spinner_entrainment"
+        android:textSize="18sp"
+        android:text="This is a description of the selected entrainment mode." />
+
+    <ProgressBar
+        android:id="@+id/progressbar_entrainment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/description_entrainment"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="23dp"
+        android:layout_marginTop="20dp"
+        android:indeterminate="false"
+        android:max="100"
+        android:minHeight="20dp"
+        android:minWidth="200dp"
+        android:progress="1"        />
+
+    <TextView
+        android:id="@+id/title_loop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_below="@+id/progressbar_entrainment"
+        android:textSize="18sp"
+        android:text="@string/loop" />
+
+    <CheckBox
+        android:id="@+id/checkbox_loop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/title_loop"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_toRightOf="@+id/title_loop"
+        android:layout_toEndOf="@+id/title_loop"
+        android:layout_below="@+id/spinner_entrainment" />
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:id="@+id/entrainment_buttons"
+                  android:layout_height="wrap_content"
+                  android:layout_width="match_parent"
+                  android:layout_marginTop="10dp"
+                  android:orientation="horizontal"
+                  android:layout_below="@+id/title_loop" >
+
+        <Button
+            android:id="@+id/button_run_stop"
+            style="@style/AppButton"
+            android:text="@string/run"/>
+
+        <Button
+            android:id="@+id/button_pause_resume"
+            style="@style/AppButton"
+            android:text="@string/pause"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

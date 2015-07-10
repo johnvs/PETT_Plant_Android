@@ -106,7 +106,7 @@
         android:id="@+id/seperator"
         android:layout_width="wrap_content"
         android:layout_height="2dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:layout_below="@+id/title_loop"
         android:background="@android:color/black" />
 
