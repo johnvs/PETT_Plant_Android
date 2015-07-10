@@ -9,6 +9,9 @@ import android.view.MenuItem;
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.fragment.PettPlantFragment;
 
+import android.support.v4.view.ViewPager;
+import com.viewpagerindicator.TabPageIndicator;
+
 public class MainActivity extends AbstractBaseActivity {
 
    private static String TAG = "MainActivity";
