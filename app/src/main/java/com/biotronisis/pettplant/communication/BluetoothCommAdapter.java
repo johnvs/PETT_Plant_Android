@@ -38,8 +38,8 @@ import java.util.UUID;
  * incoming connections, a thread for connecting with a device, and a
  * thread for performing data transmissions when connected.
  */
-public class BluetoothClient {
-    private static final String TAG = "BluetoothClient";
+public class BluetoothCommAdapter {
+    private static final String TAG = "BluetoothCommAdapter";
 
     // Name for the SDP record when creating server socket
     private static final String NAME_INSECURE = "BluetoothChatInsecure";
@@ -62,25 +62,24 @@ public class BluetoothClient {
     public static final int STATE_CONNECTING = 2;    // now initiating an outgoing connection
     public static final int STATE_CONNECTED  = 3;    // now connected to a remote device
 
-    // BluetoothClient Handler message types
+    // BluetoothCommAdapter Handler message types
     public static final int MESSAGE_STATE_CHANGE  = 1;
     public static final int MESSAGE_READ          = 2;
     public static final int MESSAGE_WRITE         = 3;
     public static final int MESSAGE_DEVICE_NAME   = 4;
     public static final int MESSAGE_TOAST         = 5;
 
-    // Key names received from the BluetoothClient Handler
+    // Key names received from the BluetoothCommAdapter Handler
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
 
     /**
      * Constructor. Prepares a new BluetoothChat session.
      *
-     * @param context The UI Activity Context
      * @param handler A Handler to send messages back to the UI Activity
      */
-//    public BluetoothClient(Context context, Handler handler) {
-    public BluetoothClient(Handler handler) {
+//    public BluetoothCommAdapter(Context context, Handler handler) {
+    public BluetoothCommAdapter(Handler handler) {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         connectionState = ConnectionState.NONE;  // STATE_NONE;
         mHandler = handler;
@@ -96,7 +95,7 @@ public class BluetoothClient {
         connectionState = state;
 
         // Give the new state to the Handler so the UI Activity can update
-        mHandler.obtainMessage(MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
+        mHandler.obtainMessage(MESSAGE_STATE_CHANGE, state.getId(), -1).sendToTarget();
     }
 
     /**
@@ -272,7 +271,7 @@ public class BluetoothClient {
         mHandler.sendMessage(msg);
 
         // Start the service over to restart listening mode
-        BluetoothClient.this.start();
+        BluetoothCommAdapter.this.start();
     }
 
     /**
@@ -287,7 +286,7 @@ public class BluetoothClient {
         mHandler.sendMessage(msg);
 
         // Start the service over to restart listening mode
-        BluetoothClient.this.start();
+        BluetoothCommAdapter.this.start();
     }
 
     /**
@@ -336,7 +335,7 @@ public class BluetoothClient {
 
                 // If a connection was accepted
                 if (socket != null) {
-                    synchronized (BluetoothClient.this) {
+                    synchronized (BluetoothCommAdapter.this) {
                         switch (connectionState) {
                             case LISTENING:
                             case CONNECTING:
@@ -425,7 +424,7 @@ public class BluetoothClient {
             }
 
             // Reset the ConnectThread because we're done
-            synchronized (BluetoothClient.this) {
+            synchronized (BluetoothCommAdapter.this) {
                 mConnectThread = null;
             }
 
@@ -487,7 +486,7 @@ public class BluetoothClient {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
                     // Start the service over to restart listening mode
-                    BluetoothClient.this.start();
+                    BluetoothCommAdapter.this.start();
                     break;
                 }
             }
