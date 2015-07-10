@@ -20,12 +20,17 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
 import android.util.Log;
 //import com.biotronisis.common.logger.Log;
+
+import com.biotronisis.pettplant.debug.MyDebug;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +43,7 @@ import java.util.UUID;
  * incoming connections, a thread for connecting with a device, and a
  * thread for performing data transmissions when connected.
  */
-public class BluetoothCommAdapter {
+public class BluetoothCommAdapter implements ICommAdapter {
     private static final String TAG = "BluetoothCommAdapter";
 
     // Name for the SDP record when creating server socket
@@ -48,19 +53,29 @@ public class BluetoothCommAdapter {
     private static final UUID MY_UUID_INSECURE =
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    // Member fields
-    private final BluetoothAdapter bluetoothAdapter;
-    private final Handler mHandler;
-    private AcceptThread mInsecureAcceptThread;
-    private ConnectThread mConnectThread;
-    private ConnectedThread mConnectedThread;
-    private ConnectionState connectionState;
+   private final BluetoothAdapter bluetoothAdapter;
+   private final Handler mHandler;
+   private AcceptThread mInsecureAcceptThread;
+   private ConnectThread connectThread;
+   private ConnectedThread connectedThread;
+   private ConnectionState connectionState;
+   private MyBluetoothBroadcastReceiver bluetoothReceiver;
+   private MyBluetoothBroadcastReceiver resetReceiver;
+   private MyBluetoothBroadcastReceiver enableReceiver;
+   private Context meterService;
+   private String currentDeviceAddress;
+   private boolean isActivating;
+   private boolean isReConnecting;
+   private boolean isResetting;
+   private boolean isEnabling;
+   private Boolean waitingForBTState;
+   private Handler backgroundHandler;
 
     // Constants that indicate the current connection state
-    public static final int STATE_NONE       = 0;    // we're doing nothing
-    public static final int STATE_LISTEN     = 1;    // now listening for incoming connections
-    public static final int STATE_CONNECTING = 2;    // now initiating an outgoing connection
-    public static final int STATE_CONNECTED  = 3;    // now connected to a remote device
+//    public static final int STATE_NONE       = 0;    // we're doing nothing
+//    public static final int STATE_LISTEN     = 1;    // now listening for incoming connections
+//    public static final int STATE_CONNECTING = 2;    // now initiating an outgoing connection
+//    public static final int STATE_CONNECTED  = 3;    // now connected to a remote device
 
     // BluetoothCommAdapter Handler message types
     public static final int MESSAGE_STATE_CHANGE  = 1;
@@ -81,7 +96,7 @@ public class BluetoothCommAdapter {
 //    public BluetoothCommAdapter(Context context, Handler handler) {
     public BluetoothCommAdapter(Handler handler) {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        connectionState = ConnectionState.NONE;  // STATE_NONE;
+        connectionState = ConnectionState.NONE;
         mHandler = handler;
     }
 
@@ -109,19 +124,24 @@ public class BluetoothCommAdapter {
      * Start the chat service. Specifically start AcceptThread to begin a
      * session in listening (server) mode. Called by the Activity onResume()
      */
-    public synchronized void start() {
-        Log.d(TAG, "start");
+    @Override
+    public synchronized void activate(String address) {
+       if (MyDebug.LOG) {
+          Log.d(TAG, "bluetooth comm adapter activate");
+       }
 
-        // Cancel any thread attempting to make a connection
-        if (mConnectThread != null) {
-            mConnectThread.cancel();
-            mConnectThread = null;
+       currentDeviceAddress = address;
+
+       // Cancel any thread attempting to make a connection
+        if (connectThread != null) {
+            connectThread.cancel();
+            connectThread = null;
         }
 
         // Cancel any thread currently running a connection
-        if (mConnectedThread != null) {
-            mConnectedThread.cancel();
-            mConnectedThread = null;
+        if (connectedThread != null) {
+            connectedThread.cancel();
+            connectedThread = null;
         }
 
         setState(ConnectionState.LISTENING);
@@ -148,21 +168,21 @@ public class BluetoothCommAdapter {
 
         // Cancel any thread attempting to make a connection
         if (connectionState == ConnectionState.CONNECTING) {
-            if (mConnectThread != null) {
-                mConnectThread.cancel();
-                mConnectThread = null;
+            if (connectThread != null) {
+                connectThread.cancel();
+                connectThread = null;
             }
         }
 
         // Cancel any thread currently running a connection
-        if (mConnectedThread != null) {
-            mConnectedThread.cancel();
-            mConnectedThread = null;
+        if (connectedThread != null) {
+            connectedThread.cancel();
+            connectedThread = null;
         }
 
         // Start the thread to connect with the given device
-        mConnectThread = new ConnectThread(device, secure);
-        mConnectThread.start();
+        connectThread = new ConnectThread(device, secure);
+        connectThread.start();
         setState(ConnectionState.CONNECTING);
     }
 
@@ -177,15 +197,15 @@ public class BluetoothCommAdapter {
         Log.d(TAG, "connected, Socket Type:" + socketType);
 
         // Cancel the thread that completed the connection
-        if (mConnectThread != null) {
-            mConnectThread.cancel();
-            mConnectThread = null;
+        if (connectThread != null) {
+            connectThread.cancel();
+            connectThread = null;
         }
 
         // Cancel any thread currently running a connection
-        if (mConnectedThread != null) {
-            mConnectedThread.cancel();
-            mConnectedThread = null;
+        if (connectedThread != null) {
+            connectedThread.cancel();
+            connectedThread = null;
         }
 
         // Cancel the accept thread because we only want to connect to one device
@@ -199,8 +219,8 @@ public class BluetoothCommAdapter {
         }
 
         // Start the thread to manage the connection and perform transmissions
-        mConnectedThread = new ConnectedThread(socket, socketType);
-        mConnectedThread.start();
+        connectedThread = new ConnectedThread(socket, socketType);
+        connectedThread.start();
 
         // Send the name of the connected device back to the UI Activity
         Message msg = mHandler.obtainMessage(MESSAGE_DEVICE_NAME);
@@ -215,17 +235,18 @@ public class BluetoothCommAdapter {
     /**
      * Stop all threads
      */
-    public synchronized void stop() {
-        Log.d(TAG, "stop");
+    @Override
+    public synchronized void deactivate() {
+        Log.d(TAG, "deactivate");
 
-        if (mConnectThread != null) {
-            mConnectThread.cancel();
-            mConnectThread = null;
+        if (connectThread != null) {
+            connectThread.cancel();
+            connectThread = null;
         }
 
-        if (mConnectedThread != null) {
-            mConnectedThread.cancel();
-            mConnectedThread = null;
+        if (connectedThread != null) {
+            connectedThread.cancel();
+            connectedThread = null;
         }
 
 //        if (mSecureAcceptThread != null) {
@@ -241,7 +262,43 @@ public class BluetoothCommAdapter {
         setState(ConnectionState.NONE);
     }
 
-    /**
+   @Override
+   public void sendBytes(byte[] command) {
+      // Create temporary object
+      ConnectedThread r;
+      // Synchronize a copy of the ConnectedThread
+      synchronized (this) {
+         if (connectionState != ConnectionState.ESTABLISHED) {
+            if (MyDebug.LOG) {
+               Log.e(TAG, "cannot write to a connection that is not established");
+            }
+            return;
+         }
+         r = connectedThread;
+      }
+      // Perform the write unsynchronized
+
+      //String msg = "ULTRAGRAV_TEST";
+      //r.write(msg.getBytes());
+
+      r.write(command);
+
+   }
+
+   @Override
+   public boolean isReConnectingToDevice(String address) {
+      return isReConnecting && address.equals(currentDeviceAddress);
+   }
+
+   private void doDiscovery() {
+      // Request discover from BluetoothAdapter
+      if (MyDebug.LOG) {
+         Log.i(TAG, "Discovery Started");
+      }
+      bluetoothAdapter.startDiscovery();
+   }
+
+   /**
      * Write to the ConnectedThread in an unsynchronized manner
      *
      * @param out The bytes to write
@@ -253,7 +310,7 @@ public class BluetoothCommAdapter {
         // Synchronize a copy of the ConnectedThread
         synchronized (this) {
             if (connectionState != ConnectionState.ESTABLISHED) return;
-            r = mConnectedThread;
+            r = connectedThread;
         }
         // Perform the write unsynchronized
         r.write(out);
@@ -391,7 +448,7 @@ public class BluetoothCommAdapter {
             try {
                 if (!secure) {
                     tmp = device.createInsecureRfcommSocketToServiceRecord(
-                            MY_UUID_INSECURE);
+                          MY_UUID_INSECURE);
                 }
             } catch (IOException e) {
                 Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
@@ -400,7 +457,7 @@ public class BluetoothCommAdapter {
         }
 
         public void run() {
-            Log.i(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
+            Log.i(TAG, "BEGIN connectThread SocketType:" + mSocketType);
             setName("ConnectThread" + mSocketType);
 
             // Always cancel discovery because it will slow down a connection
@@ -425,7 +482,7 @@ public class BluetoothCommAdapter {
 
             // Reset the ConnectThread because we're done
             synchronized (BluetoothCommAdapter.this) {
-                mConnectThread = null;
+                connectThread = null;
             }
 
             // Start the connected thread
@@ -469,7 +526,7 @@ public class BluetoothCommAdapter {
         }
 
         public void run() {
-            Log.i(TAG, "BEGIN mConnectedThread");
+            Log.i(TAG, "BEGIN connectedThread");
             byte[] buffer = new byte[1024];
             int bytes;
 
@@ -517,4 +574,71 @@ public class BluetoothCommAdapter {
             }
         }
     }
+
+   // The BroadcastReceiver that listens for discovered devices and
+   // tries to connect if the most recent BT device is found
+   private class MyBluetoothBroadcastReceiver extends BroadcastReceiver {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+         String action = intent.getAction();
+
+         // When discovery finds a device
+         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+            // Get the BluetoothDevice object from the Intent
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            // If it's the device we were most recently connected to, reconnect with it
+            if (device.getAddress().equals(currentDeviceAddress)) {
+               if (MyDebug.LOG) {
+                  Log.i(TAG, "Found previous BT device; trying to reactivate");
+               }
+               isActivating = true;
+               activate(currentDeviceAddress);
+            }
+            // When discovery is finished, if we have not yet reconnected, continue trying
+         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+            if (MyDebug.LOG) {
+               Log.i(TAG, "Discovery Finished.");
+            }
+            if (isActivating) {
+               // Unregister broadcast listener
+               meterService.unregisterReceiver(bluetoothReceiver);
+               isReConnecting = false;
+            } else if (isReConnecting) {
+               doDiscovery();
+            }
+         } else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+            synchronized (waitingForBTState) {
+               if (MyDebug.LOG) {
+                  Log.i(TAG, "Bluetooth Adapter State has changed. isEnabling: " + isEnabling + ", " +
+                        "isResetting: " + isResetting + ", BT State: " + bluetoothAdapter.getState());
+               }
+               if (isEnabling) {
+                  if (bluetoothAdapter.getState() == BluetoothAdapter.STATE_ON) {
+                     if (MyDebug.LOG) {
+                        Log.i(TAG, "BroadcastReceiver - Enabling BT Adapter - State is ON.");
+                     }
+                     waitingForBTState = false;
+                     // Unregister broadcast listener
+                     meterService.unregisterReceiver(enableReceiver);
+                  }
+               } else if (isResetting) {
+                  if (bluetoothAdapter.getState() == BluetoothAdapter.STATE_OFF) {
+                     if (MyDebug.LOG) {
+                        Log.i(TAG, "BroadcastReceiver - Resetting BT Adapter - State is OFF.");
+                     }
+                     waitingForBTState = false;
+                  } else if (bluetoothAdapter.getState() == BluetoothAdapter.STATE_ON) {
+                     if (MyDebug.LOG) {
+                        Log.i(TAG, "BroadcastReceiver - Resetting BT Adapter - State is ON.");
+                     }
+                     waitingForBTState = false;
+                     // Unregister broadcast listener
+                     meterService.unregisterReceiver(resetReceiver);
+                  }
+               }
+            }
+         }
+      }
+   }
+
 }

@@ -49,7 +49,6 @@ import com.biotronisis.pettplant.activity.AbstractBaseActivity;
 import com.biotronisis.pettplant.activity.DeviceListActivity;
 import com.biotronisis.pettplant.communication.BluetoothCommAdapter;
 import com.biotronisis.pettplant.communication.ConnectionState;
-import com.biotronisis.pettplant.type.ColorMode;
 import com.biotronisis.pettplant.type.EntrainmentMode;
 
 import java.lang.ref.WeakReference;
@@ -159,7 +158,7 @@ public class PettPlantFragment extends Fragment {
    public void onDestroy() {
       super.onDestroy();
       if (bluetoothCommAdapter != null) {
-         bluetoothCommAdapter.stop();
+         bluetoothCommAdapter.deactivate();
       }
    }
 
@@ -473,8 +472,7 @@ public class PettPlantFragment extends Fragment {
     */
    private void connectDevice(Intent data, boolean secure) {
       // Get the device MAC address
-      String address = data.getExtras()
-            .getString(com.biotronisis.pettplant.activity.DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+      String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
       // Get the BluetoothDevice object
       BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
       // Attempt to connect to the device

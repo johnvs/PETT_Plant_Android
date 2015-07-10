@@ -78,19 +78,19 @@ public class CommunicationManager {
 		this.commandIdToWaitingCommands = new HashMap<Byte, AbstractCommand<?>>();
 		this.waitingCommandsToTimeouts = new HashMap<AbstractCommand<?>, TimeoutBackgroundRunnable>();
 		this.endCommandIdToStartCommandId = new HashMap<Byte, Byte>();
-		
-        // Test
+
+		// Test
 //		switch (CommunicationType.TEST) {
-        switch (communicationParams.getCommunicationType()) {
+		switch (communicationParams.getCommunicationType()) {
 			case MOCK:
 				this.commAdapter = new MockCommAdapter(commResponseListener);
 				break;
-            case BLUETOOTH:
-                this.commAdapter = new BluetoothCommAdapter(commResponseListener, this.pettPlantService);
-                break;
-            case USB:
-                this.commAdapter = new UsbCommAdapter(commResponseListener, this.pettPlantService);
-                break;
+			case BLUETOOTH:
+				this.commAdapter = new BluetoothCommAdapter(commResponseListener, this.pettPlantService);
+				break;
+			case USB:
+				this.commAdapter = new UsbCommAdapter(commResponseListener, this.pettPlantService);
+				break;
 			default:
 //			    ErrorHandler errorHandler = ErrorHandler.getInstance(this.pettPlantService);
 //			    errorHandler.logError(Level.WARNING, "CommunicationManager.CommunicationManager(): " +
