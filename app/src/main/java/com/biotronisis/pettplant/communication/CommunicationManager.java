@@ -13,7 +13,7 @@ import com.biotronisis.pettplant.communication.transfer.AbstractResponse;
 import com.biotronisis.pettplant.communication.transfer.EmptyResponse;
 import com.biotronisis.pettplant.communication.transfer.ResponseCallback;
 import com.biotronisis.pettplant.debug.MyDebug;
-//import com.biotronisis.pettplant.file.ErrorHandler;
+import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.model.CommunicationParams;
 import com.biotronisis.pettplant.service.PettPlantService;
 import com.biotronisis.pettplant.type.CommunicationType;
@@ -88,9 +88,9 @@ public class CommunicationManager {
 			case BLUETOOTH:
 				this.commAdapter = new BluetoothCommAdapter(commResponseListener, this.pettPlantService);
 				break;
-			case USB:
-				this.commAdapter = new UsbCommAdapter(commResponseListener, this.pettPlantService);
-				break;
+//			case USB:
+//				this.commAdapter = new UsbCommAdapter(commResponseListener, this.pettPlantService);
+//				break;
 			default:
 //			    ErrorHandler errorHandler = ErrorHandler.getInstance(this.pettPlantService);
 //			    errorHandler.logError(Level.WARNING, "CommunicationManager.CommunicationManager(): " +
@@ -105,9 +105,9 @@ public class CommunicationManager {
 	            commAdapter.isReConnectingToDevice(address));
 	}
 	
-    public boolean isUsbDeviceAttached(PettPlantService meter) {
-        return UsbCommAdapter.isUsbDeviceAttached(meter);
-    }
+//    public boolean isUsbDeviceAttached(PettPlantService meter) {
+//        return UsbCommAdapter.isUsbDeviceAttached(meter);
+//    }
     
 	public void connect() {            // throws Exception {
         if (MyDebug.LOG) {
