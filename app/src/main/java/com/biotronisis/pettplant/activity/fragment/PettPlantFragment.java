@@ -173,7 +173,7 @@ public class PettPlantFragment extends Fragment {
          // Only if the state is STATE_NONE, do we know that we haven't started already
          if (bluetoothCommAdapter.getState() == ConnectionState.NONE) {
             // Start the Bluetooth client
-            bluetoothCommAdapter.start();
+            bluetoothCommAdapter.activate();
          }
       }
    }
