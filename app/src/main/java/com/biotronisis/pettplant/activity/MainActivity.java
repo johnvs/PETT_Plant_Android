@@ -31,6 +31,10 @@ public class MainActivity extends AbstractBaseActivity {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
 
+      // Create a new Error Handler object in case the application was stopped
+      // but not destroyed, in which case, MyApplication.onCreate will not be executed.
+      ErrorHandler.getInstance(this.getApplicationContext());
+
       if (savedInstanceState == null) {
          FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
          PettPlantFragment fragment = new PettPlantFragment();
