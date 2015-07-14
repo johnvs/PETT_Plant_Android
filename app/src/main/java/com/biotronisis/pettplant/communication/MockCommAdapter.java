@@ -4,11 +4,11 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
-import com.zlscorp.ultragrav.communication.transfer.AlternateBreakCommand;
-import com.zlscorp.ultragrav.communication.transfer.BeginIntervalReadingCommand;
-import com.zlscorp.ultragrav.communication.transfer.EndIntervalReadingCommand;
-import com.zlscorp.ultragrav.communication.transfer.GetPwmDutyCycleCommand;
-import com.zlscorp.ultragrav.debug.MyDebug;
+//import com.zlscorp.ultragrav.communication.transfer.AlternateBreakCommand;
+//import com.zlscorp.ultragrav.communication.transfer.BeginIntervalReadingCommand;
+//import com.zlscorp.ultragrav.communication.transfer.EndIntervalReadingCommand;
+//import com.zlscorp.ultragrav.communication.transfer.GetPwmDutyCycleCommand;
+import com.biotronisis.pettplant.debug.MyDebug;
 
 public class MockCommAdapter implements ICommAdapter {
 	
@@ -86,6 +86,7 @@ public class MockCommAdapter implements ICommAdapter {
 			new RuntimeException("connection not active");
 		}
 		
+/*
 		if (command[1] == BeginIntervalReadingCommand.COMMAND_ID) {
 			datasetRunnable = new DatasetRunnable();
 			commHandler.postDelayed(datasetRunnable, 1000);
@@ -125,6 +126,7 @@ public class MockCommAdapter implements ICommAdapter {
             }, 500);
 		    
 		}
+*/
 	}
 	
 	@Override

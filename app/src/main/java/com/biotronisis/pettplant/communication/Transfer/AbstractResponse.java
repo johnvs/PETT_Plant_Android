@@ -24,7 +24,7 @@ public abstract class AbstractResponse implements Serializable {
 		return myInt;
 	}
 	
-/*
+
 	public boolean validateChecksum(byte[] bytes) {
 		boolean result = true;
 		
@@ -40,18 +40,17 @@ public abstract class AbstractResponse implements Serializable {
 		}
 		
 		byte checksum = 0;
-		for (int i=0; i<bytes.length-1; i++) {
+		for (int i = 0; i < bytes.length - 1; i++) {
 			checksum ^= bytes[i];
 		}
 		
-		if (checksum != bytes[bytes.length-1]) {
+		if (checksum != bytes[bytes.length - 1]) {
 			result = false;
 //			return false;
 		}
 		return result;
 //		return true;
 	}
-*/
 
 }
 

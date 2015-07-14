@@ -16,6 +16,7 @@ import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.communication.CommunicationErrorType;
 import com.biotronisis.pettplant.communication.ConnectionState;
 import com.biotronisis.pettplant.communication.ICommAdapter;
+import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.persist.CommunicationParamsDao;
 import com.biotronisis.pettplant.communication.CommunicationManager;
 import com.biotronisis.pettplant.communication.CommunicationManager.CommunicationManagerListener;
@@ -70,14 +71,14 @@ public class PettPlantService extends Service {
       // save the ref to the singleton managed by android
       instance = this;
 
-//      ErrorHandler errorHandler = ErrorHandler.getInstance();
-//      if (errorHandler == null) {
-//         if (MyDebug.LOG) {
-//            Log.d(TAG, "MeterService.onCreate() - errorHandler is null");
-//         }
-//      } else {
-//         errorHandler.logError(Level.INFO, "MeterService.onCreate().", 0, 0);
-//      }
+      ErrorHandler errorHandler = ErrorHandler.getInstance();
+      if (errorHandler == null) {
+         if (MyDebug.LOG) {
+            Log.d(TAG, "MeterService.onCreate() - errorHandler is null");
+         }
+      } else {
+         errorHandler.logError(Level.INFO, "MeterService.onCreate().", 0, 0);
+      }
       if (MyDebug.LOG) {
          Log.d(TAG, "PettPlantService.onCreate() - Entered");
       }

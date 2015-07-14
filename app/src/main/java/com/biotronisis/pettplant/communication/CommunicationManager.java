@@ -207,10 +207,10 @@ public class CommunicationManager {
 				responseIdToWaitingCommands.put(responseId, command);
 				
 				// check if this command starts an interval
-				if (command.isInterval()) {
-					endCommandIdToStartCommandId.put(command.getIntervalEndCommandId(), commandId);
-					justEndedInterval = false;
-				}
+//				if (command.isInterval()) {
+//					endCommandIdToStartCommandId.put(command.getIntervalEndCommandId(), commandId);
+//					justEndedInterval = false;
+//				}
 				
 				TimeoutBackgroundRunnable timeout = new TimeoutBackgroundRunnable(command);
 				waitingCommandsToTimeouts.put(command, timeout);
@@ -307,13 +307,13 @@ public class CommunicationManager {
 		
 		uiHandler.post(new ResponseCallbackUiRunnable(waitingCommand.getResponseCallback(), response));
 		
-		if (waitingCommand.isInterval()) {
-			// is interval, expecting another, so reset the timeout
-			backgroundHandler.postDelayed(timeout, waitingCommand.getResponseTimeoutMs());
-		} else {
+//		if (waitingCommand.isInterval()) {
+//			// is interval, expecting another, so reset the timeout
+//			backgroundHandler.postDelayed(timeout, waitingCommand.getResponseTimeoutMs());
+//		} else {
 			commandIdToWaitingCommands.remove(waitingCommand.getCommandId());
 			responseIdToWaitingCommands.remove(waitingCommand.getResponseId());
-		}
+//		}
 	}
 	
 	/**
