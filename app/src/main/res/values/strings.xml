@@ -98,4 +98,8 @@
     <string name="generic_error_message">An unexpected error has occurred. Please call ZLS Tech Support
         and send them the Errors.log file.</string>
 
+    <string name="bluetooth_adapter_error_title">Bluetooth Adapter Error</string>
+    <string name="bluetooth_adapter_error_message">There is an error with this device\'s bluetooth
+        adapter.</string>
+
 </resources>

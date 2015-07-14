@@ -23,19 +23,25 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Message;
 
 import android.util.Log;
 //import com.biotronisis.common.logger.Log;
 
+import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.debug.MyDebug;
+import com.biotronisis.pettplant.file.ErrorHandler;
+import com.biotronisis.pettplant.service.PettPlantService;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
+import java.util.logging.Level;
 
 /**
  * This class does all the work for setting up and managing Bluetooth
@@ -53,8 +59,10 @@ public class BluetoothCommAdapter implements ICommAdapter {
     private static final UUID MY_UUID_INSECURE =
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+   private CommAdapterListener listener;
+
    private final BluetoothAdapter bluetoothAdapter;
-   private final Handler mHandler;
+//   private final Handler mHandler;
    private AcceptThread mInsecureAcceptThread;
    private ConnectThread connectThread;
    private ConnectedThread connectedThread;
@@ -91,26 +99,47 @@ public class BluetoothCommAdapter implements ICommAdapter {
     /**
      * Constructor. Prepares a new BluetoothChat session.
      *
-     * @param handler A Handler to send messages back to the UI Activity
+     * @param listener
+     * @param pettPlantService
      */
 //    public BluetoothCommAdapter(Context context, Handler handler) {
-    public BluetoothCommAdapter(Handler handler) {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        connectionState = ConnectionState.NONE;
-        mHandler = handler;
+//    public BluetoothCommAdapter(Handler handler) {
+    public BluetoothCommAdapter(CommAdapterListener listener, PettPlantService pettPlantService) {
+       bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+       connectionState = ConnectionState.NONE;
+       this.listener = listener;
+       this.meterService = meterService;
+       isReConnecting = false;
+       isResetting = false;
+
+       HandlerThread backgroundThread = new HandlerThread("meter-service");
+       backgroundThread.start();
+       this.backgroundHandler = new Handler(backgroundThread.getLooper());
+//       mHandler = handler;
     }
 
     /**
      * Set the current state of the chat connection
      *
-     * @param state An integer defining the current connection state
+     * @param newState An integer defining the current connection state
      */
-    private synchronized void setState(ConnectionState state) {
-        Log.d(TAG, "setState() " + connectionState + " -> " + state);
-        connectionState = state;
+    private synchronized void setState(ConnectionState newState) {
+//        Log.d(TAG, "setState() " + connectionState + " -> " + state);
+//        connectionState = state;
+//
+//        // Give the new state to the Handler so the UI Activity can update
+//        mHandler.obtainMessage(MESSAGE_STATE_CHANGE, state.getId(), -1).sendToTarget();
 
-        // Give the new state to the Handler so the UI Activity can update
-        mHandler.obtainMessage(MESSAGE_STATE_CHANGE, state.getId(), -1).sendToTarget();
+       ConnectionState oldState = connectionState;
+       connectionState = newState;
+
+       if (MyDebug.LOG) {
+          Log.d(TAG, "setState() " + oldState + " -> " + newState);
+       }
+
+       if (newState != oldState && listener != null) {
+          listener.onConnectionState(newState);
+       }
     }
 
     /**
@@ -194,9 +223,11 @@ public class BluetoothCommAdapter implements ICommAdapter {
      */
     public synchronized void connected(BluetoothSocket socket, BluetoothDevice
             device, final String socketType) {
-        Log.d(TAG, "connected, Socket Type:" + socketType);
+       if (MyDebug.LOG) {
+          Log.d(TAG, "connected, Socket Type:" + socketType);
+       }
 
-        // Cancel the thread that completed the connection
+       // Cancel the thread that completed the connection
         if (connectThread != null) {
             connectThread.cancel();
             connectThread = null;
@@ -213,26 +244,36 @@ public class BluetoothCommAdapter implements ICommAdapter {
 //            mSecureAcceptThread.cancel();
 //            mSecureAcceptThread = null;
 //        }
-        if (mInsecureAcceptThread != null) {
-            mInsecureAcceptThread.cancel();
-            mInsecureAcceptThread = null;
-        }
+//        if (mInsecureAcceptThread != null) {
+//            mInsecureAcceptThread.cancel();
+//            mInsecureAcceptThread = null;
+//        }
 
         // Start the thread to manage the connection and perform transmissions
         connectedThread = new ConnectedThread(socket, socketType);
         connectedThread.start();
 
         // Send the name of the connected device back to the UI Activity
-        Message msg = mHandler.obtainMessage(MESSAGE_DEVICE_NAME);
-        Bundle bundle = new Bundle();
-        bundle.putString(DEVICE_NAME, device.getName());
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+//        Message msg = mHandler.obtainMessage(MESSAGE_DEVICE_NAME);
+//        Bundle bundle = new Bundle();
+//        bundle.putString(DEVICE_NAME, device.getName());
+//        msg.setData(bundle);
+//        mHandler.sendMessage(msg);
 
-        setState(ConnectionState.ESTABLISHED);
+       // Send the name of the connected device back to the UI Activity
+       if (MyDebug.LOG) {
+          Log.d(TAG, "connection established");
+       }
+
+       setState(ConnectionState.ESTABLISHED);
     }
 
-    /**
+   @Override
+   public ConnectionState getConnectionState() {
+      return connectionState;
+   }
+
+   /**
      * Stop all threads
      */
     @Override
@@ -321,14 +362,21 @@ public class BluetoothCommAdapter implements ICommAdapter {
      */
     private void connectionFailed() {
         // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
-        Bundle bundle = new Bundle();
-        bundle.putString(TOAST, "Unable to connect device");
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+//        Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
+//        Bundle bundle = new Bundle();
+//        bundle.putString(TOAST, "Unable to connect device");
+//        msg.setData(bundle);
+//        mHandler.sendMessage(msg);
+//
+//        // Start the service over to restart listening mode
+//        BluetoothCommAdapter.this.start();
 
-        // Start the service over to restart listening mode
-        BluetoothCommAdapter.this.start();
+       // Send a failure message back to the Activity
+       if (MyDebug.LOG) {
+          Log.w(TAG, "connection failed");
+       }
+       setState(ConnectionState.FAILED);
+
     }
 
     /**
@@ -336,17 +384,54 @@ public class BluetoothCommAdapter implements ICommAdapter {
      */
     private void connectionLost() {
         // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
-        Bundle bundle = new Bundle();
-        bundle.putString(TOAST, "Device connection was lost");
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+//        Message msg = mHandler.obtainMessage(MESSAGE_TOAST);
+//        Bundle bundle = new Bundle();
+//        bundle.putString(TOAST, "Device connection was lost");
+//        msg.setData(bundle);
+//        mHandler.sendMessage(msg);
+//
+//        // Start the service over to restart listening mode
+//        BluetoothCommAdapter.this.start();
 
-        // Start the service over to restart listening mode
-        BluetoothCommAdapter.this.start();
+       // Send a failure message back to the Activity
+       if (MyDebug.LOG) {
+          Log.w(TAG, "connection lost");
+       }
+       setState(ConnectionState.NONE);
+
+       // Attempt to reconnect with the same BT device
+       reConnect();
+
     }
 
-    /**
+   /**
+    * Auto-reconnect
+    * If the BT connection is lost, try to reconnect
+    * This procedure is cancelled in the following cases:
+    * 1 - A connection is reestablished
+    * 2 - The user initiates a connection with a different BT device
+    * 3 - A USB connection is established
+    */
+   private void reConnect() {
+
+      bluetoothReceiver = new MyBluetoothBroadcastReceiver();
+
+      // Register for broadcasts when a device is discovered
+      IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+      meterService.registerReceiver(bluetoothReceiver, filter);
+
+      // Register for broadcasts when discovery has finished
+      filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+      meterService.registerReceiver(bluetoothReceiver, filter);
+
+      connectedThread = null;
+      isActivating = false;
+      isReConnecting = true;
+
+      doDiscovery();
+   }
+
+   /**
      * This thread runs while listening for incoming connections. It behaves
      * like a server-side client. It runs until a connection is accepted
      * (or until cancelled).
@@ -503,12 +588,16 @@ public class BluetoothCommAdapter implements ICommAdapter {
      * It handles all incoming and outgoing transmissions.
      */
     private class ConnectedThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final InputStream mmInStream;
-        private final OutputStream mmOutStream;
+       private final BluetoothSocket mmSocket;
+       private final InputStream mmInStream;
+       private final OutputStream mmOutStream;
+       private boolean cancelled = false;
 
         public ConnectedThread(BluetoothSocket socket, String socketType) {
-            Log.d(TAG, "create ConnectedThread: " + socketType);
+//            Log.d(TAG, "create ConnectedThread: " + socketType);
+           if (MyDebug.LOG) {
+              Log.d(TAG, "create ConnectedThread: " + socketType);
+           }
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
@@ -518,7 +607,16 @@ public class BluetoothCommAdapter implements ICommAdapter {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
             } catch (IOException e) {
-                Log.e(TAG, "temp sockets not created", e);
+//                Log.e(TAG, "temp sockets not created", e);
+
+               if (MyDebug.LOG) {
+                  Log.e(TAG, "temp sockets not created", e);
+               }
+               ErrorHandler errorHandler = ErrorHandler.getInstance();
+               errorHandler.logError(Level.WARNING, "BluetoothCommAdapter$ConnectedThread." +
+                           "ConnectedThread(): Could not get socket stream - " + e,
+                     R.string.bluetooth_adapter_error_title,
+                     R.string.bluetooth_adapter_error_message);
             }
 
             mmInStream = tmpIn;
@@ -526,25 +624,44 @@ public class BluetoothCommAdapter implements ICommAdapter {
         }
 
         public void run() {
-            Log.i(TAG, "BEGIN connectedThread");
+           if (MyDebug.LOG) {
+              Log.i(TAG, "BEGIN mConnectedThread");
+           }
             byte[] buffer = new byte[1024];
             int bytes;
 
             // Keep listening to the InputStream while connected
-            while (true) {
+            while (!cancelled) {
                 try {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
 
-                    // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
-                            .sendToTarget();
+//                    // Send the obtained bytes to the UI Activity
+//                    mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
+//                            .sendToTarget();
+//                } catch (IOException e) {
+//                    Log.e(TAG, "disconnected", e);
+//                    connectionLost();
+//                    // Start the service over to restart listening mode
+//                    BluetoothCommAdapter.this.start();
+//                    break;
+//                }
+
+                   byte[] response = new byte[bytes];
+                   System.arraycopy(buffer, 0, response, 0, bytes);
+
+                   if (listener != null) {
+                      listener.onReceiveBytes(response);
+                   }
                 } catch (IOException e) {
-                    Log.e(TAG, "disconnected", e);
-                    connectionLost();
-                    // Start the service over to restart listening mode
-                    BluetoothCommAdapter.this.start();
-                    break;
+                   if (!cancelled) {
+                      if (MyDebug.LOG) {
+                         Log.e(TAG, "connected thread read error", e);
+                      }
+                      connectionLost();
+                      cancel();
+                   }
+                   break;
                 }
             }
         }
@@ -559,19 +676,39 @@ public class BluetoothCommAdapter implements ICommAdapter {
                 mmOutStream.write(buffer);
 
                 // Share the sent message back to the UI Activity
-                mHandler.obtainMessage(MESSAGE_WRITE, -1, -1, buffer)
-                        .sendToTarget();
+//                mHandler.obtainMessage(MESSAGE_WRITE, -1, -1, buffer).sendToTarget();
             } catch (IOException e) {
-                Log.e(TAG, "Exception during write", e);
+//                Log.e(TAG, "Exception during write", e);
+
+               if (!cancelled) {
+                  if (MyDebug.LOG) {
+                     Log.e(TAG, "connected thread write error", e);
+                  }
+                  connectionLost();
+               }
             }
         }
 
         public void cancel() {
-            try {
-                mmSocket.close();
-            } catch (IOException e) {
-                Log.e(TAG, "close() of connect socket failed", e);
-            }
+//            try {
+//                mmSocket.close();
+//            } catch (IOException e) {
+//                Log.e(TAG, "close() of connect socket failed", e);
+//            }
+
+           cancelled = true;
+           try {
+              mmSocket.close();
+           } catch (IOException e) {
+              if (MyDebug.LOG) {
+                 Log.e(TAG, "close() of connect socket failed", e);
+              }
+              ErrorHandler errorHandler = ErrorHandler.getInstance();
+              errorHandler.logError(Level.WARNING, "BluetoothCommAdapter$ConnectedThread." +
+                          "cancel(): Could not close the socket - " + e,
+                    R.string.bluetooth_adapter_error_title,
+                    R.string.bluetooth_adapter_error_message);
+           }
         }
     }
 
