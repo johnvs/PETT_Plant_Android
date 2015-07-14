@@ -1,9 +1,9 @@
 package com.biotronisis.pettplant.file;
 
-import com.zlscorp.ultragrav.R;
-import com.zlscorp.ultragrav.activity.AbstractBaseActivity;
-import com.zlscorp.ultragrav.debug.MyDebug;
-import com.zlscorp.ultragrav.meter.MeterService;
+import com.biotronisis.pettplant.R;
+import com.biotronisis.pettplant.activity.AbstractBaseActivity;
+import com.biotronisis.pettplant.debug.MyDebug;
+import com.biotronisis.pettplant.service.PettPlantService;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -32,9 +32,9 @@ public class ErrorHandler {
     public static final String NO_ALERT = "none";
     public static final String USE_GENERIC_MSG = "generic";
     
-    public static final String ERROR_HANDLING_SERVICE_EVENT = "meter service event";
-    public static final String ERROR_HANDLING_SERVICE_CREATED = "meter service created";
-    public static final String ERROR_HANDLING_SERVICE_DESTROYED = "meter service destroyed";
+    public static final String ERROR_HANDLING_SERVICE_EVENT = "pett plant service event";
+    public static final String ERROR_HANDLING_SERVICE_CREATED = "pett plant service created";
+    public static final String ERROR_HANDLING_SERVICE_DESTROYED = "pett plant service destroyed";
 
     private static ErrorHandler instance;
 
@@ -215,18 +215,18 @@ public class ErrorHandler {
                     if (level == Level.WARNING) {
                         dialog.dismiss();
                     } else if (level == Level.SEVERE) {
-                        // Stop the meter service
-                        boolean wasServiceStopped = mContext.stopService(MeterService.createIntent(mContext));
+                        // Stop the pett plant service
+                        boolean wasServiceStopped = mContext.stopService(PettPlantService.createIntent(mContext));
                         if (wasServiceStopped) {
                             // We just stopped the service. Listen for the broadcast of it's ultimate demise.
-                            LocalBroadcastManager.getInstance(mContext).registerReceiver(meterEventReceiver,
-                                    new IntentFilter(MeterService.METER_SERVICE_EVENT));
+                            LocalBroadcastManager.getInstance(mContext).registerReceiver(pettPlantEventReceiver,
+                                    new IntentFilter(PettPlantService.PETT_PLANT_SERVICE_EVENT));
                         } else {
                             // The service was already stopped somewhere else, so do here what we would 
                             // be doing in the receiver 
                             if (instance != null) {
                                 instance.logError(Level.INFO, "ErrorHandler.logError - " +
-                                        "MeterService has been destroyed.");
+                                        "Pett plantService has been destroyed.");
                                 instance.onDestroy();
                             }
                             throw new RuntimeException("An unexpected error has occurred.");
@@ -244,7 +244,7 @@ public class ErrorHandler {
         }
     }
     
-    private BroadcastReceiver meterEventReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver pettPlantEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 
@@ -254,18 +254,18 @@ public class ErrorHandler {
                 Log.d("receiver", "Got message: " + message);
             }
 
-            if (message.equals(MeterService.METER_SERVICE_CREATED)) {
-            } else if  (message.equals(MeterService.METER_SERVICE_DESTROYED)) {
+            if (message.equals(PettPlantService.PETT_PLANT_SERVICE_CREATED)) {
+            } else if  (message.equals(PettPlantService.PETT_PLANT_SERVICE_DESTROYED)) {
                 
-                // The meter service has stopped, after a fatal exception, so close the log file and
+                // The pett plant service has stopped, after a fatal exception, so close the log file and
                 // throw a RTE to kill the app.
                 if (MyDebug.LOG) {
-                    Log.d(TAG, "MeterService has been destroyed.");
+                    Log.d(TAG, "pettPlantService has been destroyed.");
                 }
 
                 if (instance != null) {
-                    instance.logError(Level.INFO, "ErrorHandler.meterEventReceiver - " +
-                    		"MeterService has been destroyed.");
+                    instance.logError(Level.INFO, "ErrorHandler.pettPlantEventReceiver - " +
+                    		"pettPlantService has been destroyed.");
                     instance.onDestroy();
                 }
                 throw new RuntimeException("An unexpected error has occurred.");
