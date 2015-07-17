@@ -9,8 +9,7 @@ import android.view.MenuItem;
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.fragment.PettPlantFragment;
 
-import android.support.v4.view.ViewPager;
-import com.viewpagerindicator.TabPageIndicator;
+import com.biotronisis.pettplant.file.ErrorHandler;
 
 public class MainActivity extends AbstractBaseActivity {
 
