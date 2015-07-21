@@ -79,7 +79,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
    private Button colorRunOffButton;
    private Button colorPauseResumeButton;
 
-//   private PettPlantParams pettPlantParams;
+   private PettPlantParams pettPlantParams;
 
 //   private ArrayAdapter<CharSequence> entrainmentAdapter;
 //   private ArrayAdapter<CharSequence> colorModeAdapter;
@@ -116,16 +116,33 @@ public class PettPlantFragment extends AbstractBaseFragment {
    public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
 
-      // Check whether we're recreating a previously destroyed instance
-      if (savedInstanceState != null) {
-         // Restore value of members from saved state
-         lastEntrainmentPos = savedInstanceState.getInt(STATE_ENTRAINMENT_MODE);
-         lastColorModePos = savedInstanceState.getInt(STATE_COLOR_MODE);
-      } else {
-         // Initialize members with default values for a new instance
-         lastEntrainmentPos = 0;
-         lastColorModePos = 0;
-      }
+   }
+
+   @Override
+   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                            @Nullable Bundle savedInstanceState) {
+      View theView = inflater.inflate(R.layout.fragment_pett_plant, container, false);
+      return theView;
+   }
+
+   @Override
+   public void onStart() {
+      super.onStart();
+      // If BT is not on, request that it be enabled.
+      // setupBluetoothClient() will then be called during onActivityResult
+//      if (!mBluetoothAdapter.isEnabled()) {
+//         Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//         startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+//         // Otherwise, setup the chat session
+//      } else if (bluetoothCommAdapter == null) {
+//         //Todo
+////         setupBluetoothClient();
+//      }
+   }
+
+   @Override
+   public void onResume() {
+      super.onResume();
 
       setHasOptionsMenu(true);
       // Get local Bluetooth adapter
@@ -139,34 +156,6 @@ public class PettPlantFragment extends AbstractBaseFragment {
       }
 
       AbstractBaseActivity.fragmentName = this.getClass().getSimpleName();
-   }
-
-   @Override
-   public void onStart() {
-      super.onStart();
-      // If BT is not on, request that it be enabled.
-      // setupBluetoothClient() will then be called during onActivityResult
-      if (!mBluetoothAdapter.isEnabled()) {
-         Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-         startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-         // Otherwise, setup the chat session
-      } else if (bluetoothCommAdapter == null) {
-         //Todo
-//         setupBluetoothClient();
-      }
-   }
-
-   @Override
-   public void onDestroy() {
-      super.onDestroy();
-      if (bluetoothCommAdapter != null) {
-         bluetoothCommAdapter.deactivate();
-      }
-   }
-
-   @Override
-   public void onResume() {
-      super.onResume();
 
       // Performing this check in onResume() covers the case in which BT was
       // not enabled during onStart(), so we were paused to enable it...
@@ -182,8 +171,16 @@ public class PettPlantFragment extends AbstractBaseFragment {
    }
 
    @Override
+   public void onDestroy() {
+      super.onDestroy();
+      if (bluetoothCommAdapter != null) {
+         bluetoothCommAdapter.deactivate();
+      }
+   }
+
+   @Override
    public void populateData() {
-      PettPlantParams pettPlantParams = new PettPlantParams(getActivity());
+      pettPlantParams = new PettPlantParams(getActivity());
 
       entrainmentSpinner.setSelection(pettPlantParams.getEntrainmentSequence().getValue());
       entrainRunStopButton.setText(pettPlantParams.getEntrainmentRunButton());
@@ -198,18 +195,38 @@ public class PettPlantFragment extends AbstractBaseFragment {
    }
 
    @Override
-   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-                            @Nullable Bundle savedInstanceState) {
-      return inflater.inflate(R.layout.fragment_pett_plant, container, false);
+   public void persistData() {
+      pettPlantParams.setEntrainmentSequence(EntrainmentMode.getEntrainmentMode(entrainmentSpinner.getSelectedItemPosition()));
+      pettPlantParams.setEntrainmentRunButton(entrainRunStopButton.getText().toString());
+      pettPlantParams.setColorModePauseButton(entrainPauseResumeButton.getText().toString());
+      pettPlantParams.setEntrainmentLoopCheckbox(loopCheckbox.isChecked());
+
+      pettPlantParams.setColorMode(ColorMode.getColorMode(colorModeSpinner.getSelectedItemPosition()));
+      pettPlantParams.setColorModeRunButton(colorRunOffButton.getText().toString());
+      pettPlantParams.setColorModePauseButton(colorPauseResumeButton.getText().toString());
+      pettPlantParams.setColorModeSpeed(colorModeSeekbar.getProgress());
+
+      pettPlantParams.saveData();
    }
 
    @Override
    public void setupView(View view, Bundle savedInstanceState) {
 
-   }
+      // Check whether we're recreating a previously destroyed instance
+      if (savedInstanceState != null) {
+         // Restore value of members from saved state
+         lastEntrainmentPos = savedInstanceState.getInt(STATE_ENTRAINMENT_MODE);
+         lastColorModePos = savedInstanceState.getInt(STATE_COLOR_MODE);
+      } else {
+         // Initialize members with default values for a new instance
+         lastEntrainmentPos = 0;
+         lastColorModePos = 0;
+      }
 
-   @Override
-   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+//   }
+//
+//   @Override
+//   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
       entrainmentSpinner = (Spinner) view.findViewById(R.id.spinner_entrainment);
       ArrayAdapter<CharSequence> entrainmentAdapter = ArrayAdapter.createFromResource(getActivity(),
             R.array.entrainment_array,

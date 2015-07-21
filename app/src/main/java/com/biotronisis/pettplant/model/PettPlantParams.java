@@ -3,9 +3,13 @@ package com.biotronisis.pettplant.model;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.biotronisis.pettplant.R;
+import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.persist.AppParams;
 import com.biotronisis.pettplant.type.ColorMode;
 import com.biotronisis.pettplant.type.EntrainmentMode;
+
+import java.util.logging.Level;
 
 public class PettPlantParams {
 
@@ -19,6 +23,8 @@ public class PettPlantParams {
 	public static final String ENTRAINMENT_RUN_BUTTON = "entrainmentRunButton";
 	public static final String ENTRAINMENT_PAUSE_BUTTON = "entrainmentPauseButton";
 
+   private SharedPreferences appParams;
+
 	private ColorMode colorMode;
 	private int colorModeSpeed;
 	private String colorModeRunButton;
@@ -29,7 +35,7 @@ public class PettPlantParams {
 	private String entrainmentPauseButton;
 
 	public PettPlantParams(Context context) {
-		SharedPreferences appParams = context.getSharedPreferences(AppParams.PETT_PLANT_DATA_FILE, 0);
+		appParams = context.getSharedPreferences(AppParams.PETT_PLANT_DATA_FILE, 0);
 
 		colorMode = ColorMode.getColorMode(appParams.getInt(COLOR_MODE, ColorMode.SOUND_RESPONSIVE.getValue()));
 		colorModeSpeed = appParams.getInt(COLOR_MODE_SPEED, ColorMode.SPEED_DEFAULT);
@@ -48,7 +54,32 @@ public class PettPlantParams {
 		return colorMode;
 	}
 
-	public void setColorMode(ColorMode colorMode) {
+   public void saveData() {
+
+      SharedPreferences.Editor editor = appParams.edit();
+
+      editor.putInt(COLOR_MODE, colorMode.getValue());
+      editor.putInt(COLOR_MODE_SPEED, colorModeSpeed);
+      editor.putString(COLOR_MODE_RUN_BUTTON, colorModeRunButton);
+      editor.putString(COLOR_MODE_PAUSE_BUTTON, colorModePauseButton);
+
+      editor.putInt(ENTRAINMENT_SEQUENCE, entrainmentSequence.getValue());
+      editor.putString(ENTRAINMENT_RUN_BUTTON, entrainmentRunButton);
+      editor.putString(ENTRAINMENT_PAUSE_BUTTON, entrainmentPauseButton);
+      editor.putBoolean(ENTRAINMENT_LOOP_CHECKBOX, entrainmentLoopCheckbox);
+
+      // Commit the edits!
+      boolean success = editor.commit();
+      if (!success) {
+         ErrorHandler errorHandler = ErrorHandler.getInstance();
+         errorHandler.logError(Level.WARNING, "PettPlantParams.saveData(): " +
+                     "Can't update pettPlantParams - ",
+               R.string.pett_plant_params_persist_error_title,
+               R.string.pett_plant_params_persist_error_message);
+      }
+   }
+
+   public void setColorMode(ColorMode colorMode) {
 		this.colorMode = colorMode;
 	}
 

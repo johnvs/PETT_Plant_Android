@@ -3,15 +3,21 @@ package com.biotronisis.pettplant.model;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.biotronisis.pettplant.R;
+import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.persist.AppParams;
 import com.biotronisis.pettplant.type.CommunicationType;
 
+import java.util.logging.Level;
+
 public class CommunicationParams  {
 
-	public static final String NAME = "name";
+	public static final String COMM_NAME = "name";
 	public static final String COMMUNICATION_TYPE = "communicationType";
-   public static final String ADDRESS = "address";
+   public static final String COMM_ADDRESS = "address";
    public static final String NONE = "none";
+
+	private SharedPreferences appParams;
 
 	private String name;
 	private CommunicationType communicationType;
@@ -19,11 +25,30 @@ public class CommunicationParams  {
 
 	public CommunicationParams(Context context) {
       SharedPreferences appParams = context.getSharedPreferences(AppParams.PETT_PLANT_DATA_FILE, 0);
-      name = appParams.getString(NAME, NONE);
-      address = appParams.getString(ADDRESS, NONE);
+      name = appParams.getString(COMM_NAME, NONE);
+      address = appParams.getString(COMM_ADDRESS, NONE);
       communicationType = CommunicationType.getCommType(appParams.getInt(COMMUNICATION_TYPE, CommunicationType.MOCK.getValue()));
    }
-	
+
+	public void saveData() {
+
+		SharedPreferences.Editor editor = appParams.edit();
+
+		editor.putString(COMM_NAME, name);
+		editor.putString(COMM_ADDRESS, address);
+		editor.putInt(COMMUNICATION_TYPE, communicationType.getValue());
+
+		// Commit the edits!
+		boolean success = editor.commit();
+		if (!success) {
+			ErrorHandler errorHandler = ErrorHandler.getInstance();
+			errorHandler.logError(Level.WARNING, "CommunicationParams.saveData(): " +
+							"Can't update communicationParams - ",
+					R.string.comm_params_persist_error_title,
+					R.string.comm_params_persist_error_message);
+		}
+	}
+
 	public String getName() {
 		return name;
 	}
