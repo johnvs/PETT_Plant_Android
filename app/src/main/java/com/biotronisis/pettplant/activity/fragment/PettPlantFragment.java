@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
@@ -49,6 +48,8 @@ import com.biotronisis.pettplant.activity.AbstractBaseActivity;
 import com.biotronisis.pettplant.activity.DeviceListActivity;
 import com.biotronisis.pettplant.communication.BluetoothCommAdapter;
 import com.biotronisis.pettplant.communication.ConnectionState;
+import com.biotronisis.pettplant.model.PettPlantParams;
+import com.biotronisis.pettplant.type.ColorMode;
 import com.biotronisis.pettplant.type.EntrainmentMode;
 
 import java.lang.ref.WeakReference;
@@ -56,7 +57,7 @@ import java.lang.ref.WeakReference;
 /**
  * This fragment controls Bluetooth to communicate with other devices.
  */
-public class PettPlantFragment extends Fragment {
+public class PettPlantFragment extends AbstractBaseFragment {
 
    private static final String TAG = "PettPlantFragment";
 //   public static String fragmentName = null;
@@ -75,16 +76,16 @@ public class PettPlantFragment extends Fragment {
    // Color Mode Layout Views
    private Spinner colorModeSpinner;
    private SeekBar colorModeSeekbar;
-   private Button colorOnOffButton;
+   private Button colorRunOffButton;
    private Button colorPauseResumeButton;
 
-   private ArrayAdapter<CharSequence> entrainmentAdapter;
-   private ArrayAdapter<CharSequence> colorModeAdapter;
+//   private PettPlantParams pettPlantParams;
+
+//   private ArrayAdapter<CharSequence> entrainmentAdapter;
+//   private ArrayAdapter<CharSequence> colorModeAdapter;
 
    private int lastEntrainmentPos;
    private int lastColorModePos;
-//   private EntrainmentMode lastEntrainmentPos;
-//   private ColorMode lastColorModePos;
 
    // Name of the connected device
    private String mConnectedDeviceName = null;
@@ -150,7 +151,8 @@ public class PettPlantFragment extends Fragment {
          startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
          // Otherwise, setup the chat session
       } else if (bluetoothCommAdapter == null) {
-         setupBluetoothClient();
+         //Todo
+//         setupBluetoothClient();
       }
    }
 
@@ -173,9 +175,26 @@ public class PettPlantFragment extends Fragment {
          // Only if the state is STATE_NONE, do we know that we haven't started already
          if (bluetoothCommAdapter.getState() == ConnectionState.NONE) {
             // Start the Bluetooth client
-            bluetoothCommAdapter.activate();
+            // Todo
+//            bluetoothCommAdapter.activate();
          }
       }
+   }
+
+   @Override
+   public void populateData() {
+      PettPlantParams pettPlantParams = new PettPlantParams(getActivity());
+
+      entrainmentSpinner.setSelection(pettPlantParams.getEntrainmentSequence().getValue());
+      entrainRunStopButton.setText(pettPlantParams.getEntrainmentRunButton());
+      entrainPauseResumeButton.setText(pettPlantParams.getEntrainmentPauseButton());
+      loopCheckbox.setChecked(pettPlantParams.getEntrainmentLoopCheckbox());
+
+      colorModeSpinner.setSelection(pettPlantParams.getColorMode().getValue());
+      colorModeSeekbar.setProgress(pettPlantParams.getColorModeSpeed());
+      colorRunOffButton.setText(pettPlantParams.getColorModeRunButton());
+      colorPauseResumeButton.setText(pettPlantParams.getColorModePauseButton());
+
    }
 
    @Override
@@ -185,9 +204,14 @@ public class PettPlantFragment extends Fragment {
    }
 
    @Override
+   public void setupView(View view, Bundle savedInstanceState) {
+
+   }
+
+   @Override
    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
       entrainmentSpinner = (Spinner) view.findViewById(R.id.spinner_entrainment);
-      entrainmentAdapter = ArrayAdapter.createFromResource(getActivity(),
+      ArrayAdapter<CharSequence> entrainmentAdapter = ArrayAdapter.createFromResource(getActivity(),
             R.array.entrainment_array,
             R.layout.cell_modes);
 //        entrainmentAdapter.setDropDownViewResource(R.layout.cell_modes);
@@ -228,7 +252,7 @@ public class PettPlantFragment extends Fragment {
       loopCheckbox = (CheckBox) view.findViewById(R.id.checkbox_loop);
 
       colorModeSpinner = (Spinner) view.findViewById(R.id.spinner_color_mode);
-      colorModeAdapter = ArrayAdapter.createFromResource(getActivity(),
+      ArrayAdapter<CharSequence> colorModeAdapter = ArrayAdapter.createFromResource(getActivity(),
             R.array.color_mode_array,
             R.layout.cell_modes);
       colorModeSpinner.setAdapter(colorModeAdapter);
@@ -251,7 +275,7 @@ public class PettPlantFragment extends Fragment {
       });
 
       colorModeSeekbar = (SeekBar) view.findViewById(R.id.seekbar_speed);
-      colorOnOffButton = (Button) view.findViewById(R.id.button_color_on_off);
+      colorRunOffButton = (Button) view.findViewById(R.id.button_color_on_off);
       colorPauseResumeButton = (Button) view.findViewById(R.id.button_color_pause_resume);
    }
 
@@ -277,6 +301,7 @@ public class PettPlantFragment extends Fragment {
    /**
     * Set up the UI and background operations for chat.
     */
+/*
    private void setupBluetoothClient() {
       Log.d(TAG, "setupBluetoothClient()");
 
@@ -299,7 +324,7 @@ public class PettPlantFragment extends Fragment {
       // Initialize the buffer for outgoing messages
       mOutStringBuffer = new StringBuffer("");
    }
-
+*/
    /**
     * Sends a message.
     *
@@ -393,18 +418,18 @@ public class PettPlantFragment extends Fragment {
 
          switch (msg.what) {
             case BluetoothCommAdapter.MESSAGE_STATE_CHANGE:
-               switch (msg.arg1) {
-                  case BluetoothCommAdapter.STATE_CONNECTED:
-                     theFrag.setStatus(theFrag.getString(R.string.title_connected_to, theFrag.mConnectedDeviceName));
-                     break;
-                  case BluetoothCommAdapter.STATE_CONNECTING:
-                     theFrag.setStatus(R.string.title_connecting);
-                     break;
-                  case BluetoothCommAdapter.STATE_LISTEN:
-                  case BluetoothCommAdapter.STATE_NONE:
-                     theFrag.setStatus(R.string.title_not_connected);
-                     break;
-               }
+//               switch (msg.arg1) {
+//                  case BluetoothCommAdapter.STATE_CONNECTED:
+//                     theFrag.setStatus(theFrag.getString(R.string.title_connected_to, theFrag.mConnectedDeviceName));
+//                     break;
+//                  case BluetoothCommAdapter.STATE_CONNECTING:
+//                     theFrag.setStatus(R.string.title_connecting);
+//                     break;
+//                  case BluetoothCommAdapter.STATE_LISTEN:
+//                  case BluetoothCommAdapter.STATE_NONE:
+//                     theFrag.setStatus(R.string.title_not_connected);
+//                     break;
+//               }
                break;
             case BluetoothCommAdapter.MESSAGE_WRITE:
 //                    byte[] writeBuf = (byte[]) msg.obj;
@@ -454,7 +479,8 @@ public class PettPlantFragment extends Fragment {
             // When the request to enable Bluetooth returns
             if (resultCode == Activity.RESULT_OK) {
                // Bluetooth is now enabled, so set up a chat session
-               setupBluetoothClient();
+               // Todo
+//               setupBluetoothClient();
             } else {
                // User did not enable Bluetooth or an error occurred
                Log.d(TAG, "BT not enabled");
@@ -465,7 +491,7 @@ public class PettPlantFragment extends Fragment {
    }
 
    /**
-    * Establish connection with other divice
+    * Establish connection with the device
     *
     * @param data   An {@link Intent} with {@link com.biotronisis.pettplant.activity.DeviceListActivity#EXTRA_DEVICE_ADDRESS} extra.
     * @param secure Socket Security type - Secure (true) , Insecure (false)
