@@ -17,4 +17,8 @@ public enum CommunicationType {
 	public int getId() {
 		return id;
 	}
+
+   public static CommunicationType getCommType(int id) {
+      return CommunicationType.values()[id];
+   }
 }

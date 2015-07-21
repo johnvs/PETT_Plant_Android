@@ -5,22 +5,29 @@ package com.biotronisis.pettplant.type;
  */
 public enum EntrainmentMode {
 
-    MEDITATE(0),
-    SLEEP(1),
-    LUCID_DREAM(2),
-    STAY_AWAKE(3);
+   MEDITATE(0),
+   SLEEP(1),
+   STAY_AWAKE(3);
 
-    private int id;
+   public static final boolean LOOP_CHECKBOX_DEFAULT = false;
+   public static final String STOP = "stop";
+   public static final String PAUSE = "pause";
 
-    private EntrainmentMode(int id) {
-        this.id = id;
-    }
+   private int id;
 
-    public int getValue() {
-        return id;
-    }
+   private EntrainmentMode(int id) {
+      this.id = id;
+   }
 
-    public int getId() {
-        return id;
-    }
+   public int getValue() {
+      return id;
+   }
+
+   public int getId() {
+      return id;
+   }
+
+   public static EntrainmentMode getEntrainmentMode(int id) {
+      return EntrainmentMode.values()[id];
+   }
 }
