@@ -4,8 +4,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.hardware.usb.UsbManager;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
@@ -17,12 +16,11 @@ import com.biotronisis.pettplant.communication.CommunicationErrorType;
 import com.biotronisis.pettplant.communication.ConnectionState;
 import com.biotronisis.pettplant.communication.ICommAdapter;
 import com.biotronisis.pettplant.file.ErrorHandler;
-import com.biotronisis.pettplant.persist.CommunicationParamsDao;
+import com.biotronisis.pettplant.persist.AppParams;
 import com.biotronisis.pettplant.communication.CommunicationManager;
 import com.biotronisis.pettplant.communication.CommunicationManager.CommunicationManagerListener;
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.model.CommunicationParams;
-import com.biotronisis.pettplant.type.CommunicationType;
 
 import java.sql.SQLException;
 import java.util.LinkedHashSet;
@@ -46,7 +44,7 @@ public class PettPlantService extends Service {
 
    private NotificationManager notificationManager;
 
-   private CommunicationParamsDao communicationParamsDao;
+//   private CommunicationParamsDao communicationParamsDao;
 
    // registry of listeners that want to be notified for the status of communications *access
    // synchronized on statusListeners*
@@ -85,20 +83,24 @@ public class PettPlantService extends Service {
 
       uiHandler = new Handler(getMainLooper());
 
-      try {
-         CommunicationParams communicationParams = communicationParamsDao.queryForDefault();
-         communicationManager = new CommunicationManager(this, communicationParams);
-         communicationManager.connect();
-      } catch (SQLException e) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "failed to retrieve default CommunicationsParams or a valid commAdapter " +
-                  "was not created", e);
-         }
-//         errorHandler.logError(Level.SEVERE, "MeterService.onCreate(): " +
-//                     "Failed to retrieve default CommunicationsParams - " + e,
-//               R.string.communication_params_file_open_error_title,
-//               R.string.communication_params_file_open_error_message);
-      }
+//      try {
+      CommunicationParams communicationParams = new CommunicationParams(this);
+      SharedPreferences appParams = getSharedPreferences(AppParams.PETT_PLANT_DATA_FILE, 0);
+
+//         CommunicationParams communicationParams = communicationParamsDao.queryForDefault();
+//         communicationManager = new CommunicationManager(this, communicationParams);
+      communicationManager = new CommunicationManager(this, communicationParams);
+      communicationManager.connect();
+//      } catch (SQLException e) {
+//         if (MyDebug.LOG) {
+//            Log.e(TAG, "failed to retrieve default CommunicationsParams or a valid commAdapter " +
+//                  "was not created", e);
+//         }
+////         errorHandler.logError(Level.SEVERE, "MeterService.onCreate(): " +
+////                     "Failed to retrieve default CommunicationsParams - " + e,
+////               R.string.communication_params_file_open_error_title,
+////               R.string.communication_params_file_open_error_message);
+//      }
 
 //      IntentFilter usbFilter = new IntentFilter();
 //      usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
@@ -167,7 +169,7 @@ public class PettPlantService extends Service {
       if (communicationManager != null) {
          commAdapter = communicationManager.getCurrentCommAdapter();
       }
-      if (commAdapter == null ) {
+      if (commAdapter == null) {
          return false;
       }
       return commAdapter.getConnectionState() == ConnectionState.ESTABLISHED;

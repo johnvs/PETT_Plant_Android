@@ -1,30 +1,29 @@
 package com.biotronisis.pettplant.model;
 
-import com.j256.ormlite.field.DataType;
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
+import android.content.Context;
+import android.content.SharedPreferences;
 
+import com.biotronisis.pettplant.persist.AppParams;
 import com.biotronisis.pettplant.type.CommunicationType;
 
-@DatabaseTable(tableName = "communicationParams")
-public class CommunicationParams extends AbstractParamsObject {
-	private static final long serialVersionUID = 1L;
-	
-	public static final String COLUMN_NAME = "name";
-	public static final String COLUMN_COMMUNICATION_TYPE = "communicationType";
-	public static final String COLUMN_ADDRESS = "address";
-	
+public class CommunicationParams  {
 
-	@DatabaseField(columnName=COLUMN_NAME)
+	public static final String NAME = "name";
+	public static final String COMMUNICATION_TYPE = "communicationType";
+   public static final String ADDRESS = "address";
+   public static final String NONE = "none";
+
 	private String name;
-	
-	@DatabaseField(columnName=COLUMN_COMMUNICATION_TYPE, dataType=DataType.ENUM_STRING)
 	private CommunicationType communicationType;
-	
-	@DatabaseField(columnName=COLUMN_ADDRESS)
 	private String address;
-	
 
+	public CommunicationParams(Context context) {
+      SharedPreferences appParams = context.getSharedPreferences(AppParams.PETT_PLANT_DATA_FILE, 0);
+      name = appParams.getString(NAME, NONE);
+      address = appParams.getString(ADDRESS, NONE);
+      communicationType = CommunicationType.getCommType(appParams.getInt(COMMUNICATION_TYPE, CommunicationType.MOCK.getValue()));
+   }
+	
 	public String getName() {
 		return name;
 	}

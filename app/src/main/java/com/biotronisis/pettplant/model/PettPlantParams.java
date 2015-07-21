@@ -1,49 +1,47 @@
 package com.biotronisis.pettplant.model;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.biotronisis.pettplant.persist.AppParams;
 import com.biotronisis.pettplant.type.ColorMode;
 import com.biotronisis.pettplant.type.EntrainmentMode;
-import com.j256.ormlite.field.DataType;
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName = "pettPlantParams")
-public class PettPlantParams extends AbstractParamsObject {
-	private static final long serialVersionUID = 1L;
+public class PettPlantParams {
 
-	public static final String COLUMN_COLOR_MODE = "colorMode";
-	public static final String COLUMN_COLOR_MODE_SPEED = "colorModeSpeed";
-	public static final String COLUMN_COLOR_MODE_RUN_BUTTON = "colorModeRunButton";
-	public static final String COLUMN_COLOR_MODE_PAUSE_BUTTON = "colorModePauseButton";
+	public static final String COLOR_MODE = "colorMode";
+	public static final String COLOR_MODE_SPEED = "colorModeSpeed";
+	public static final String COLOR_MODE_RUN_BUTTON = "colorModeRunButton";
+	public static final String COLOR_MODE_PAUSE_BUTTON = "colorModePauseButton";
 
-	public static final String COLUMN_ENTRAINMENT_SEQUENCE = "entrainmentSequence";
-	public static final String COLUMN_ENTRAINMENT_LOOP_CHECKBOX = "entrainmentLoopCheckbox";
-	public static final String COLUMN_ENTRAINMENT_RUN_BUTTON = "entrainmentRunButton";
-	public static final String COLUMN_ENTRAINMENT_PAUSE_BUTTON = "entrainmentPauseButton";
+	public static final String ENTRAINMENT_SEQUENCE = "entrainmentSequence";
+	public static final String ENTRAINMENT_LOOP_CHECKBOX = "entrainmentLoopCheckbox";
+	public static final String ENTRAINMENT_RUN_BUTTON = "entrainmentRunButton";
+	public static final String ENTRAINMENT_PAUSE_BUTTON = "entrainmentPauseButton";
 
-
-	@DatabaseField(columnName=COLUMN_COLOR_MODE)
 	private ColorMode colorMode;
-
-	@DatabaseField(columnName=COLUMN_COLOR_MODE_SPEED)
 	private int colorModeSpeed;
-
-	@DatabaseField(columnName=COLUMN_COLOR_MODE_RUN_BUTTON)
 	private String colorModeRunButton;
-
-	@DatabaseField(columnName=COLUMN_COLOR_MODE_PAUSE_BUTTON)
 	private String colorModePauseButton;
-
-	@DatabaseField(columnName=COLUMN_ENTRAINMENT_SEQUENCE)
 	private EntrainmentMode entrainmentSequence;
-
-	@DatabaseField(columnName=COLUMN_ENTRAINMENT_LOOP_CHECKBOX)
-	private String entrainmentLoopCheckbox;
-
-	@DatabaseField(columnName=COLUMN_ENTRAINMENT_RUN_BUTTON)
+	private boolean entrainmentLoopCheckbox;
 	private String entrainmentRunButton;
-
-	@DatabaseField(columnName=COLUMN_ENTRAINMENT_PAUSE_BUTTON)
 	private String entrainmentPauseButton;
+
+	public PettPlantParams(Context context) {
+		SharedPreferences appParams = context.getSharedPreferences(AppParams.PETT_PLANT_DATA_FILE, 0);
+
+		colorMode = ColorMode.getColorMode(appParams.getInt(COLOR_MODE, ColorMode.SOUND_RESPONSIVE.getValue()));
+		colorModeSpeed = appParams.getInt(COLOR_MODE_SPEED, ColorMode.SPEED_DEFAULT);
+      colorModeRunButton = appParams.getString(COLOR_MODE_RUN_BUTTON, ColorMode.OFF);
+      colorModePauseButton = appParams.getString(COLOR_MODE_PAUSE_BUTTON, ColorMode.PAUSE);
+
+      entrainmentSequence = EntrainmentMode.getEntrainmentMode(appParams.getInt(ENTRAINMENT_SEQUENCE, EntrainmentMode.MEDITATE.getValue()));
+      entrainmentLoopCheckbox = appParams.getBoolean(ENTRAINMENT_LOOP_CHECKBOX, EntrainmentMode.LOOP_CHECKBOX_DEFAULT);
+      entrainmentRunButton = appParams.getString(ENTRAINMENT_RUN_BUTTON, EntrainmentMode.STOP);
+      entrainmentPauseButton = appParams.getString(ENTRAINMENT_PAUSE_BUTTON, EntrainmentMode.PAUSE);
+
+	}
 
 
 	public ColorMode getColorMode() {
@@ -86,11 +84,11 @@ public class PettPlantParams extends AbstractParamsObject {
 		this.entrainmentSequence = entrainmentSequence;
 	}
 
-	public String getEntrainmentLoopCheckbox() {
+	public boolean getEntrainmentLoopCheckbox() {
 		return entrainmentLoopCheckbox;
 	}
 
-	public void setEntrainmentLoopCheckbox(String entrainmentLoopCheckbox) {
+	public void setEntrainmentLoopCheckbox(boolean entrainmentLoopCheckbox) {
 		this.entrainmentLoopCheckbox = entrainmentLoopCheckbox;
 	}
 
