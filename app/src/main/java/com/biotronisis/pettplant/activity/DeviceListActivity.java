@@ -45,24 +45,14 @@ import java.util.Set;
  */
 public class DeviceListActivity extends Activity {
 
-    /**
-     * Tag for Log
-     */
     private static final String TAG = "DeviceListActivity";
 
-    /**
-     * Return Intent extra
-     */
+    // Return Intent extra
     public static String EXTRA_DEVICE_ADDRESS = "device_address";
 
-    /**
-     * Member fields
-     */
     private BluetoothAdapter mBtAdapter;
 
-    /**
-     * Newly discovered devices
-     */
+    // Newly discovered devices
     private ArrayAdapter<String> mNewDevicesArrayAdapter;
 
     @Override
@@ -165,8 +155,7 @@ public class DeviceListActivity extends Activity {
     /**
      * The on-click listener for all devices in the ListViews
      */
-    private AdapterView.OnItemClickListener mDeviceClickListener
-            = new AdapterView.OnItemClickListener() {
+    private AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
             // Cancel discovery because it's costly and we're about to connect
             mBtAdapter.cancelDiscovery();
