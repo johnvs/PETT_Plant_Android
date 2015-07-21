@@ -16,8 +16,14 @@ public enum ColorMode {
    PRESET_5(7);
 
    public static final int SPEED_DEFAULT = 50;
-   public static final String OFF = "off";
-   public static final String PAUSE = "pause";
+
+   // Run/Off button values
+   public static final String RUN = "Run";
+   public static final String OFF = "Off";
+
+   // Pause/Resume button values
+   public static final String PAUSE = "Pause";
+   public static final String RESUME = "Resume";
 
    private int id;
 

@@ -9,9 +9,15 @@ public enum EntrainmentMode {
    SLEEP(1),
    STAY_AWAKE(3);
 
+   // Run/Stop button values
+   public static final String RUN = "Run";
+   public static final String STOP = "Stop";
+
+   // Pause/Resume button values
+   public static final String PAUSE = "Pause";
+   public static final String RESUME = "Resume";
+
    public static final boolean LOOP_CHECKBOX_DEFAULT = false;
-   public static final String STOP = "stop";
-   public static final String PAUSE = "pause";
 
    private int id;
 
