@@ -3,13 +3,16 @@ package com.biotronisis.pettplant.activity;
 import android.content.Intent;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.fragment.PettPlantFragment;
 
+import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.file.ErrorHandler;
+import com.biotronisis.pettplant.service.PettPlantService;
 
 public class MainActivity extends AbstractBaseActivity {
 
@@ -33,6 +36,12 @@ public class MainActivity extends AbstractBaseActivity {
       // Create a new Error Handler object in case the application was stopped
       // but not destroyed, in which case, MyApplication.onCreate will not be executed.
       ErrorHandler.getInstance(this.getApplicationContext());
+
+      Intent intent = PettPlantService.createIntent(this);
+      startService(intent);
+      if (MyDebug.LOG) {
+         Log.d(TAG, "Started PettPlantService.");
+      }
 
       if (savedInstanceState == null) {
          FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

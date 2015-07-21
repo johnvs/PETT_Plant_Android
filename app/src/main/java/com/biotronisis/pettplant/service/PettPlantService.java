@@ -72,10 +72,10 @@ public class PettPlantService extends Service {
       ErrorHandler errorHandler = ErrorHandler.getInstance();
       if (errorHandler == null) {
          if (MyDebug.LOG) {
-            Log.d(TAG, "MeterService.onCreate() - errorHandler is null");
+            Log.d(TAG, "PettPlantService.onCreate() - errorHandler is null");
          }
       } else {
-         errorHandler.logError(Level.INFO, "MeterService.onCreate().", 0, 0);
+         errorHandler.logError(Level.INFO, "PettPlantService.onCreate().", 0, 0);
       }
       if (MyDebug.LOG) {
          Log.d(TAG, "PettPlantService.onCreate() - Entered");
@@ -85,7 +85,6 @@ public class PettPlantService extends Service {
 
 //      try {
       CommunicationParams communicationParams = new CommunicationParams(this);
-      SharedPreferences appParams = getSharedPreferences(AppParams.PETT_PLANT_DATA_FILE, 0);
 
 //         CommunicationParams communicationParams = communicationParamsDao.queryForDefault();
 //         communicationManager = new CommunicationManager(this, communicationParams);
