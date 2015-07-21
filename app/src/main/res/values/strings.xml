@@ -114,4 +114,12 @@
     <string name="activity_fatal_persist_message">An unknown error has prevented this screen from
         saving.</string>
 
+    <string name="comm_params_persist_error_title">Unable To Save</string>
+    <string name="comm_params_persist_error_message">Unable to save communication parameters to
+        Shared Preferences.</string>
+
+    <string name="pett_plant_params_persist_error_title">Unable To Save</string>
+    <string name="pett_plant_params_persist_error_message">Unable to save Pett Plant parameters to
+        Shared Preferences.</string>
+
 </resources>
