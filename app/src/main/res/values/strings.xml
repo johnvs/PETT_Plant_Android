@@ -102,4 +102,16 @@
     <string name="bluetooth_adapter_error_message">There is an error with this device\'s bluetooth
         adapter.</string>
 
+    <string name="communication_type_error_title">Communication Type Error</string>
+    <string name="communication_type_error_message">An unknown Communication Type was selected.
+        Select either Bluetooth or USB.</string>
+
+    <string name="activity_fatal_setup_title">Alert - Unable To Load</string>
+    <string name="activity_fatal_setup_message">An unknown error has prevented this screen from
+        loading.</string>
+
+    <string name="activity_fatal_persist_title">Unable To Save</string>
+    <string name="activity_fatal_persist_message">An unknown error has prevented this screen from
+        saving.</string>
+
 </resources>
