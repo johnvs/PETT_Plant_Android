@@ -35,9 +35,9 @@ public class CommunicationManager {
 	private static final String TAG = "CommunicationManager";
 	
 	private PettPlantService pettPlantService;
-	
+
 	private CommunicationParams communicationParams;
-	
+
 	// handles sending and receiving bytes over some channel
 	private ICommAdapter commAdapter;
 	
@@ -63,7 +63,7 @@ public class CommunicationManager {
    private boolean justEndedInterval;
 
    @SuppressLint("UseSparseArrays")
-   public CommunicationManager(PettPlantService pettPlantService, CommunicationParams communicationParams) {
+	public CommunicationManager(PettPlantService pettPlantService, CommunicationParams communicationParams) {
 
 		this.pettPlantService = pettPlantService;
 		this.communicationParams = communicationParams;
@@ -92,40 +92,43 @@ public class CommunicationManager {
 //				this.commAdapter = new UsbCommAdapter(commResponseListener, this.pettPlantService);
 //				break;
 			default:
-//			    ErrorHandler errorHandler = ErrorHandler.getInstance(this.pettPlantService);
-//			    errorHandler.logError(Level.WARNING, "CommunicationManager.CommunicationManager(): " +
-//			    		"unknown CommunicationType - " + communicationParams.getCommunicationType(),
-//			    		R.string.communication_type_error_title,
-//			    		R.string.communication_type_error_message);
+			    ErrorHandler errorHandler = ErrorHandler.getInstance(this.pettPlantService);
+			    errorHandler.logError(Level.WARNING, "CommunicationManager.CommunicationManager(): " +
+			    		"unknown CommunicationType - " + communicationParams.getCommunicationType(),
+			    		R.string.communication_type_error_title,
+			    		R.string.communication_type_error_message);
 		}
 	}
 	
 	public boolean isReConnectingToBtDevice(String address) {
-	    return (communicationParams.getCommunicationType() == CommunicationType.BLUETOOTH &&
-	            commAdapter.isReConnectingToDevice(address));
+      return (communicationParams.getCommunicationType() == CommunicationType.BLUETOOTH &&
+            commAdapter.isReConnectingToDevice(address));
+
+//      return (communicationParams.getCommunicationType() == CommunicationType.BLUETOOTH &&
+//            commAdapter.isReConnectingToDevice(address));
 	}
 	
 //    public boolean isUsbDeviceAttached(PettPlantService meter) {
 //        return UsbCommAdapter.isUsbDeviceAttached(meter);
 //    }
-    
-	public void connect() {            // throws Exception {
-        if (MyDebug.LOG) {
-            Log.d(TAG, "connect. name=" + communicationParams.getName() + " address:" +
-						communicationParams.getAddress());
-        }
-		if (commAdapter == null) {
-		    ErrorHandler errorHandler = ErrorHandler.getInstance(pettPlantService);
-            errorHandler.logError(Level.SEVERE, "CommunicationManager.connect(): " +
-            		"commAdapter does not exist.",
-            		R.string.bluetooth_adapter_error_title,
-            		R.string.bluetooth_adapter_error_message);
-		} else {
-	        commAdapter.activate(communicationParams.getAddress());
-		}
-	}
-	
-	public void disconnect() {
+
+   public void connect() {            // throws Exception {
+      if (MyDebug.LOG) {
+         Log.d(TAG, "connect. name=" + communicationParams.getName() + " address:" +
+               communicationParams.getAddress());
+      }
+      if (commAdapter == null) {
+         ErrorHandler errorHandler = ErrorHandler.getInstance(pettPlantService);
+         errorHandler.logError(Level.SEVERE, "CommunicationManager.connect(): " +
+                     "commAdapter does not exist.",
+               R.string.bluetooth_adapter_error_title,
+               R.string.bluetooth_adapter_error_message);
+      } else {
+         commAdapter.activate(communicationParams.getAddress());
+      }
+   }
+
+   public void disconnect() {
 		commAdapter.deactivate();
 	}
 	
