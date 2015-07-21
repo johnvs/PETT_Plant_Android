@@ -70,7 +70,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
    private MyBluetoothBroadcastReceiver bluetoothReceiver;
    private MyBluetoothBroadcastReceiver resetReceiver;
    private MyBluetoothBroadcastReceiver enableReceiver;
-   private Context meterService;
+   private Context pettPlantService;
    private String currentDeviceAddress;
    private boolean isActivating;
    private boolean isReConnecting;
@@ -108,7 +108,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
        connectionState = ConnectionState.NONE;
        this.listener = listener;
-       this.meterService = meterService;
+       this.pettPlantService = pettPlantService;
        isReConnecting = false;
        isResetting = false;
 
@@ -418,11 +418,11 @@ public class BluetoothCommAdapter implements ICommAdapter {
 
       // Register for broadcasts when a device is discovered
       IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-      meterService.registerReceiver(bluetoothReceiver, filter);
+      pettPlantService.registerReceiver(bluetoothReceiver, filter);
 
       // Register for broadcasts when discovery has finished
       filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-      meterService.registerReceiver(bluetoothReceiver, filter);
+      pettPlantService.registerReceiver(bluetoothReceiver, filter);
 
       connectedThread = null;
       isActivating = false;
@@ -738,7 +738,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
             }
             if (isActivating) {
                // Unregister broadcast listener
-               meterService.unregisterReceiver(bluetoothReceiver);
+               pettPlantService.unregisterReceiver(bluetoothReceiver);
                isReConnecting = false;
             } else if (isReConnecting) {
                doDiscovery();
@@ -756,7 +756,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
                      }
                      waitingForBTState = false;
                      // Unregister broadcast listener
-                     meterService.unregisterReceiver(enableReceiver);
+                     pettPlantService.unregisterReceiver(enableReceiver);
                   }
                } else if (isResetting) {
                   if (bluetoothAdapter.getState() == BluetoothAdapter.STATE_OFF) {
@@ -770,7 +770,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
                      }
                      waitingForBTState = false;
                      // Unregister broadcast listener
-                     meterService.unregisterReceiver(resetReceiver);
+                     pettPlantService.unregisterReceiver(resetReceiver);
                   }
                }
             }
