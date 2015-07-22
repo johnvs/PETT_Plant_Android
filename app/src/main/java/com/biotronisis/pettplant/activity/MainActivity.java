@@ -9,7 +9,6 @@ import android.view.MenuItem;
 
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.fragment.PettPlantFragment;
-
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.service.PettPlantService;
