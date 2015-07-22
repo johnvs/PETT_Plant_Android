@@ -21,7 +21,6 @@
     <string-array name="entrainment_array">
         <item>Meditate</item>
         <item>Sleep</item>
-        <item>Lucid Dream</item>
         <item>Stay Awake</item>
     </string-array>
 
