@@ -42,7 +42,6 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-//import com.pett.plant.common.logger.Log;
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.AbstractBaseActivity;
 import com.biotronisis.pettplant.activity.DeviceListActivity;
@@ -80,9 +79,6 @@ public class PettPlantFragment extends AbstractBaseFragment {
    private Button colorPauseResumeButton;
 
    private PettPlantParams pettPlantParams;
-
-//   private ArrayAdapter<CharSequence> entrainmentAdapter;
-//   private ArrayAdapter<CharSequence> colorModeAdapter;
 
    private int lastEntrainmentPos;
    private int lastColorModePos;
@@ -168,71 +164,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
 //            bluetoothCommAdapter.activate();
          }
       }
-   }
 
-   @Override
-   public void onDestroy() {
-      super.onDestroy();
-      if (bluetoothCommAdapter != null) {
-         bluetoothCommAdapter.deactivate();
-      }
-   }
-
-   @Override
-   public void populateData() {
-      pettPlantParams = new PettPlantParams(getActivity());
-
-      entrainmentSpinner.setSelection(pettPlantParams.getEntrainmentSequence().getValue());
-      entrainRunStopButton.setText(pettPlantParams.getEntrainmentRunButton());
-      entrainPauseResumeButton.setText(pettPlantParams.getEntrainmentPauseButton());
-      loopCheckbox.setChecked(pettPlantParams.getEntrainmentLoopCheckbox());
-
-      colorModeSpinner.setSelection(pettPlantParams.getColorMode().getValue());
-      colorModeSeekbar.setProgress(pettPlantParams.getColorModeSpeed());
-      colorRunOffButton.setText(pettPlantParams.getColorModeRunButton());
-      colorPauseResumeButton.setText(pettPlantParams.getColorModePauseButton());
-
-   }
-
-   @Override
-   public void persistData() {
-      pettPlantParams.setEntrainmentSequence(EntrainmentMode.getEntrainmentMode(entrainmentSpinner.getSelectedItemPosition()));
-      pettPlantParams.setEntrainmentRunButton(entrainRunStopButton.getText().toString());
-      pettPlantParams.setColorModePauseButton(entrainPauseResumeButton.getText().toString());
-      pettPlantParams.setEntrainmentLoopCheckbox(loopCheckbox.isChecked());
-
-      pettPlantParams.setColorMode(ColorMode.getColorMode(colorModeSpinner.getSelectedItemPosition()));
-      pettPlantParams.setColorModeRunButton(colorRunOffButton.getText().toString());
-      pettPlantParams.setColorModePauseButton(colorPauseResumeButton.getText().toString());
-      pettPlantParams.setColorModeSpeed(colorModeSeekbar.getProgress());
-
-      pettPlantParams.saveData();
-   }
-
-   @Override
-   public void setupView(View view, Bundle savedInstanceState) {
-
-      // Check whether we're recreating a previously destroyed instance
-      if (savedInstanceState != null) {
-         // Restore value of members from saved state
-         lastEntrainmentPos = savedInstanceState.getInt(STATE_ENTRAINMENT_MODE);
-         lastColorModePos = savedInstanceState.getInt(STATE_COLOR_MODE);
-      } else {
-         // Initialize members with default values for a new instance
-         lastEntrainmentPos = 0;
-         lastColorModePos = 0;
-      }
-
-//   }
-//
-//   @Override
-//   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-      entrainmentSpinner = (Spinner) view.findViewById(R.id.spinner_entrainment);
-      ArrayAdapter<CharSequence> entrainmentAdapter = ArrayAdapter.createFromResource(getActivity(),
-            R.array.entrainment_array,
-            R.layout.cell_modes);
-//        entrainmentAdapter.setDropDownViewResource(R.layout.cell_modes);
-      entrainmentSpinner.setAdapter(entrainmentAdapter);
       entrainmentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
          @Override
          public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -262,6 +194,76 @@ public class PettPlantFragment extends AbstractBaseFragment {
          }
       });
 
+      colorModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+         @Override
+         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            // The if is needed because the listener fires when the app starts
+            if (position != lastColorModePos) {
+               lastColorModePos = position;
+               Toast colorModeToast = Toast.makeText(getActivity(),
+                     parent.getItemAtPosition(position) + " selected",
+                     Toast.LENGTH_LONG);
+               colorModeToast.show();
+            }
+         }
+
+         @Override
+         public void onNothingSelected(AdapterView<?> parent) {
+         }
+      });
+   }
+
+   @Override
+   public void onDestroy() {
+      super.onDestroy();
+      if (bluetoothCommAdapter != null) {
+         bluetoothCommAdapter.deactivate();
+      }
+   }
+
+   @Override
+   public void populateData() {
+      pettPlantParams = new PettPlantParams(getActivity());
+
+      entrainmentSpinner.setSelection(pettPlantParams.getEntrainmentSequence().getValue());
+      entrainRunStopButton.setText(pettPlantParams.getEntrainmentRunButton());
+      entrainPauseResumeButton.setText(pettPlantParams.getEntrainmentPauseButton());
+      loopCheckbox.setChecked(pettPlantParams.getEntrainmentLoopCheckbox());
+
+      colorModeSpinner.setSelection(pettPlantParams.getColorMode().getValue());
+      colorModeSeekbar.setProgress(pettPlantParams.getColorModeSpeed());
+      colorRunOffButton.setText(pettPlantParams.getColorModeRunButton());
+      colorPauseResumeButton.setText(pettPlantParams.getColorModePauseButton());
+
+      lastEntrainmentPos = entrainmentSpinner.getSelectedItemPosition();
+      lastColorModePos = colorModeSpinner.getSelectedItemPosition();
+
+   }
+
+   @Override
+   public void persistData() {
+      pettPlantParams.setEntrainmentSequence(EntrainmentMode.getEntrainmentMode(entrainmentSpinner.getSelectedItemPosition()));
+      pettPlantParams.setEntrainmentRunButton(entrainRunStopButton.getText().toString());
+      pettPlantParams.setColorModePauseButton(entrainPauseResumeButton.getText().toString());
+      pettPlantParams.setEntrainmentLoopCheckbox(loopCheckbox.isChecked());
+
+      pettPlantParams.setColorMode(ColorMode.getColorMode(colorModeSpinner.getSelectedItemPosition()));
+      pettPlantParams.setColorModeRunButton(colorRunOffButton.getText().toString());
+      pettPlantParams.setColorModePauseButton(colorPauseResumeButton.getText().toString());
+      pettPlantParams.setColorModeSpeed(colorModeSeekbar.getProgress());
+
+      pettPlantParams.saveData();
+   }
+
+   @Override
+   public void setupView(View view, Bundle savedInstanceState) {
+
+      // Setup the Entrainment controls
+      entrainmentSpinner = (Spinner) view.findViewById(R.id.spinner_entrainment);
+      ArrayAdapter<CharSequence> entrainmentAdapter = ArrayAdapter.createFromResource(getActivity(),
+            R.array.entrainment_array,
+            R.layout.cell_modes);
+      entrainmentSpinner.setAdapter(entrainmentAdapter);
 
       entrainRunStopButton = (Button) view.findViewById(R.id.button_run_stop);
 
@@ -273,23 +275,6 @@ public class PettPlantFragment extends AbstractBaseFragment {
             R.array.color_mode_array,
             R.layout.cell_modes);
       colorModeSpinner.setAdapter(colorModeAdapter);
-      colorModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-         @Override
-         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            // The if is needed because the listener fires when the app starts
-            if (position != lastColorModePos) {
-               lastColorModePos = position;
-               Toast colorModeToast = Toast.makeText(getActivity(),
-                     parent.getItemAtPosition(position) + " selected, id = " + id + " pos = " + position,
-                     Toast.LENGTH_LONG);
-               colorModeToast.show();
-            }
-         }
-
-         @Override
-         public void onNothingSelected(AdapterView<?> parent) {
-         }
-      });
 
       colorModeSeekbar = (SeekBar) view.findViewById(R.id.seekbar_speed);
       colorRunOffButton = (Button) view.findViewById(R.id.button_color_on_off);
@@ -342,6 +327,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
       mOutStringBuffer = new StringBuffer("");
    }
 */
+
    /**
     * Sends a message.
     *
