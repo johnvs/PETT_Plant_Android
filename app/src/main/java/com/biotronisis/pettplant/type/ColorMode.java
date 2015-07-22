@@ -8,12 +8,12 @@ public enum ColorMode {
    SOUND_RESPONSIVE(0),
    RAINBOW_CYCLE_1(1),
    RAINBOW_CYCLE_2(2),
-   RAINBOW_CYCLE_3(2),
-   PRESET_1(3),
-   PRESET_2(4),
-   PRESET_3(5),
-   PRESET_4(6),
-   PRESET_5(7);
+   RAINBOW_CYCLE_3(3),
+   PRESET_1(4),
+   PRESET_2(5),
+   PRESET_3(6),
+   PRESET_4(7),
+   PRESET_5(8);
 
    public static final int SPEED_DEFAULT = 50;
 

@@ -7,7 +7,7 @@ public enum EntrainmentMode {
 
    MEDITATE(0),
    SLEEP(1),
-   STAY_AWAKE(3);
+   STAY_AWAKE(2);
 
    // Run/Stop button values
    public static final String RUN = "Run";
