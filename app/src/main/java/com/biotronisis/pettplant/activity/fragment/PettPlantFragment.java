@@ -87,7 +87,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
    private String mConnectedDeviceName = null;
 
    // String buffer for outgoing messages
-   private StringBuffer mOutStringBuffer;
+//   private StringBuffer mOutStringBuffer;
 
    // Local Bluetooth adapter
    private BluetoothAdapter mBluetoothAdapter = null;
@@ -281,6 +281,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
       colorPauseResumeButton = (Button) view.findViewById(R.id.button_color_pause_resume);
    }
 
+/*
    @Override
    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
       super.onCreateOptionsMenu(menu, inflater);
@@ -299,7 +300,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
       }
       return false;
    }
-
+*/
    /**
     * Set up the UI and background operations for chat.
     */
@@ -347,7 +348,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
          bluetoothCommAdapter.write(send);
 
          // Reset out string buffer to zero and clear the edit text field
-         mOutStringBuffer.setLength(0);
+//         mOutStringBuffer.setLength(0);
       }
    }
 
@@ -469,6 +470,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
 //   };
 
+/*
    public void onActivityResult(int requestCode, int resultCode, Intent data) {
       switch (requestCode) {
          case REQUEST_CONNECT_DEVICE_INSECURE:
@@ -492,7 +494,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
             }
       }
    }
-
+*/
    /**
     * Establish connection with the device
     *
