@@ -69,6 +69,8 @@ public class PettPlantService extends Service {
       // save the ref to the singleton managed by android
       instance = this;
 
+      notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
       ErrorHandler errorHandler = ErrorHandler.getInstance();
       if (errorHandler == null) {
          if (MyDebug.LOG) {
@@ -147,6 +149,31 @@ public class PettPlantService extends Service {
 
    public static PettPlantService getInstance() {
       return instance;
+   }
+
+   /**
+    * Adds a listener to be notified for the status of communications
+    */
+   public synchronized void addCommStatusListener(CommunicationManagerListener listener) {
+      if (MyDebug.LOG) {
+         Log.d(TAG, "Adding CommStatusListener");
+      }
+      synchronized (statusListeners) {
+         statusListeners.add(listener);
+      }
+   }
+
+   /**
+    * Removes a listener to be notified for the status of communications
+    */
+   public synchronized void removeCommStatusListener(CommunicationManagerListener listener) {
+      boolean result;
+      synchronized (statusListeners) {
+         result = statusListeners.remove(listener);
+      }
+      if (MyDebug.LOG) {
+         Log.d(TAG, "Removing CommStatusListener " + result);
+      }
    }
 
    public boolean isReConnectingToBtDevice(String address) {
