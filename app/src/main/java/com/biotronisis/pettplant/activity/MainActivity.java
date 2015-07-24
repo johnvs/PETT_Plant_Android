@@ -1,21 +1,37 @@
 package com.biotronisis.pettplant.activity;
 
+//import android.app.Activity;
+//import android.app.AlertDialog;
+//import android.bluetooth.BluetoothAdapter;
+//import android.bluetooth.BluetoothDevice;
+//import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+//import android.view.View;
+//import android.widget.Toast;
 
 import com.biotronisis.pettplant.R;
+//import com.biotronisis.pettplant.activity.fragment.BluetoothScanFragment;
+//import com.biotronisis.pettplant.activity.fragment.BluetoothScanFragment.OnBluetoothDeviceSelectedListener;
 import com.biotronisis.pettplant.activity.fragment.PettPlantFragment;
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.file.ErrorHandler;
+//import com.biotronisis.pettplant.model.CommunicationParams;
 import com.biotronisis.pettplant.service.PettPlantService;
+//import com.biotronisis.pettplant.type.CommunicationType;
 
 public class MainActivity extends AbstractBaseActivity {
 
    private static String TAG = "MainActivity";
+
+//   private static final int REQUEST_CONNECT_DEVICE_INSECURE = 1;
+//   private static final int REQUEST_ENABLE_BT = 2;
+
+//   private CommunicationParams communicationParams;
 
    @Override
    public String getActivityName() {
@@ -61,11 +77,18 @@ public class MainActivity extends AbstractBaseActivity {
 
    @Override
    public boolean onOptionsItemSelected(MenuItem item) {
-      // Handle action bar item clicks here. The action bar will
-      // automatically handle clicks on the Home/Up button, so long
-      // as you specify a parent activity in AndroidManifest.xml.
+      // Handle action bar item clicks here. The action bar will automatically handle clicks
+      // on the Home/Up button, so long as you specify a parent activity in AndroidManifest.xml.
 
       switch (item.getItemId()) {
+//         case R.id.insecure_connect_scan: {
+         case R.id.settings: {
+            // Launch the SettingsActivity
+            Intent intent = SettingsActivity.createIntent(this);    // new Intent(this, SettingsActivity.class);
+//            startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+            startActivity(intent);
+            return true;
+         }
          case R.id.action_help: {
             Intent intent = HelpActivity.createIntent(this, getActivityName(), fragmentName);
             startActivity(intent);
@@ -75,4 +98,5 @@ public class MainActivity extends AbstractBaseActivity {
 
       return super.onOptionsItemSelected(item);
    }
+
 }
