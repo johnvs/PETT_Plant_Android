@@ -1,9 +1,5 @@
 package com.biotronisis.pettplant.activity.fragment;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -11,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +17,13 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
-import com.zlscorp.ultragrav.R;
+import com.biotronisis.pettplant.R;
 
-public final class BluetoothScanFragment extends SherlockDialogFragment {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+public final class BluetoothScanFragment extends DialogFragment {
 	
 //    private static final String TAG = "BluetoothScanFragment";
 
@@ -171,7 +171,8 @@ public final class BluetoothScanFragment extends SherlockDialogFragment {
 			text1.setTextColor(color);
 			
 			TextView text2 = (TextView) convertView.findViewById(android.R.id.text2);
-			text2.setText(item.device.getAddress() + " - " + getString(bonded ? R.string.paired : R.string.not_paired));
+			text2.setText(item.device.getAddress() + " - " +
+               getString(bonded ? R.string.paired : R.string.not_paired));
 			text2.setTextColor(color);
 			
 			return convertView;
