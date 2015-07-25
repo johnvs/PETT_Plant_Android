@@ -33,8 +33,8 @@ public class SettingsActivity extends AbstractBaseActivity {
 
    private static final String TAG = "SettingsActivity";
 
-   private TextView communicationTypeTV;
    private TextView deviceNameTV;
+   private TextView communicationTypeTV;
    private TextView connectionStatusTV;
    private Button bluetoothScanButton;
    private Button usbScanButton;
@@ -42,7 +42,7 @@ public class SettingsActivity extends AbstractBaseActivity {
    private CommunicationParams communicationParams;
 
    private Context activityContext;
-   private boolean isRegistered;
+//   private boolean isRegistered;
 
    private MyCommunicationManagerListener myCommunicationManagerListener =
          new MyCommunicationManagerListener();
@@ -108,7 +108,7 @@ public class SettingsActivity extends AbstractBaseActivity {
          pettPlantService.addCommStatusListener(myCommunicationManagerListener);
       }
       LocalBroadcastManager.getInstance(this).
-            registerReceiver(meterEventReceiver,
+            registerReceiver(pettPlantServiceEventReceiver,
                   new IntentFilter(PettPlantService.PETT_PLANT_SERVICE_EVENT));
    }
 
@@ -119,7 +119,7 @@ public class SettingsActivity extends AbstractBaseActivity {
       if (pettPlantService != null) {
          pettPlantService.removeCommStatusListener(myCommunicationManagerListener);
       }
-      LocalBroadcastManager.getInstance(this).unregisterReceiver(meterEventReceiver);
+      LocalBroadcastManager.getInstance(this).unregisterReceiver(pettPlantServiceEventReceiver);
 
 //      myUnregisterReceiver(mUsbReceiver);
    }
@@ -186,7 +186,7 @@ public class SettingsActivity extends AbstractBaseActivity {
       }
    }
 
-   private BroadcastReceiver meterEventReceiver = new BroadcastReceiver() {
+   private BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
          String message = intent.getStringExtra("message");
@@ -256,7 +256,7 @@ public class SettingsActivity extends AbstractBaseActivity {
                   communicationParams.setAddress(device.getAddress());
                }
 
-               // This code was moved to meterEventReceiver
+               // This code was moved to pettPlantServiceEventReceiver
                // so it gets executed after the meter service has shut down
 //                   communicationParamsDao.updateDefault(communicationParams, new TransactionCallback() {
 //

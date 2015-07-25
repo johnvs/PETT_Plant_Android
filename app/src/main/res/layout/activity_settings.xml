@@ -24,23 +24,12 @@
             android:orientation="horizontal" >
             <TextView
                 style="@style/LabelColumnLeft01"
-                android:text="@string/connection_type" />
-            <TextView
-                android:id="@+id/communicationType"
-                style="@style/LabelColumnRight01"
-                android:text="@string/none" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:orientation="horizontal" >
-            <TextView
-                style="@style/LabelColumnLeft01"
+                android:textSize="18sp"
                 android:text="@string/pett_plant_name" />
             <TextView
                 android:id="@+id/deviceName"
                 style="@style/LabelColumnRight01"
+                android:textSize="18sp"
                 android:text="@string/none" />
         </LinearLayout>
         <LinearLayout
@@ -50,10 +39,27 @@
             android:orientation="horizontal" >
             <TextView
                 style="@style/LabelColumnLeft01"
+                android:textSize="18sp"
+                android:text="@string/connection_type" />
+            <TextView
+                android:id="@+id/communicationType"
+                style="@style/LabelColumnRight01"
+                android:textSize="18sp"
+                android:text="@string/none" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:orientation="horizontal" >
+            <TextView
+                style="@style/LabelColumnLeft01"
+                android:textSize="18sp"
                 android:text="@string/connection_status" />
             <TextView
                 android:id="@+id/connectionStatus"
                 style="@style/LabelColumnRight01"
+                android:textSize="18sp"
                 android:text="@string/none" />
         </LinearLayout>
     </LinearLayout>

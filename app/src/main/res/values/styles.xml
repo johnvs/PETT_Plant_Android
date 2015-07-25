@@ -54,7 +54,7 @@
     <style name="LabelColumnLeft01" parent="LabelTextPlus">
         <item name="android:layout_marginLeft">10dp</item>
         <item name="android:singleLine">true</item>
-        <item name="android:layout_weight">0.95</item>
+        <item name="android:layout_weight">1.25</item>
     </style>
 
     <style name="LabelColumnRight" parent="LabelTextPlus">
@@ -63,7 +63,7 @@
 
     <style name="LabelColumnRight01" parent="LabelTextPlus">
         <item name="android:layout_marginRight">20dp</item>
-        <item name="android:layout_weight">1.05</item>
+        <item name="android:layout_weight">1</item>
     </style>
 
 
