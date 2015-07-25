@@ -56,6 +56,7 @@
     <string name="title_other_devices">Other Available Devices</string>
     <string name="button_scan">Scan for devices</string>
 
+    <string name="pett_plant">PETT Plant</string>
     <string name="pett_plant_connection">PETT Plant Connection</string>
     <string name="scan_new_plant">Scan For PETT Plants</string>
     <string name="bluetooth_scan">Bluetooth</string>

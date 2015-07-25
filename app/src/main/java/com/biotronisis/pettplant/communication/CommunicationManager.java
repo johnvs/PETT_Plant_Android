@@ -392,7 +392,7 @@ public class CommunicationManager {
 
 		@Override
 		public void onConnectionState(ConnectionState connectionState) {
-			
+
 			switch (connectionState) {
 				case ESTABLISHED:
 					pettPlantService.onCommConnected();
@@ -400,12 +400,12 @@ public class CommunicationManager {
 				case CONNECTING:
 					pettPlantService.onCommConnecting();
 					break;
-                case NONE:
-                    pettPlantService.onCommDisconnected();
-                    break;
-                case FAILED:
-                    pettPlantService.onCommFailed();
-                    break;
+				case NONE:
+					pettPlantService.onCommDisconnected();
+					break;
+				case FAILED:
+					pettPlantService.onCommFailed();
+					break;
 				default:
 					break;
 			}

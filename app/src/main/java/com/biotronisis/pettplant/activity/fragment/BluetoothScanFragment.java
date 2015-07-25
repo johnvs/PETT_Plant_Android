@@ -28,7 +28,7 @@ public final class BluetoothScanFragment extends DialogFragment {
 //    private static final String TAG = "BluetoothScanFragment";
 
     // Return Intent extra
-    public static String EXTRA_DEVICE_ADDRESS = "device_address";
+//    public static String EXTRA_DEVICE_ADDRESS = "device_address";
     
     private LayoutInflater inflator;
 
@@ -162,7 +162,7 @@ public final class BluetoothScanFragment extends DialogFragment {
 			}
 			
 			MyItem item = items.get(position);
-			boolean bonded = item.device.getBondState() == BluetoothDevice.BOND_BONDED;
+			boolean bonded = (item.device.getBondState() == BluetoothDevice.BOND_BONDED);
 			int colorId = bonded ? android.R.color.black : android.R.color.darker_gray;
 			int color = getResources().getColor(colorId);
 			

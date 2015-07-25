@@ -14,6 +14,8 @@ import java.util.logging.Level;
 
 public class CommunicationParams  {
 
+   // Shared Preferences stuff - http://stackoverflow.com/a/19613702/1130859
+
 	private static final String TAG = "CommunicationParams";
 
 	public static final String COMM_NAME = "name";
