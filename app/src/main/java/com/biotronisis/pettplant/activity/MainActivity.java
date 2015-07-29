@@ -15,6 +15,8 @@ import com.biotronisis.pettplant.service.PettPlantService;
 
 public class MainActivity extends AbstractBaseActivity {
 
+   // This was added on the develop branch.
+
    private static String TAG = "MainActivity";
 
    @Override
