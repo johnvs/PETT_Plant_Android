@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.IBinder;
@@ -21,14 +20,16 @@ import com.biotronisis.pettplant.activity.MainActivity;
 import com.biotronisis.pettplant.communication.CommunicationErrorType;
 import com.biotronisis.pettplant.communication.ConnectionState;
 import com.biotronisis.pettplant.communication.ICommAdapter;
+import com.biotronisis.pettplant.communication.transfer.EmptyResponse;
+import com.biotronisis.pettplant.communication.transfer.ResponseCallback;
+import com.biotronisis.pettplant.communication.transfer.RunEntrainmentCommand;
 import com.biotronisis.pettplant.file.ErrorHandler;
-import com.biotronisis.pettplant.persist.AppParams;
 import com.biotronisis.pettplant.communication.CommunicationManager;
 import com.biotronisis.pettplant.communication.CommunicationManager.CommunicationManagerListener;
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.model.CommunicationParams;
+import com.biotronisis.pettplant.type.EntrainmentMode;
 
-import java.sql.SQLException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -270,27 +271,27 @@ public class PettPlantService extends Service {
 //            dispatchCommConnected();
 //
 //            // Initialize the meter's duty cycle to 50%
-//            setDutyCycle(32767, new SetDutyCycleCallback() {
+//            runEntrainmentSequence(32767, new RunEntrainmentCallback() {
 //
 //               @Override
 //               public void onSuccess() {
 //                  if (MyDebug.LOG) {
-//                     Log.d(TAG, "OnCommConnected setDutyCycle success.");
+//                     Log.d(TAG, "OnCommConnected runEntrainmentSequence success.");
 //                  }
 //               }
 //
 //               @Override
 //               public void onFailed(String reason) {
 //                  if (MyDebug.LOG) {
-//                     Log.e(TAG, "OnCommConnected setDutyCycle failed. " + reason);
+//                     Log.e(TAG, "OnCommConnected runEntrainmentSequence failed. " + reason);
 //                  }
 //
 //                  ErrorHandler errorHandler = ErrorHandler.getInstance();
 //                  errorHandler.logError(Level.WARNING, "MeterService.onCommConnected()$" +
-//                              "onResponse$SetDutyCycleCallback.onFailed(): " +
-//                              "setDutyCycle() failed - " + reason,
-//                        R.string.set_duty_cycle_failed_title,
-//                        R.string.set_duty_cycle_failed_message);
+//                              "onResponse$RunEntrainmentCallback.onFailed(): " +
+//                              "runEntrainmentSequence() failed - " + reason,
+//                        R.string.run_entrainment_failed_title,
+//                        R.string.run_entrainment_failed_message);
 //               }
 //            });
 //         }
@@ -452,5 +453,76 @@ public class PettPlantService extends Service {
 //      }
    }
 
+   private String toUserMessage(CommunicationErrorType errorType) {
+
+      switch (errorType) {
+         case TIMEOUT_RESPONSE:
+            return getString(R.string.plantCommandTimeout);
+         case MALFORMED_RESPONSE:
+            return getString(R.string.malformed_response);
+         case TRANSMIT_FAILED:
+            return getString(R.string.transmit_failed);
+         case UNEXPECTED_RESPONSE:
+            return getString(R.string.unexpected_response);
+         case UNKNOWN_RESPONSE:
+            return getString(R.string.unknown_response);
+         default:
+            return getString(R.string.plantCommandUnknownError);
+      }
+   }
+
+   public void runEntrainmentSequence(EntrainmentMode eMode, RunEntrainmentCallback callback) {
+      try {
+         RunEntrainmentCommand command = new RunEntrainmentCommand();
+         command.setEntrainmentSequence(eMode);
+         command.setResponseCallback(new RunEntrainmentResponseCallback(callback));
+
+         // Test
+         boolean test = false;
+         if (test) {
+            throw new Exception("test");
+         }
+
+         communicationManager.sendCommand(command);
+      } catch (Exception ex) {
+         if (MyDebug.LOG) {
+            Log.e(TAG, "failed to send set duty sysle", ex);
+         }
+         callback.onFailed(ex.toString());
+//            callback.onFailed(getString(R.string.failed_to_set_duty_cycle) + ex);
+      }
+   }
+
+   private class RunEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
+
+      private RunEntrainmentCallback callback;
+
+      public RunEntrainmentResponseCallback(RunEntrainmentCallback callback) {
+         this.callback = callback;
+      }
+
+      public void onResponse(EmptyResponse response) {
+         uiHandler.post(new Runnable() {
+            public void run() {
+               callback.onSuccess();
+            }
+         });
+      }
+
+      public void onFailed(final CommunicationErrorType type) {
+         uiHandler.post(new Runnable() {
+            public void run() {
+               callback.onFailed(toUserMessage(type));
+            }
+         });
+      }
+   }
+
+   public interface RunEntrainmentCallback {
+
+      public void onSuccess();
+
+      public void onFailed(String reason);
+   }
 
 }

@@ -46,6 +46,9 @@
     <string name="title_connected_to">Connected to <xliff:g id="device_name">%1$s</xliff:g></string>
     <string name="title_not_connected">Not connected to a Plant</string>
     <string name="title_comm_failed">Failed to connect to a Plant</string>
+    <string name="no_plant_connected_title">Alert - No Plant Connected</string>
+    <string name="no_plant_connected_message">The app is not connected to a plant. Connect to a
+        plant to continue.</string>
 
     <!--  DeviceListActivity -->
     <string name="scanning">scanning for devices...</string>
@@ -76,6 +79,13 @@
     <string name="meditation_description">This is a description of the meditation entrainment
         routine. Use this routine when you want to meditate.</string>
     <string name="time_remaining">Time Remaining</string>
+    <string name="run_entrainment_success">Run Entrainment</string>
+    <string name="run_entrainment_failed_title">Run Entrainment Failed</string>
+    <string name="run_entrainment_failed_message">An error was encountered while trying to run the
+        entrainment sequence.</string>
+
+    <!-- Color Mode Fragment -->
+    <string name="run_color_mode_success">Run Color Mode</string>
 
     <!-- Help Text -->
     <string name="cant_find_help_text">There is no help for this topic.</string>
@@ -144,4 +154,12 @@
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
     <string name="attempting_to_reconnect">Attempting to reconnect</string>
+
+    <!-- Service -->
+    <string name="plantCommandTimeout">The plant has not responded within the timeout.</string>
+    <string name="plantCommandUnknownError">An unknown communication error has occurred.</string>
+    <string name="malformed_response">Malformed Response</string>
+    <string name="transmit_failed">Transmit Failed</string>
+    <string name="unexpected_response">Unexpected Response</string>
+    <string name="unknown_response">Unknown Response</string>
 </resources>

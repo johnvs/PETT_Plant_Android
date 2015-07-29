@@ -16,22 +16,10 @@
 
 package com.biotronisis.pettplant.activity.fragment;
 
-import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.Intent;
+import android.app.AlertDialog;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -44,11 +32,13 @@ import android.widget.Toast;
 
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.AbstractBaseActivity;
+import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.model.PettPlantParams;
+import com.biotronisis.pettplant.service.PettPlantService;
 import com.biotronisis.pettplant.type.ColorMode;
 import com.biotronisis.pettplant.type.EntrainmentMode;
 
-import java.lang.ref.WeakReference;
+import java.util.logging.Level;
 
 /**
  * This fragment contains the controls for controlling the PETT Plant
@@ -101,8 +91,30 @@ public class PettPlantFragment extends AbstractBaseFragment {
    }
 
    @Override
-   public void onStart() {
-      super.onStart();
+   public void setupView(View view, Bundle savedInstanceState) {
+
+      // Setup the Entrainment controls
+      entrainmentSpinner = (Spinner) view.findViewById(R.id.spinner_entrainment);
+      ArrayAdapter<CharSequence> entrainmentAdapter = ArrayAdapter.createFromResource(getActivity(),
+            R.array.entrainment_array,
+            R.layout.cell_modes);
+      entrainmentSpinner.setAdapter(entrainmentAdapter);
+
+      entrainRunStopButton = (Button) view.findViewById(R.id.button_run_stop);
+      entrainRunStopButton.setOnClickListener(new EntrainmentRunStopOnClick());
+
+      entrainPauseResumeButton = (Button) view.findViewById(R.id.button_pause_resume);
+      loopCheckbox = (CheckBox) view.findViewById(R.id.checkbox_loop);
+
+      colorModeSpinner = (Spinner) view.findViewById(R.id.spinner_color_mode);
+      ArrayAdapter<CharSequence> colorModeAdapter = ArrayAdapter.createFromResource(getActivity(),
+            R.array.color_mode_array,
+            R.layout.cell_modes);
+      colorModeSpinner.setAdapter(colorModeAdapter);
+
+      colorModeSeekbar = (SeekBar) view.findViewById(R.id.seekbar_speed);
+      colorRunOffButton = (Button) view.findViewById(R.id.button_color_on_off);
+      colorPauseResumeButton = (Button) view.findViewById(R.id.button_color_pause_resume);
    }
 
    @Override
@@ -198,30 +210,56 @@ public class PettPlantFragment extends AbstractBaseFragment {
       pettPlantParams.saveData();
    }
 
-   @Override
-   public void setupView(View view, Bundle savedInstanceState) {
+   public void showNoPlantConnectedAlert() {
+      AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+      builder.setTitle(R.string.no_plant_connected_title);
+      builder.setMessage(R.string.no_plant_connected_message);
+      builder.setPositiveButton(R.string.ok, null);
+      builder.show();
+   }
 
-      // Setup the Entrainment controls
-      entrainmentSpinner = (Spinner) view.findViewById(R.id.spinner_entrainment);
-      ArrayAdapter<CharSequence> entrainmentAdapter = ArrayAdapter.createFromResource(getActivity(),
-            R.array.entrainment_array,
-            R.layout.cell_modes);
-      entrainmentSpinner.setAdapter(entrainmentAdapter);
+   private class EntrainmentRunStopOnClick implements View.OnClickListener {
 
-      entrainRunStopButton = (Button) view.findViewById(R.id.button_run_stop);
+      @Override
+      public void onClick(View v) {
 
-      entrainPauseResumeButton = (Button) view.findViewById(R.id.button_pause_resume);
-      loopCheckbox = (CheckBox) view.findViewById(R.id.checkbox_loop);
+         PettPlantService pettPlantService = PettPlantService.getInstance();
+         if (pettPlantService != null) {
+            // Make sure we are connected to a plant before trying to send it the command
+            if (pettPlantService.isConnected()) {
+               // Check the current mode of the button
+               if (entrainRunStopButton.getText() == EntrainmentMode.RUN) {
 
-      colorModeSpinner = (Spinner) view.findViewById(R.id.spinner_color_mode);
-      ArrayAdapter<CharSequence> colorModeAdapter = ArrayAdapter.createFromResource(getActivity(),
-            R.array.color_mode_array,
-            R.layout.cell_modes);
-      colorModeSpinner.setAdapter(colorModeAdapter);
+                  // Send the Run command
+                  pettPlantService.runEntrainmentSequence(
+                        EntrainmentMode.getEntrainmentMode(entrainmentSpinner.getSelectedItemPosition()),
+                        new PettPlantService.RunEntrainmentCallback() {
 
-      colorModeSeekbar = (SeekBar) view.findViewById(R.id.seekbar_speed);
-      colorRunOffButton = (Button) view.findViewById(R.id.button_color_on_off);
-      colorPauseResumeButton = (Button) view.findViewById(R.id.button_color_pause_resume);
+                     @Override
+                     public void onSuccess() {
+                        Toast.makeText(getActivity(), getString(R.string.run_entrainment_success),
+                              Toast.LENGTH_LONG).show();
+                        // Entrainment is now running, so change the Run/Stop button to Stop
+                        entrainRunStopButton.setText(EntrainmentMode.STOP);
+                     }
+
+                     @Override
+                     public void onFailed(String reason) {
+                        ErrorHandler errorHandler = ErrorHandler.getInstance();
+                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                    "SetEntrainmentRunOnClick.onClick(): Can't set duty cycle - " + reason,
+                              R.string.run_entrainment_failed_title,
+                              R.string.run_entrainment_failed_message);
+                     }
+                  });
+               } else if (entrainRunStopButton.getText() == EntrainmentMode.STOP) {
+
+               }
+            } else {
+               showNoPlantConnectedAlert();
+            }
+         }
+      }
    }
 
 }
