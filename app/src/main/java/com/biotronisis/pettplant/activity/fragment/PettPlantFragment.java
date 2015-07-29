@@ -44,9 +44,6 @@ import android.widget.Toast;
 
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.AbstractBaseActivity;
-import com.biotronisis.pettplant.activity.DeviceListActivity;
-import com.biotronisis.pettplant.communication.BluetoothCommAdapter;
-import com.biotronisis.pettplant.communication.ConnectionState;
 import com.biotronisis.pettplant.model.PettPlantParams;
 import com.biotronisis.pettplant.type.ColorMode;
 import com.biotronisis.pettplant.type.EntrainmentMode;
