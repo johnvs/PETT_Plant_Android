@@ -2,8 +2,10 @@ package com.biotronisis.pettplant.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.biotronisis.pettplant.R;
+import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.persist.AppParams;
 import com.biotronisis.pettplant.type.ColorMode;
@@ -12,6 +14,8 @@ import com.biotronisis.pettplant.type.EntrainmentMode;
 import java.util.logging.Level;
 
 public class PettPlantParams {
+
+	private static final String TAG = "PettPlantParams";
 
 	public static final String COLOR_MODE = "colorMode";
 	public static final String COLOR_MODE_SPEED = "colorModeSpeed";
@@ -54,7 +58,7 @@ public class PettPlantParams {
 		return colorMode;
 	}
 
-   public void saveData() {
+   public boolean saveData() {
 
       SharedPreferences.Editor editor = appParams.edit();
 
@@ -71,12 +75,17 @@ public class PettPlantParams {
       // Commit the edits!
       boolean success = editor.commit();
       if (!success) {
-         ErrorHandler errorHandler = ErrorHandler.getInstance();
+			if (MyDebug.LOG) {
+				Log.e(TAG, "failed to save pettPlantparams");
+			}
+			ErrorHandler errorHandler = ErrorHandler.getInstance();
          errorHandler.logError(Level.WARNING, "PettPlantParams.saveData(): " +
                      "Can't update pettPlantParams - ",
                R.string.pett_plant_params_persist_error_title,
                R.string.pett_plant_params_persist_error_message);
       }
+
+		return success;
    }
 
    public void setColorMode(ColorMode colorMode) {

@@ -1,17 +1,23 @@
 package com.biotronisis.pettplant.service;
 
+import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.biotronisis.pettplant.R;
+import com.biotronisis.pettplant.activity.MainActivity;
 import com.biotronisis.pettplant.communication.CommunicationErrorType;
 import com.biotronisis.pettplant.communication.ConnectionState;
 import com.biotronisis.pettplant.communication.ICommAdapter;
@@ -69,6 +75,8 @@ public class PettPlantService extends Service {
       // save the ref to the singleton managed by android
       instance = this;
 
+      notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
       ErrorHandler errorHandler = ErrorHandler.getInstance();
       if (errorHandler == null) {
          if (MyDebug.LOG) {
@@ -121,14 +129,14 @@ public class PettPlantService extends Service {
       }
 
       instance = null;
-//      ErrorHandler errorHandler = ErrorHandler.getInstance();
-//      if (errorHandler != null) {
-//         errorHandler.logError(Level.INFO, "MeterService.onDestroy().", 0, 0);
-//      } else {
-//         if (MyDebug.LOG) {
-//            Log.d(TAG, "errorHandler is null.");
-//         }
-//      }
+      ErrorHandler errorHandler = ErrorHandler.getInstance();
+      if (errorHandler != null) {
+         errorHandler.logError(Level.INFO, "PettPlantService.onDestroy().", 0, 0);
+      } else {
+         if (MyDebug.LOG) {
+            Log.d(TAG, "errorHandler is null.");
+         }
+      }
 
       Runnable run = new Runnable() {
          public void run() {
@@ -149,6 +157,31 @@ public class PettPlantService extends Service {
       return instance;
    }
 
+   /**
+    * Adds a listener to be notified for the status of communications
+    */
+   public synchronized void addCommStatusListener(CommunicationManagerListener listener) {
+      if (MyDebug.LOG) {
+         Log.d(TAG, "Adding CommStatusListener");
+      }
+      synchronized (statusListeners) {
+         statusListeners.add(listener);
+      }
+   }
+
+   /**
+    * Removes a listener to be notified for the status of communications
+    */
+   public synchronized void removeCommStatusListener(CommunicationManagerListener listener) {
+      boolean result;
+      synchronized (statusListeners) {
+         result = statusListeners.remove(listener);
+      }
+      if (MyDebug.LOG) {
+         Log.d(TAG, "Removing CommStatusListener " + result);
+      }
+   }
+
    public boolean isReConnectingToBtDevice(String address) {
       return communicationManager.isReConnectingToBtDevice(address);
    }
@@ -156,6 +189,30 @@ public class PettPlantService extends Service {
    @Override
    public IBinder onBind(Intent intent) {
       return null;
+   }
+
+   private Notification createNotification(String message, boolean ongoing) {
+      if (MyDebug.LOG) {
+         Log.d(TAG, "Create Notification with message: " + message);
+      }
+      Intent intent = MainActivity.createIntent(this);
+      intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+      PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT);
+
+      BitmapDrawable icon = (BitmapDrawable) ContextCompat.getDrawable(this, R.drawable.ic_launcher);
+      // depricated method getResources().getDrawable(R.drawable.ic_launcher);
+
+
+      Notification notification = new NotificationCompat.Builder(this)
+            .setContentTitle(getString(R.string.pett_plant))
+            .setContentText(message).setContentIntent(contentIntent)
+            .setSmallIcon(R.drawable.ic_launcher)
+            .setLargeIcon(icon.getBitmap())
+            .setOngoing(ongoing)
+            .setTicker(message)
+            .build();
+      return notification;
    }
 
    public boolean isConnected() {
@@ -199,6 +256,10 @@ public class PettPlantService extends Service {
       if (MyDebug.LOG) {
          Log.d(TAG, "onCommConnected");
       }
+
+      dispatchCommConnected(); // This represents a simple BT connection, not any communications
+                               // between the app and the plant's code.
+
 
       // send an AlternateBreak right after comm connect then dispatch connected if the command
       // was responded to
@@ -249,10 +310,12 @@ public class PettPlantService extends Service {
    }
 
    private void dispatchCommConnected() {
+      final CommunicationParams communicationParams = new CommunicationParams(this);
+
       Runnable run = new Runnable() {
          public void run() {
-            String message = getString(R.string.title_connected_to);
-//            notificationManager.notify(NOTIFICATION_ID, createNotification(message, true));
+            String message = getString(R.string.title_connected_to, communicationParams.getName());
+            notificationManager.notify(NOTIFICATION_ID, createNotification(message, true));
             Toast.makeText(PettPlantService.this, message, Toast.LENGTH_SHORT).show();
 
             synchronized (statusListeners) {

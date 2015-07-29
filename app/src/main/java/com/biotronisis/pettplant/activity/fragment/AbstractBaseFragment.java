@@ -25,11 +25,9 @@ public abstract class AbstractBaseFragment extends Fragment {
 
    public abstract void setupView(View view, Bundle savedInstanceState);
 
-   public void populateData() {
-   }
+   public void populateData() {}
 
-   public void persistData() {
-   }
+   public void persistData() {}
 
    @Override
    public void onViewCreated(View view, Bundle savedInstanceState) {

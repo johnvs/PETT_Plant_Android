@@ -49,15 +49,26 @@
 
     <!--  DeviceListActivity -->
     <string name="scanning">scanning for devices...</string>
-    <string name="select_device">Select a device to connect</string>
+    <string name="select_device">Select a Plant to connect to</string>
     <string name="none_paired">No devices have been paired</string>
     <string name="none_found">No devices found</string>
     <string name="title_paired_devices">Paired Devices</string>
     <string name="title_other_devices">Other Available Devices</string>
     <string name="button_scan">Scan for devices</string>
 
+    <string name="pett_plant">PETT Plant</string>
+    <string name="pett_plant_connection">PETT Plant Connection</string>
+    <string name="scan_new_plant">Scan For PETT Plants</string>
+    <string name="bluetooth_scan">Bluetooth</string>
+    <string name="usb_scan">USB</string>
+    <string name="connection_type">Connection Type</string>
+    <string name="pett_plant_name">PETT Plant Name</string>
+    <string name="connection_status">Connection Status</string>
+    <string name="none">None</string>
+
     <!-- Options Menu -->
     <string name="insecure_connect">Connect to your Plant</string>
+    <string name="settings">Settings</string>
     <string name="help">Help</string>
     <!--<string name="done">Done</string>-->
 
@@ -94,8 +105,8 @@
         the error log file.</string>
 
     <string name="generic_error_title">Unexpected Error</string>
-    <string name="generic_error_message">An unexpected error has occurred. Please call ZLS Tech Support
-        and send them the Errors.log file.</string>
+    <string name="generic_error_message">An unexpected error has occurred. Please call Biotronisis
+        Tech Support and send them the Errors.log file.</string>
 
     <string name="bluetooth_adapter_error_title">Bluetooth Adapter Error</string>
     <string name="bluetooth_adapter_error_message">There is an error with this device\'s bluetooth
@@ -121,4 +132,16 @@
     <string name="pett_plant_params_persist_error_message">Unable to save Pett Plant parameters to
         Shared Preferences.</string>
 
+    <string name="paired">Paired</string>
+    <string name="not_paired">Not Paired</string>
+
+    <string name="no_bluetooth_support_title">Alert - No Bluetooth Support</string>
+    <string name="no_bluetooth_support_message">This device does not support Bluetooth</string>
+    <string name="enable_bluetooth_title">Bluetooth is not Enabled</string>
+    <string name="enable_bluetooth_message">Bluetooth is not currently enabled. Enable Bluetooth from
+        Settings.</string>
+    <string name="reconnecting_to_device">Reconnecting to your Pett Plant.</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="attempting_to_reconnect">Attempting to reconnect</string>
 </resources>
