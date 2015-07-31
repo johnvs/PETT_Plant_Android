@@ -32,6 +32,7 @@
         <item>Sound Responsive</item>
         <item>Rainbow Cycle 1</item>
         <item>Rainbow Cycle 2</item>
+        <item>Rainbow Cycle 3</item>
         <item>Preset 1</item>
         <item>Preset 2</item>
         <item>Preset 3</item>
@@ -86,6 +87,14 @@
     <string name="stop_entrainment_success">Stop Entrainment</string>
     <string name="stop_entrainment_failed_title">Stop Entrainment Failed</string>
     <string name="stop_entrainment_failed_message">An error was encountered while trying to stop the
+        entrainment sequence.</string>
+    <string name="pause_entrainment_success">Pause Entrainment</string>
+    <string name="pause_entrainment_failed_title">Pause Entrainment Failed</string>
+    <string name="pause_entrainment_failed_message">An error was encountered while trying to pause the
+        entrainment sequence.</string>
+    <string name="resume_entrainment_success">Resume Entrainment</string>
+    <string name="resume_entrainment_failed_title">Resume Entrainment Failed</string>
+    <string name="resume_entrainment_failed_message">An error was encountered while trying to resume the
         entrainment sequence.</string>
 
     <!-- Color Mode Fragment -->
