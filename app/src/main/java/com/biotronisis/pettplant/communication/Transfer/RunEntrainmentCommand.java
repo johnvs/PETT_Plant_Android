@@ -15,7 +15,8 @@ public class RunEntrainmentCommand extends AbstractCommand<EmptyResponse> {
 		byte[] bytes = new byte[4];
 		bytes[0] = 3;                        // Number of message bytes to follow
 		bytes[1] = COMMAND_ID;
-		bytes[2] = (byte)eMode.getValue();
+		bytes[2] = (byte)(eMode.getValue() + 0x01); // Add 0x01 to translate the sequence numbers into command data format
+		                                            // See ?? for plant command structure
 		bytes[3] = computeChecksum(bytes);
 		
 		return bytes;

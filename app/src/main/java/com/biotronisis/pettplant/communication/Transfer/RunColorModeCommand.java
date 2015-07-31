@@ -15,7 +15,8 @@ public class RunColorModeCommand extends AbstractCommand<EmptyResponse> {
 		byte[] bytes = new byte[4];
 		bytes[0] = 3;                        // Number of message bytes to follow
 		bytes[1] = COMMAND_ID;
-		bytes[2] = (byte)cMode.getValue();
+		bytes[2] = (byte)(cMode.getValue() + 0x01);  // Add 0x20 to translate the color mode values into command data format
+                                                   // See the app's readme.md file for plant command structure
 		bytes[3] = computeChecksum(bytes);
 		
 		return bytes;
