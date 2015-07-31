@@ -65,7 +65,7 @@
         android:id="@+id/title_loop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="25dp"
         android:layout_marginLeft="20dp"
         android:layout_marginStart="20dp"
         android:layout_below="@+id/entrainment_buttons"
@@ -133,7 +133,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="25dp"
         android:layout_below="@+id/color_buttons"
         android:textSize="18sp"
         android:text="@string/speed" />
