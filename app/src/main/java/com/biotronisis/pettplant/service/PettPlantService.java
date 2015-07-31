@@ -23,6 +23,7 @@ import com.biotronisis.pettplant.communication.ICommAdapter;
 import com.biotronisis.pettplant.communication.transfer.EmptyResponse;
 import com.biotronisis.pettplant.communication.transfer.ResponseCallback;
 import com.biotronisis.pettplant.communication.transfer.RunEntrainmentCommand;
+import com.biotronisis.pettplant.communication.transfer.StopEntrainmentCommand;
 import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.communication.CommunicationManager;
 import com.biotronisis.pettplant.communication.CommunicationManager.CommunicationManagerListener;
@@ -486,10 +487,29 @@ public class PettPlantService extends Service {
          communicationManager.sendCommand(command);
       } catch (Exception ex) {
          if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send set duty sysle", ex);
+            Log.e(TAG, "failed to send run entrainment sequence", ex);
          }
          callback.onFailed(ex.toString());
-//            callback.onFailed(getString(R.string.failed_to_set_duty_cycle) + ex);
+      }
+   }
+
+   public void stopEntrainmentSequence(StopEntrainmentCallback callback) {
+      try {
+         StopEntrainmentCommand command = new StopEntrainmentCommand();
+         command.setResponseCallback(new StopEntrainmentResponseCallback(callback));
+
+         // Test
+         boolean test = false;
+         if (test) {
+            throw new Exception("test");
+         }
+
+         communicationManager.sendCommand(command);
+      } catch (Exception ex) {
+         if (MyDebug.LOG) {
+            Log.e(TAG, "failed to send stop entrainment sequence", ex);
+         }
+         callback.onFailed(ex.toString());
       }
    }
 
@@ -518,7 +538,39 @@ public class PettPlantService extends Service {
       }
    }
 
+   private class StopEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
+
+      private StopEntrainmentCallback callback;
+
+      public StopEntrainmentResponseCallback(StopEntrainmentCallback callback) {
+         this.callback = callback;
+      }
+
+      public void onResponse(EmptyResponse response) {
+         uiHandler.post(new Runnable() {
+            public void run() {
+               callback.onSuccess();
+            }
+         });
+      }
+
+      public void onFailed(final CommunicationErrorType type) {
+         uiHandler.post(new Runnable() {
+            public void run() {
+               callback.onFailed(toUserMessage(type));
+            }
+         });
+      }
+   }
+
    public interface RunEntrainmentCallback {
+
+      public void onSuccess();
+
+      public void onFailed(String reason);
+   }
+
+   public interface StopEntrainmentCallback {
 
       public void onSuccess();
 

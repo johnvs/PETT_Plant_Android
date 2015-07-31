@@ -228,7 +228,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
             // Make sure we are connected to a plant before trying to send it the command
             if (pettPlantService.isConnected()) {
                // Check the current mode of the button
-               if (entrainRunStopButton.getText() == EntrainmentMode.RUN) {
+               if (entrainRunStopButton.getText().equals(EntrainmentMode.RUN)) {
 
                   // Send the Run command
                   pettPlantService.runEntrainmentSequence(
@@ -247,13 +247,33 @@ public class PettPlantFragment extends AbstractBaseFragment {
                      public void onFailed(String reason) {
                         ErrorHandler errorHandler = ErrorHandler.getInstance();
                         errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                    "SetEntrainmentRunOnClick.onClick(): Can't set duty cycle - " + reason,
+                                    "SetEntrainmentRunOnClick.onClick(): Can't run entrainment - " + reason,
                               R.string.run_entrainment_failed_title,
                               R.string.run_entrainment_failed_message);
                      }
                   });
-               } else if (entrainRunStopButton.getText() == EntrainmentMode.STOP) {
+               } else if (entrainRunStopButton.getText().equals(EntrainmentMode.STOP)) {
 
+                  // Send the Stop command
+                  pettPlantService.stopEntrainmentSequence(new PettPlantService.StopEntrainmentCallback() {
+
+                           @Override
+                           public void onSuccess() {
+                              Toast.makeText(getActivity(), getString(R.string.stop_entrainment_success),
+                                    Toast.LENGTH_LONG).show();
+                              // Entrainment is now stopped, so change the Run/Stop button to Run
+                              entrainRunStopButton.setText(EntrainmentMode.RUN);
+                           }
+
+                           @Override
+                           public void onFailed(String reason) {
+                              ErrorHandler errorHandler = ErrorHandler.getInstance();
+                              errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                          "SetEntrainmentStopOnClick.onClick(): Can't stop entrainment - " + reason,
+                                    R.string.stop_entrainment_failed_title,
+                                    R.string.stop_entrainment_failed_message);
+                           }
+                        });
                }
             } else {
                showNoPlantConnectedAlert();

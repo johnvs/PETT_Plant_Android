@@ -2,21 +2,18 @@ package com.biotronisis.pettplant.communication.transfer;
 
 import com.biotronisis.pettplant.type.EntrainmentMode;
 
-public class RunEntrainmentCommand extends AbstractCommand<EmptyResponse> {
+public class PauseEntrainmentCommand extends AbstractCommand<EmptyResponse> {
 	private static final long serialVersionUID = 1L;
 	
-	public static final Byte COMMAND_ID = (byte)0x10;
-	
-	private EntrainmentMode eMode;
+	public static final Byte COMMAND_ID = (byte)0x12;
 	
 	@Override
 	public byte[] toCommandBytes() {
 
-		byte[] bytes = new byte[4];
-		bytes[0] = 3;                        // Number of message bytes to follow
+		byte[] bytes = new byte[3];
+		bytes[0] = 2;                        // Number of message bytes to follow
 		bytes[1] = COMMAND_ID;
-		bytes[2] = (byte)eMode.getValue();
-		bytes[3] = computeChecksum(bytes);
+		bytes[2] = computeChecksum(bytes);
 		
 		return bytes;
 	}
@@ -36,7 +33,4 @@ public class RunEntrainmentCommand extends AbstractCommand<EmptyResponse> {
 		return EmptyResponse.RESPONSE_ID;
 	}
 
-	public void setEntrainmentSequence(EntrainmentMode eMode) {
-		this.eMode = eMode;
-	}
 }

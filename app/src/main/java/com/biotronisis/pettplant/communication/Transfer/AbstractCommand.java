@@ -60,6 +60,7 @@ public abstract class AbstractCommand<R extends AbstractResponse> implements Ser
          Log.d(TAG, "computeChecksum bytes = " + byteStr);
       }
 
+      // byte[0] = N number of message bytes to follow
       if (bytes[0] < 2 || bytes[0] != bytes.length - 1) {
          ErrorHandler errorHandler = ErrorHandler.getInstance();
          errorHandler.logError(Level.SEVERE, this.getClass().getSimpleName() + ".computeChecksum(): " +

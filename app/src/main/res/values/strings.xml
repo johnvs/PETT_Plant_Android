@@ -83,6 +83,10 @@
     <string name="run_entrainment_failed_title">Run Entrainment Failed</string>
     <string name="run_entrainment_failed_message">An error was encountered while trying to run the
         entrainment sequence.</string>
+    <string name="stop_entrainment_success">Stop Entrainment</string>
+    <string name="stop_entrainment_failed_title">Stop Entrainment Failed</string>
+    <string name="stop_entrainment_failed_message">An error was encountered while trying to stop the
+        entrainment sequence.</string>
 
     <!-- Color Mode Fragment -->
     <string name="run_color_mode_success">Run Color Mode</string>

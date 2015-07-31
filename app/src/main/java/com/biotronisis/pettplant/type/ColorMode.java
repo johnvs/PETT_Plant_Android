@@ -5,15 +5,15 @@ package com.biotronisis.pettplant.type;
  */
 public enum ColorMode {
 
-   SOUND_RESPONSIVE(0),
-   RAINBOW_CYCLE_1(1),
-   RAINBOW_CYCLE_2(2),
-   RAINBOW_CYCLE_3(3),
-   PRESET_1(4),
-   PRESET_2(5),
-   PRESET_3(6),
-   PRESET_4(7),
-   PRESET_5(8);
+   SOUND_RESPONSIVE(0x21),
+   RAINBOW_CYCLE_1(0x22),
+   RAINBOW_CYCLE_2(0x23),
+   RAINBOW_CYCLE_3(0x24),
+   PRESET_1(0x25),
+   PRESET_2(0x26),
+   PRESET_3(0x27),
+   PRESET_4(0x28),
+   PRESET_5(0x29);
 
    public static final int SPEED_DEFAULT = 50;
 

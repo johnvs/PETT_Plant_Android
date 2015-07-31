@@ -5,9 +5,9 @@ package com.biotronisis.pettplant.type;
  */
 public enum EntrainmentMode {
 
-   MEDITATE(0),
-   SLEEP(1),
-   STAY_AWAKE(2);
+   MEDITATE(0x01),
+   SLEEP(0x02),
+   STAY_AWAKE(0x03);
 
    // Run/Stop button values
    public static final String RUN = "Run";
