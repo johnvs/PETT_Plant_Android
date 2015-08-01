@@ -51,7 +51,7 @@
     <string name="no_plant_connected_message">The app is not connected to a plant. Connect to a
         plant to continue.</string>
 
-    <!--  DeviceListActivity -->
+    <!--  BluetoothScanFragment -->
     <string name="scanning">scanning for devices...</string>
     <string name="select_device">Select a Plant to connect to</string>
     <string name="none_paired">No devices have been paired</string>
@@ -90,15 +90,45 @@
         entrainment sequence.</string>
     <string name="pause_entrainment_success">Pause Entrainment</string>
     <string name="pause_entrainment_failed_title">Pause Entrainment Failed</string>
-    <string name="pause_entrainment_failed_message">An error was encountered while trying to pause the
-        entrainment sequence.</string>
+    <string name="pause_entrainment_failed_message">An error was encountered while trying to pause
+        the entrainment sequence.</string>
     <string name="resume_entrainment_success">Resume Entrainment</string>
     <string name="resume_entrainment_failed_title">Resume Entrainment Failed</string>
-    <string name="resume_entrainment_failed_message">An error was encountered while trying to resume the
-        entrainment sequence.</string>
+    <string name="resume_entrainment_failed_message">An error was encountered while trying to resume
+        the entrainment sequence.</string>
+    <string name="loop_off_entrainment_success">Loop Entrainment Off</string>
+    <string name="loop_off_entrainment_failed_title">Loop Off Entrainment Failed</string>
+    <string name="loop_off_entrainment_failed_message">An error was encountered while trying to turn
+        off looping of the entrainment sequence.</string>
+    <string name="loop_on_entrainment_success">Loop Entrainment On</string>
+    <string name="loop_on_entrainment_failed_title">Loop On Entrainment Failed</string>
+    <string name="loop_on_entrainment_failed_message">An error was encountered while trying to turn
+        on looping of the entrainment sequence.</string>
 
     <!-- Color Mode Fragment -->
+    <string name="set_color_mode_success">Set Color Mode</string>
+    <string name="set_color_mode_failed_title">Set Color Mode Failed</string>
+    <string name="set_color_mode_failed_message">An error was encountered while trying to set
+        the color mode.</string>
     <string name="run_color_mode_success">Run Color Mode</string>
+    <string name="run_color_mode_failed_title">Run Color Mode Failed</string>
+    <string name="run_color_mode_failed_message">An error was encountered while trying to run
+        the color mode.</string>
+    <string name="off_color_mode_success">Turn Off Color Mode</string>
+    <string name="off_color_mode_failed_title">Turn Off Color Mode Failed</string>
+    <string name="off_color_mode_failed_message">An error was encountered while trying to turn off
+        the color mode.</string>
+    <string name="pause_color_mode_success">Pause Color Mode</string>
+    <string name="pause_color_mode_failed_title">Pause Color Mode Failed</string>
+    <string name="pause_color_mode_failed_message">An error was encountered while trying to pause
+        the color mode.</string>
+    <string name="resume_color_mode_success">Resume Color Mode</string>
+    <string name="resume_color_mode_failed_title">Resume Color Mode Failed</string>
+    <string name="resume_color_mode_failed_message">An error was encountered while trying to resume
+        the color mode.</string>
+    <string name="set_speed_color_mode_failed_title">Set Speed Color Mode Failed</string>
+    <string name="set_speed_color_mode_failed_message">An error was encountered while trying to set
+        the color mode speed.</string>
 
     <!-- Help Text -->
     <string name="cant_find_help_text">There is no help for this topic.</string>
@@ -134,7 +164,6 @@
     <string name="bluetooth_adapter_error_title">Bluetooth Adapter Error</string>
     <string name="bluetooth_adapter_error_message">There is an error with this device\'s bluetooth
         adapter.</string>
-
     <string name="communication_type_error_title">Communication Type Error</string>
     <string name="communication_type_error_message">An unknown Communication Type was selected.
         Select either Bluetooth or USB.</string>
@@ -142,22 +171,18 @@
     <string name="activity_fatal_setup_title">Alert - Unable To Load</string>
     <string name="activity_fatal_setup_message">An unknown error has prevented this screen from
         loading.</string>
-
-    <string name="activity_fatal_persist_title">Unable To Save</string>
+    <string name="activity_fatal_persist_title">Alert - Unable To Save</string>
     <string name="activity_fatal_persist_message">An unknown error has prevented this screen from
         saving.</string>
 
     <string name="comm_params_persist_error_title">Unable To Save</string>
     <string name="comm_params_persist_error_message">Unable to save communication parameters to
         Shared Preferences.</string>
-
     <string name="pett_plant_params_persist_error_title">Unable To Save</string>
     <string name="pett_plant_params_persist_error_message">Unable to save Pett Plant parameters to
         Shared Preferences.</string>
-
     <string name="paired">Paired</string>
     <string name="not_paired">Not Paired</string>
-
     <string name="no_bluetooth_support_title">Alert - No Bluetooth Support</string>
     <string name="no_bluetooth_support_message">This device does not support Bluetooth</string>
     <string name="enable_bluetooth_title">Bluetooth is not Enabled</string>

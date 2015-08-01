@@ -21,16 +21,25 @@ import com.biotronisis.pettplant.communication.CommunicationErrorType;
 import com.biotronisis.pettplant.communication.ConnectionState;
 import com.biotronisis.pettplant.communication.ICommAdapter;
 import com.biotronisis.pettplant.communication.transfer.EmptyResponse;
+import com.biotronisis.pettplant.communication.transfer.LoopOffEntrainmentCommand;
+import com.biotronisis.pettplant.communication.transfer.LoopOnEntrainmentCommand;
+import com.biotronisis.pettplant.communication.transfer.OffColorModeCommand;
 import com.biotronisis.pettplant.communication.transfer.PauseEntrainmentCommand;
+import com.biotronisis.pettplant.communication.transfer.PauseColorModeCommand;
 import com.biotronisis.pettplant.communication.transfer.ResponseCallback;
+import com.biotronisis.pettplant.communication.transfer.ResumeColorModeCommand;
 import com.biotronisis.pettplant.communication.transfer.ResumeEntrainmentCommand;
+import com.biotronisis.pettplant.communication.transfer.RunColorModeCommand;
 import com.biotronisis.pettplant.communication.transfer.RunEntrainmentCommand;
+import com.biotronisis.pettplant.communication.transfer.SetColorModeCommand;
+import com.biotronisis.pettplant.communication.transfer.SetSpeedColorModeCommand;
 import com.biotronisis.pettplant.communication.transfer.StopEntrainmentCommand;
 import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.communication.CommunicationManager;
 import com.biotronisis.pettplant.communication.CommunicationManager.CommunicationManagerListener;
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.model.CommunicationParams;
+import com.biotronisis.pettplant.type.ColorMode;
 import com.biotronisis.pettplant.type.EntrainmentMode;
 
 import java.util.LinkedHashSet;
@@ -474,6 +483,9 @@ public class PettPlantService extends Service {
       }
    }
 
+   //
+   // ----------- Commands -----------
+   //
    public void runEntrainmentSequence(EntrainmentMode eMode, RunEntrainmentCallback callback) {
       try {
          RunEntrainmentCommand command = new RunEntrainmentCommand();
@@ -489,7 +501,7 @@ public class PettPlantService extends Service {
          communicationManager.sendCommand(command);
       } catch (Exception ex) {
          if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send run entrainment sequence", ex);
+            Log.e(TAG, "failed to send run entrainment sequence command", ex);
          }
          callback.onFailed(ex.toString());
       }
@@ -509,7 +521,7 @@ public class PettPlantService extends Service {
          communicationManager.sendCommand(command);
       } catch (Exception ex) {
          if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send stop entrainment sequence", ex);
+            Log.e(TAG, "failed to send stop entrainment sequence command", ex);
          }
          callback.onFailed(ex.toString());
       }
@@ -529,7 +541,7 @@ public class PettPlantService extends Service {
          communicationManager.sendCommand(command);
       } catch (Exception ex) {
          if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send stop entrainment sequence", ex);
+            Log.e(TAG, "failed to send pause entrainment sequence command", ex);
          }
          callback.onFailed(ex.toString());
       }
@@ -549,12 +561,178 @@ public class PettPlantService extends Service {
          communicationManager.sendCommand(command);
       } catch (Exception ex) {
          if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send stop entrainment sequence", ex);
+            Log.e(TAG, "failed to send resume entrainment sequence command", ex);
          }
          callback.onFailed(ex.toString());
       }
    }
 
+   public void loopOnEntrainmentSequence(LoopOnEntrainmentCallback callback) {
+      try {
+         LoopOnEntrainmentCommand command = new LoopOnEntrainmentCommand();
+         command.setResponseCallback(new LoopOnEntrainmentResponseCallback(callback));
+
+         // Test
+         boolean test = false;
+         if (test) {
+            throw new Exception("test");
+         }
+
+         communicationManager.sendCommand(command);
+      } catch (Exception ex) {
+         if (MyDebug.LOG) {
+            Log.e(TAG, "failed to send loop on entrainment command", ex);
+         }
+         callback.onFailed(ex.toString());
+      }
+   }
+
+   public void loopOffEntrainmentSequence(LoopOffEntrainmentCallback callback) {
+      try {
+         LoopOffEntrainmentCommand command = new LoopOffEntrainmentCommand();
+         command.setResponseCallback(new LoopOffEntrainmentResponseCallback(callback));
+
+         // Test
+         boolean test = false;
+         if (test) {
+            throw new Exception("test");
+         }
+
+         communicationManager.sendCommand(command);
+      } catch (Exception ex) {
+         if (MyDebug.LOG) {
+            Log.e(TAG, "failed to send loop off entrainment command", ex);
+         }
+         callback.onFailed(ex.toString());
+      }
+   }
+
+   public void setColorMode(ColorMode cMode, SetColorModeCallback callback) {
+      try {
+         SetColorModeCommand command = new SetColorModeCommand();
+         command.setColorMode(cMode);
+         command.setResponseCallback(new SetColorModeResponseCallback(callback));
+
+         // Test
+         boolean test = false;
+         if (test) {
+            throw new Exception("test");
+         }
+
+         communicationManager.sendCommand(command);
+      } catch (Exception ex) {
+         if (MyDebug.LOG) {
+            Log.e(TAG, "failed to send set color mode command", ex);
+         }
+         callback.onFailed(ex.toString());
+      }
+   }
+
+   public void runColorMode(ColorMode cMode, RunColorModeCallback callback) {
+      try {
+         RunColorModeCommand command = new RunColorModeCommand();
+         command.setColorMode(cMode);
+         command.setResponseCallback(new RunColorModeResponseCallback(callback));
+
+         // Test
+         boolean test = false;
+         if (test) {
+            throw new Exception("test");
+         }
+
+         communicationManager.sendCommand(command);
+      } catch (Exception ex) {
+         if (MyDebug.LOG) {
+            Log.e(TAG, "failed to send run color mode command", ex);
+         }
+         callback.onFailed(ex.toString());
+      }
+   }
+
+   public void offColorMode(OffColorModeCallback callback) {
+      try {
+         OffColorModeCommand command = new OffColorModeCommand();
+         command.setResponseCallback(new OffColorModeResponseCallback(callback));
+
+         // Test
+         boolean test = false;
+         if (test) {
+            throw new Exception("test");
+         }
+
+         communicationManager.sendCommand(command);
+      } catch (Exception ex) {
+         if (MyDebug.LOG) {
+            Log.e(TAG, "failed to send off color mode command", ex);
+         }
+         callback.onFailed(ex.toString());
+      }
+   }
+
+   public void pauseColorMode(PauseColorModeCallback callback) {
+      try {
+         PauseColorModeCommand command = new PauseColorModeCommand();
+         command.setResponseCallback(new PauseColorModeResponseCallback(callback));
+
+         // Test
+         boolean test = false;
+         if (test) {
+            throw new Exception("test");
+         }
+
+         communicationManager.sendCommand(command);
+      } catch (Exception ex) {
+         if (MyDebug.LOG) {
+            Log.e(TAG, "failed to send pause color mode command", ex);
+         }
+         callback.onFailed(ex.toString());
+      }
+   }
+
+   public void resumeColorMode(ResumeColorModeCallback callback) {
+      try {
+         ResumeColorModeCommand command = new ResumeColorModeCommand();
+         command.setResponseCallback(new ResumeColorModeResponseCallback(callback));
+
+         // Test
+         boolean test = false;
+         if (test) {
+            throw new Exception("test");
+         }
+
+         communicationManager.sendCommand(command);
+      } catch (Exception ex) {
+         if (MyDebug.LOG) {
+            Log.e(TAG, "failed to send resume color mode command", ex);
+         }
+         callback.onFailed(ex.toString());
+      }
+   }
+
+   public void setSpeedColorMode(byte speed, SetSpeedColorModeCallback callback) {
+      try {
+         SetSpeedColorModeCommand command = new SetSpeedColorModeCommand();
+         command.setSpeed(speed);
+         command.setResponseCallback(new SetSpeedColorModeResponseCallback(callback));
+
+         // Test
+         boolean test = false;
+         if (test) {
+            throw new Exception("test");
+         }
+
+         communicationManager.sendCommand(command);
+      } catch (Exception ex) {
+         if (MyDebug.LOG) {
+            Log.e(TAG, "failed to send set speed color mode command", ex);
+         }
+         callback.onFailed(ex.toString());
+      }
+   }
+
+   //
+   // ----------- Command Response Callbacks -----------
+   //
    private class RunEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
 
       private RunEntrainmentCallback callback;
@@ -635,6 +813,56 @@ public class PettPlantService extends Service {
       private ResumeEntrainmentCallback callback;
 
       public ResumeEntrainmentResponseCallback(ResumeEntrainmentCallback callback) {
+         this.callback = callback;
+      }
+
+      public void onResponse(EmptyResponse response) {
+         uiHandler.post(new Runnable() {
+            public void run() {
+               callback.onSuccess();
+            }
+         });
+      }
+
+      public void onFailed(final CommunicationErrorType type) {
+         uiHandler.post(new Runnable() {
+            public void run() {
+               callback.onFailed(toUserMessage(type));
+            }
+         });
+      }
+   }
+
+   private class LoopOnEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
+
+      private LoopOnEntrainmentCallback callback;
+
+      public LoopOnEntrainmentResponseCallback(LoopOnEntrainmentCallback callback) {
+         this.callback = callback;
+      }
+
+      public void onResponse(EmptyResponse response) {
+         uiHandler.post(new Runnable() {
+            public void run() {
+               callback.onSuccess();
+            }
+         });
+      }
+
+      public void onFailed(final CommunicationErrorType type) {
+         uiHandler.post(new Runnable() {
+            public void run() {
+               callback.onFailed(toUserMessage(type));
+            }
+         });
+      }
+   }
+
+   private class LoopOffEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
+
+      private LoopOffEntrainmentCallback callback;
+
+      public LoopOffEntrainmentResponseCallback(LoopOffEntrainmentCallback callback) {
          this.callback = callback;
       }
 
@@ -805,81 +1033,91 @@ public class PettPlantService extends Service {
       }
    }
 
+   //
+   // ----------- Command Callbacks -----------
+   //
    public interface RunEntrainmentCallback {
 
-      public void onSuccess();
+      void onSuccess();
 
-      public void onFailed(String reason);
+      void onFailed(String reason);
    }
 
    public interface StopEntrainmentCallback {
 
-      public void onSuccess();
+      void onSuccess();
 
-      public void onFailed(String reason);
+      void onFailed(String reason);
    }
 
    public interface PauseEntrainmentCallback {
 
-      public void onSuccess();
+      void onSuccess();
 
-      public void onFailed(String reason);
+      void onFailed(String reason);
    }
 
    public interface ResumeEntrainmentCallback {
 
-      public void onSuccess();
+      void onSuccess();
 
-      public void onFailed(String reason);
+      void onFailed(String reason);
    }
 
-   public interface LoopEntrainmentCallback {
+   public interface LoopOnEntrainmentCallback {
 
-      public void onSuccess();
+      void onSuccess();
 
-      public void onFailed(String reason);
+      void onFailed(String reason);
+   }
+
+   public interface LoopOffEntrainmentCallback {
+
+      void onSuccess();
+
+      void onFailed(String reason);
    }
 
    public interface SetColorModeCallback {
 
-      public void onSuccess();
+      void onSuccess();
 
-      public void onFailed(String reason);
+      void onFailed(String reason);
    }
 
    public interface RunColorModeCallback {
 
-      public void onSuccess();
+      void onSuccess();
 
-      public void onFailed(String reason);
+      void onFailed(String reason);
    }
 
    public interface OffColorModeCallback {
 
-      public void onSuccess();
+      void onSuccess();
 
-      public void onFailed(String reason);
+      void onFailed(String reason);
    }
 
    public interface PauseColorModeCallback {
 
-      public void onSuccess();
+      void onSuccess();
 
-      public void onFailed(String reason);
+      void onFailed(String reason);
    }
 
    public interface ResumeColorModeCallback {
 
-      public void onSuccess();
+      void onSuccess();
 
-      public void onFailed(String reason);
+      void onFailed(String reason);
    }
 
    public interface SetSpeedColorModeCallback {
 
-      public void onSuccess();
+      void onSuccess();
 
-      public void onFailed(String reason);
+      void onFailed(String reason);
    }
 
 }

@@ -133,25 +133,15 @@ public class PettPlantFragment extends AbstractBaseFragment {
 //    colorModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
       colorRunOffButton = (Button) view.findViewById(R.id.button_color_on_off);
+      colorRunOffButton.setOnClickListener(new ColorModeRunOffOnClick());
+
       colorPauseResumeButton = (Button) view.findViewById(R.id.button_color_pause_resume);
+      colorPauseResumeButton.setOnClickListener(new ColorModePauseResumeOnClick());
 
       colorModeSpeedTV = (TextView) view.findViewById(R.id.value_seekbar);
 
       colorModeSeekbar = (SeekBar) view.findViewById(R.id.seekbar_speed);
-      colorModeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-         @Override
-         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            colorModeSpeedTV.setText(Integer.toString(progress));
-            pettPlantService = PettPlantService.getInstance();
-
-         }
-
-         @Override
-         public void onStartTrackingTouch(SeekBar seekBar) {}
-
-         @Override
-         public void onStopTrackingTouch(SeekBar seekBar) {}
-      });
+      colorModeSeekbar.setOnSeekBarChangeListener(new ColorModeOnSeekbarChange());
 
    }
 
@@ -163,68 +153,48 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
       // These are here (and not in setupView) because they execute as soon as they are created
       // and their data needs to be populated first.
-      entrainmentSpinner.setOnItemSelectedListener(entrainmentSequenceOnItemSelectedListener);
-      colorModeSpinner.setOnItemSelectedListener(colorModeOnItemSelectedListener);
+      entrainmentSpinner.setOnItemSelectedListener(new EntrainmentSpinnerOnItemSelected());
+      colorModeSpinner.setOnItemSelectedListener(new ColorModeSpinnerOnItemSelected());
    }
 
-   AdapterView.OnItemSelectedListener entrainmentSequenceOnItemSelectedListener =
-         new AdapterView.OnItemSelectedListener() {
-      @Override
-      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-         // The if is needed because the listener fires when the app starts
-         if (position != lastEntrainmentPos) {
-            lastEntrainmentPos = position;
-            if (position < EntrainmentMode.values().length) {  // Check your bounds!
-               EntrainmentMode whichMode = EntrainmentMode.values()[position];
+//   AdapterView.OnItemSelectedListener entrainmentSequenceOnItemSelectedListener =
+//         new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//               // The if is needed because the listener fires when the app starts
+//               if (position != lastEntrainmentPos) {
+//                  lastEntrainmentPos = position;
+//
+//                  Toast entrainmentToast = Toast.makeText(getActivity(),
+//                        parent.getItemAtPosition(position) + " selected",
+//                        Toast.LENGTH_LONG);
+//                  entrainmentToast.show();
+//               }
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//            }
+//         };
 
-               switch (whichMode) {
-                  case MEDITATE: {
-
-                     break;
-                  }
-
-                  case SLEEP: {
-
-                     break;
-                  }
-
-                  case STAY_AWAKE: {
-
-                     break;
-                  }
-               }
-            }
-
-            Toast entrainmentToast = Toast.makeText(getActivity(),
-                  parent.getItemAtPosition(position) + " selected",
-                  Toast.LENGTH_LONG);
-            entrainmentToast.show();
-         }
-      }
-
-      @Override
-      public void onNothingSelected(AdapterView<?> parent) {
-      }
-   };
-
-   AdapterView.OnItemSelectedListener colorModeOnItemSelectedListener =
-         new AdapterView.OnItemSelectedListener() {
-      @Override
-      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-         // The if is needed because the listener fires when the app starts
-         if (position != lastColorModePos) {
-            lastColorModePos = position;
-            Toast colorModeToast = Toast.makeText(getActivity(),
-                  parent.getItemAtPosition(position) + " selected",
-                  Toast.LENGTH_LONG);
-            colorModeToast.show();
-         }
-      }
-
-      @Override
-      public void onNothingSelected(AdapterView<?> parent) {
-      }
-   };
+//   AdapterView.OnItemSelectedListener colorModeOnItemSelectedListener =
+//         new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//               // The if is needed because the listener fires when the app starts
+//               if (position != lastColorModePos) {
+//                  lastColorModePos = position;
+//                  Toast colorModeToast = Toast.makeText(getActivity(),
+//                        parent.getItemAtPosition(position) + " selected",
+//                        Toast.LENGTH_LONG);
+//                  colorModeToast.show();
+//               }
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//            }
+//         };
 
    @Override
    public void onDestroy() {
@@ -273,6 +243,31 @@ public class PettPlantFragment extends AbstractBaseFragment {
       builder.show();
    }
 
+
+   //
+   // ----------- Control OnClick Listeners -----------
+   //
+   private class EntrainmentSpinnerOnItemSelected implements AdapterView.OnItemSelectedListener {
+
+      @Override
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+         // The if is needed because the listener fires when the app starts
+         if (position != lastEntrainmentPos) {
+            lastEntrainmentPos = position;
+
+            Toast entrainmentToast = Toast.makeText(getActivity(),
+                  parent.getItemAtPosition(position) + " selected",
+                  Toast.LENGTH_LONG);
+            entrainmentToast.show();
+         }
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+
+      }
+   }
+
    private class EntrainmentRunStopOnClick implements View.OnClickListener {
 
       @Override
@@ -302,77 +297,37 @@ public class PettPlantFragment extends AbstractBaseFragment {
                            public void onFailed(String reason) {
                               ErrorHandler errorHandler = ErrorHandler.getInstance();
                               errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                          "SetEntrainmentRunOnClick.onClick(): Can't run entrainment - " + reason,
+                                          "EntrainmentRunStopOnClick.onClick(): Can't run entrainment - " + reason,
                                     R.string.run_entrainment_failed_title,
                                     R.string.run_entrainment_failed_message);
                            }
                         });
+
                } else if (entrainRunStopButton.getText().equals(EntrainmentMode.STOP)) {
 
                   // Send the Stop command
                   pettPlantService.stopEntrainmentSequence(new PettPlantService.StopEntrainmentCallback() {
 
-                           @Override
-                           public void onSuccess() {
-                              Toast.makeText(getActivity(), getString(R.string.stop_entrainment_success),
-                                    Toast.LENGTH_LONG).show();
-                              // Entrainment is now stopped, so change the Run/Stop button to Run
-                              entrainRunStopButton.setText(EntrainmentMode.RUN);
-                           }
-
-                           @Override
-                           public void onFailed(String reason) {
-                              ErrorHandler errorHandler = ErrorHandler.getInstance();
-                              errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                          "SetEntrainmentStopOnClick.onClick(): Can't stop entrainment - " + reason,
-                                    R.string.stop_entrainment_failed_title,
-                                    R.string.stop_entrainment_failed_message);
-                           }
-                        });
-               }
-            } else {
-               showNoPlantConnectedAlert();
-            }
-         }
-      }
-   }
-
-   private class EntrainmentLoopOnClickListener implements View.OnClickListener {
-
-      @Override
-      public void onClick(View v) {
-
-         PettPlantService pettPlantService = PettPlantService.getInstance();
-         if (pettPlantService != null) {
-            // Make sure we are connected to a plant before trying to send it the command
-            if (pettPlantService.isConnected()) {
-               // Check the current mode of the checkbox
-               if (loopCheckbox.isChecked()) {
-
-                  // Send the Loop off command
-                  pettPlantService.loopOffEntrainSequence(new PettPlantService.LoopEntrainmentCallback() {
-
                      @Override
                      public void onSuccess() {
-                        Toast.makeText(getActivity(), getString(R.string.pause_entrainment_success),
+                        Toast.makeText(getActivity(), getString(R.string.stop_entrainment_success),
                               Toast.LENGTH_LONG).show();
-                        // Entrainment is now paused, so change the Pause/Resume button to Resume
-                        entrainPauseResumeButton.setText(EntrainmentMode.RESUME);
+                        // Entrainment is now stopped, so change the Run/Stop button to Run
+                        entrainRunStopButton.setText(EntrainmentMode.RUN);
                      }
 
                      @Override
                      public void onFailed(String reason) {
                         ErrorHandler errorHandler = ErrorHandler.getInstance();
                         errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                    "EntrainmentPauseResumeOnClick.onClick(): Can't pause entrainment - " + reason,
-                              R.string.pause_entrainment_failed_title,
-                              R.string.pause_entrainment_failed_message);
+                                    "EntrainmentRunStopOnClick.onClick(): Can't stop entrainment - " + reason,
+                              R.string.stop_entrainment_failed_title,
+                              R.string.stop_entrainment_failed_message);
                      }
                   });
-
-               } else {
-
                }
+            } else {
+               showNoPlantConnectedAlert();
             }
          }
       }
@@ -391,25 +346,26 @@ public class PettPlantFragment extends AbstractBaseFragment {
                if (entrainPauseResumeButton.getText().equals(EntrainmentMode.PAUSE)) {
 
                   // Send the Pause command
-                  pettPlantService.pauseEntrainmentSequence(new PettPlantService.PauseEntrainmentCallback() {
+                  pettPlantService.pauseEntrainmentSequence(
+                        new PettPlantService.PauseEntrainmentCallback() {
 
-                     @Override
-                     public void onSuccess() {
-                        Toast.makeText(getActivity(), getString(R.string.pause_entrainment_success),
-                              Toast.LENGTH_LONG).show();
-                        // Entrainment is now paused, so change the Pause/Resume button to Resume
-                        entrainPauseResumeButton.setText(EntrainmentMode.RESUME);
-                     }
+                           @Override
+                           public void onSuccess() {
+                              Toast.makeText(getActivity(), getString(R.string.pause_entrainment_success),
+                                    Toast.LENGTH_LONG).show();
+                              // Entrainment is now pause, so change the Pause/Resume button to Resume
+                              entrainPauseResumeButton.setText(EntrainmentMode.RESUME);
+                           }
 
-                     @Override
-                     public void onFailed(String reason) {
-                        ErrorHandler errorHandler = ErrorHandler.getInstance();
-                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                    "EntrainmentPauseResumeOnClick.onClick(): Can't pause entrainment - " + reason,
-                              R.string.pause_entrainment_failed_title,
-                              R.string.pause_entrainment_failed_message);
-                     }
-                  });
+                           @Override
+                           public void onFailed(String reason) {
+                              ErrorHandler errorHandler = ErrorHandler.getInstance();
+                              errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                          "EntrainmentPauseResumeOnClick.onClick(): Can't pause entrainment - " + reason,
+                                    R.string.pause_entrainment_failed_title,
+                                    R.string.pause_entrainment_failed_message);
+                           }
+                        });
 
                } else if (entrainPauseResumeButton.getText().equals(EntrainmentMode.RESUME)) {
 
@@ -439,6 +395,277 @@ public class PettPlantFragment extends AbstractBaseFragment {
             }
          }
       }
+   }
+
+   private class EntrainmentLoopOnClickListener implements View.OnClickListener {
+
+      @Override
+      public void onClick(View v) {
+
+         PettPlantService pettPlantService = PettPlantService.getInstance();
+         if (pettPlantService != null) {
+            // Make sure we are connected to a plant before trying to send it the command
+            if (pettPlantService.isConnected()) {
+               // Check the current state of the checkbox, which is the NEW state
+               if (loopCheckbox.isChecked()) {
+
+                  // Send the Loop On command
+                  pettPlantService.loopOnEntrainmentSequence(new PettPlantService.LoopOnEntrainmentCallback() {
+
+                     @Override
+                     public void onSuccess() {
+                        Toast.makeText(getActivity(), getString(R.string.loop_on_entrainment_success),
+                              Toast.LENGTH_LONG).show();
+                     }
+
+                     @Override
+                     public void onFailed(String reason) {
+                        ErrorHandler errorHandler = ErrorHandler.getInstance();
+                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                    "EntrainmentLoopOnClick.onClick(): Can't loop on entrainment - " + reason,
+                              R.string.loop_on_entrainment_failed_title,
+                              R.string.loop_on_entrainment_failed_message);
+                     }
+                  });
+
+               } else {
+
+                  // Send the Loop Off command
+                  pettPlantService.loopOffEntrainmentSequence(new PettPlantService.LoopOffEntrainmentCallback() {
+
+                     @Override
+                     public void onSuccess() {
+                        Toast.makeText(getActivity(), getString(R.string.loop_off_entrainment_success),
+                              Toast.LENGTH_LONG).show();
+                     }
+
+                     @Override
+                     public void onFailed(String reason) {
+                        ErrorHandler errorHandler = ErrorHandler.getInstance();
+                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                    "EntrainmentLoopOnClick.onClick(): Can't loop off entrainment - " + reason,
+                              R.string.loop_off_entrainment_failed_title,
+                              R.string.loop_off_entrainment_failed_message);
+                     }
+                  });
+
+               }
+            }
+         }
+      }
+   }
+
+   private class ColorModeSpinnerOnItemSelected implements AdapterView.OnItemSelectedListener {
+
+      @Override
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+         // The if is needed because the listener fires when the app starts
+         if (position != lastColorModePos) {
+            lastColorModePos = position;
+            Toast colorModeToast = Toast.makeText(getActivity(),
+                  parent.getItemAtPosition(position) + " selected",
+                  Toast.LENGTH_LONG);
+            colorModeToast.show();
+
+            PettPlantService pettPlantService = PettPlantService.getInstance();
+            if (pettPlantService != null) {
+               // Make sure we are connected to a plant before trying to send it the command
+               if (pettPlantService.isConnected()) {
+
+                  // Send the Set Color Mode command
+                  pettPlantService.setColorMode(
+                        ColorMode.getColorMode(colorModeSpinner.getSelectedItemPosition()),
+                        new PettPlantService.SetColorModeCallback() {
+
+                           @Override
+                           public void onSuccess() {
+                              Toast.makeText(getActivity(), getString(R.string.set_color_mode_success),
+                                    Toast.LENGTH_LONG).show();
+                           }
+
+                           @Override
+                           public void onFailed(String reason) {
+                              ErrorHandler errorHandler = ErrorHandler.getInstance();
+                              errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                          "ColorModeSpinnerOnClick.onClick(): Can't set color mode - " + reason,
+                                    R.string.set_color_mode_failed_title,
+                                    R.string.set_color_mode_failed_message);
+                           }
+                        }
+                  );
+               }
+            }
+         }
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+
+      }
+   }
+
+   private class ColorModeRunOffOnClick implements View.OnClickListener {
+
+      @Override
+      public void onClick(View v) {
+
+         PettPlantService pettPlantService = PettPlantService.getInstance();
+         if (pettPlantService != null) {
+            // Make sure we are connected to a plant before trying to send it the command
+            if (pettPlantService.isConnected()) {
+               // Check the current mode of the button
+               if (colorRunOffButton.getText().equals(ColorMode.RUN)) {
+
+                  // Send the Run command
+                  pettPlantService.runColorMode(
+                        ColorMode.getColorMode(colorModeSpinner.getSelectedItemPosition()),
+                        new PettPlantService.RunColorModeCallback() {
+
+                           @Override
+                           public void onSuccess() {
+                              Toast.makeText(getActivity(), getString(R.string.run_color_mode_success),
+                                    Toast.LENGTH_LONG).show();
+                              // Color Mode is now running, so change the Run/Off button to Off
+                              colorRunOffButton.setText(ColorMode.OFF);
+                           }
+
+                           @Override
+                           public void onFailed(String reason) {
+                              ErrorHandler errorHandler = ErrorHandler.getInstance();
+                              errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                          "ColorModeRunOffOnClick.onClick(): Can't run color mode - " + reason,
+                                    R.string.run_color_mode_failed_title,
+                                    R.string.run_color_mode_failed_message);
+                           }
+                        });
+
+               } else if (colorRunOffButton.getText().equals(ColorMode.OFF)) {
+
+                  // Send the Off command
+                  pettPlantService.offColorMode(new PettPlantService.OffColorModeCallback() {
+
+                     @Override
+                     public void onSuccess() {
+                        Toast.makeText(getActivity(), getString(R.string.off_color_mode_success),
+                              Toast.LENGTH_LONG).show();
+                        // Color mode is now off, so change the Run/Off button to Run
+                        colorRunOffButton.setText(ColorMode.RUN);
+                     }
+
+                     @Override
+                     public void onFailed(String reason) {
+                        ErrorHandler errorHandler = ErrorHandler.getInstance();
+                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                    "ColorModeRunOffOnClick.onClick(): Can't turn off color mode - " + reason,
+                              R.string.off_color_mode_failed_title,
+                              R.string.off_color_mode_failed_message);
+                     }
+                  });
+               }
+            } else {
+               showNoPlantConnectedAlert();
+            }
+         }
+      }
+   }
+
+   private class ColorModePauseResumeOnClick implements View.OnClickListener {
+
+      @Override
+      public void onClick(View v) {
+
+         PettPlantService pettPlantService = PettPlantService.getInstance();
+         if (pettPlantService != null) {
+            // Make sure we are connected to a plant before trying to send it the command
+            if (pettPlantService.isConnected()) {
+               // Check the current mode of the button
+               if (colorPauseResumeButton.getText().equals(ColorMode.PAUSE)) {
+
+                  pettPlantService.pauseColorMode(new PettPlantService.PauseColorModeCallback() {
+
+                     @Override
+                     public void onSuccess() {
+                        Toast.makeText(getActivity(), getString(R.string.pause_color_mode_success),
+                              Toast.LENGTH_LONG).show();
+                        // Color Mode is now paused, so change the Pause/Resume button to Resume
+                        colorPauseResumeButton.setText(ColorMode.RESUME);
+                     }
+
+                     @Override
+                     public void onFailed(String reason) {
+                        ErrorHandler errorHandler = ErrorHandler.getInstance();
+                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                    "ColorModePauseResumeOnClick.onClick(): Can't pause color mode - " + reason,
+                              R.string.pause_color_mode_failed_title,
+                              R.string.pause_color_mode_failed_message);
+                     }
+                  });
+
+               } else if (colorPauseResumeButton.getText().equals(ColorMode.RESUME)) {
+
+                  pettPlantService.resumeColorMode(new PettPlantService.ResumeColorModeCallback() {
+
+                     @Override
+                     public void onSuccess() {
+                        Toast.makeText(getActivity(), getString(R.string.resume_color_mode_success),
+                              Toast.LENGTH_LONG).show();
+                        // Color Mode is now resumed, so change the Pause/Resume button to Pause
+                        colorPauseResumeButton.setText(ColorMode.PAUSE);
+                     }
+
+                     @Override
+                     public void onFailed(String reason) {
+                        ErrorHandler errorHandler = ErrorHandler.getInstance();
+                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                    "ColorModePauseResumeOnClick.onClick(): Can't resume color mode - " + reason,
+                              R.string.resume_color_mode_failed_title,
+                              R.string.resume_color_mode_failed_message);
+                     }
+                  });
+
+               }
+            }
+         }
+      }
+   }
+
+   private class ColorModeOnSeekbarChange implements SeekBar.OnSeekBarChangeListener {
+
+      @Override
+      public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+         colorModeSpeedTV.setText(Integer.toString(progress));
+
+         PettPlantService pettPlantService = PettPlantService.getInstance();
+         if (pettPlantService != null) {
+            // Make sure we are connected to a plant before trying to send it the command
+            if (pettPlantService.isConnected()) {
+
+               // Send command
+               pettPlantService.setSpeedColorMode((byte)progress,
+                     new PettPlantService.SetSpeedColorModeCallback() {
+                        @Override
+                        public void onSuccess() {}
+
+                        @Override
+                        public void onFailed(String reason) {
+                           ErrorHandler errorHandler = ErrorHandler.getInstance();
+                           errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                       "ColorModeOnSeekbarChange(): Can't set color mode speed- " + reason,
+                                 R.string.set_speed_color_mode_failed_title,
+                                 R.string.set_speed_color_mode_failed_message);
+                        }
+                     }
+               );
+
+            }
+         }
+      }
+
+      @Override
+      public void onStartTrackingTouch(SeekBar seekBar) {}
+
+      @Override
+      public void onStopTrackingTouch(SeekBar seekBar) {}
    }
 
 }
