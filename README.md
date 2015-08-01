@@ -35,7 +35,7 @@ This is an Android app designed to control a PETT Plant via Bluetooth.
     Off                 0x32
     Pause               0x33
     Resume              0x34
-    New Color Mode      0x35, <color mode>    Sent when color mode state = Running and
+    Set Color Mode      0x35, <color mode>    Sent when color mode state = Running and
                                               a new color mode is selected from the list
 
   General
