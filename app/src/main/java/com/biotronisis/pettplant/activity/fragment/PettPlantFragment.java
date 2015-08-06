@@ -66,15 +66,18 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
    private int lastEntrainmentPos;
    private int lastColorModePos;
+   private int lastColorModeSpeed;
 
    static final String STATE_ENTRAINMENT_MODE = "entrainmentMode";
    static final String STATE_COLOR_MODE = "colorMode";
+   static final String STATE_COLOR_MODE_SPEED = "colorModeSpeed";
 
    @Override
    public void onSaveInstanceState(Bundle savedInstanceState) {
       // Save the fragment state
       savedInstanceState.putInt(STATE_ENTRAINMENT_MODE, lastEntrainmentPos);
       savedInstanceState.putInt(STATE_COLOR_MODE, lastColorModePos);
+      savedInstanceState.putInt(STATE_COLOR_MODE_SPEED, lastColorModeSpeed);
 
       // Always call the superclass so it can save the view hierarchy state
       super.onSaveInstanceState(savedInstanceState);
@@ -141,7 +144,9 @@ public class PettPlantFragment extends AbstractBaseFragment {
       colorModeSpeedTV = (TextView) view.findViewById(R.id.value_seekbar);
 
       colorModeSeekbar = (SeekBar) view.findViewById(R.id.seekbar_speed);
-      colorModeSeekbar.setOnSeekBarChangeListener(new ColorModeOnSeekbarChange());
+
+//    This is in onResume()
+//      colorModeSeekbar.setOnSeekBarChangeListener(new ColorModeOnSeekbarChange());
 
    }
 
@@ -155,46 +160,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
       // and their data needs to be populated first.
       entrainmentSpinner.setOnItemSelectedListener(new EntrainmentSpinnerOnItemSelected());
       colorModeSpinner.setOnItemSelectedListener(new ColorModeSpinnerOnItemSelected());
+      colorModeSeekbar.setOnSeekBarChangeListener(new ColorModeOnSeekbarChange());
    }
-
-//   AdapterView.OnItemSelectedListener entrainmentSequenceOnItemSelectedListener =
-//         new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//               // The if is needed because the listener fires when the app starts
-//               if (position != lastEntrainmentPos) {
-//                  lastEntrainmentPos = position;
-//
-//                  Toast entrainmentToast = Toast.makeText(getActivity(),
-//                        parent.getItemAtPosition(position) + " selected",
-//                        Toast.LENGTH_LONG);
-//                  entrainmentToast.show();
-//               }
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//            }
-//         };
-
-//   AdapterView.OnItemSelectedListener colorModeOnItemSelectedListener =
-//         new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//               // The if is needed because the listener fires when the app starts
-//               if (position != lastColorModePos) {
-//                  lastColorModePos = position;
-//                  Toast colorModeToast = Toast.makeText(getActivity(),
-//                        parent.getItemAtPosition(position) + " selected",
-//                        Toast.LENGTH_LONG);
-//                  colorModeToast.show();
-//               }
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//            }
-//         };
 
    @Override
    public void onDestroy() {
@@ -212,11 +179,13 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
       colorModeSpinner.setSelection(pettPlantParams.getColorMode().getValue());
       colorModeSeekbar.setProgress(pettPlantParams.getColorModeSpeed());
+      colorModeSpeedTV.setText(Integer.toString(pettPlantParams.getColorModeSpeed()));
       colorRunOffButton.setText(pettPlantParams.getColorModeRunButton());
       colorPauseResumeButton.setText(pettPlantParams.getColorModePauseButton());
 
       lastEntrainmentPos = entrainmentSpinner.getSelectedItemPosition();
       lastColorModePos = colorModeSpinner.getSelectedItemPosition();
+      lastColorModeSpeed = colorModeSeekbar.getProgress();
 
    }
 
@@ -633,30 +602,34 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
       @Override
       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-         colorModeSpeedTV.setText(Integer.toString(progress));
+         if (progress != lastColorModeSpeed) {
+            lastColorModeSpeed = progress;
+            colorModeSpeedTV.setText(Integer.toString(progress));
 
-         PettPlantService pettPlantService = PettPlantService.getInstance();
-         if (pettPlantService != null) {
-            // Make sure we are connected to a plant before trying to send it the command
-            if (pettPlantService.isConnected()) {
+            PettPlantService pettPlantService = PettPlantService.getInstance();
+            if (pettPlantService != null) {
+               // Make sure we are connected to a plant before trying to send it the command
+               if (pettPlantService.isConnected()) {
 
-               // Send command
-               pettPlantService.setSpeedColorMode((byte)progress,
-                     new PettPlantService.SetSpeedColorModeCallback() {
-                        @Override
-                        public void onSuccess() {}
+                  // Send command
+                  pettPlantService.setSpeedColorMode((byte) progress,
+                        new PettPlantService.SetSpeedColorModeCallback() {
+                           @Override
+                           public void onSuccess() {
+                           }
 
-                        @Override
-                        public void onFailed(String reason) {
-                           ErrorHandler errorHandler = ErrorHandler.getInstance();
-                           errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                       "ColorModeOnSeekbarChange(): Can't set color mode speed- " + reason,
-                                 R.string.set_speed_color_mode_failed_title,
-                                 R.string.set_speed_color_mode_failed_message);
+                           @Override
+                           public void onFailed(String reason) {
+                              ErrorHandler errorHandler = ErrorHandler.getInstance();
+                              errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                          "ColorModeOnSeekbarChange(): Can't set color mode speed- " + reason,
+                                    R.string.set_speed_color_mode_failed_title,
+                                    R.string.set_speed_color_mode_failed_message);
+                           }
                         }
-                     }
-               );
+                  );
 
+               }
             }
          }
       }
