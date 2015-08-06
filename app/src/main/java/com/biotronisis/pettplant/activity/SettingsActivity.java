@@ -10,7 +10,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -98,6 +101,9 @@ public class SettingsActivity extends AbstractBaseActivity {
 
       bluetoothScanButton.setOnClickListener(new BluetoothScanClickListener());
 
+      ActionBar actionBar = getSupportActionBar();
+      actionBar.setDisplayHomeAsUpEnabled(true);
+
    }
 
    @Override
@@ -122,6 +128,26 @@ public class SettingsActivity extends AbstractBaseActivity {
       LocalBroadcastManager.getInstance(this).unregisterReceiver(pettPlantServiceEventReceiver);
 
 //      myUnregisterReceiver(mUsbReceiver);
+   }
+
+   @Override
+   public boolean onCreateOptionsMenu(Menu menu) {
+      // Inflate the menu; this adds items to the action bar.
+//      getMenuInflater().inflate(R.menu.menu_main, menu);
+      super.onCreateOptionsMenu(menu);
+
+      return true;
+   }
+
+   @Override
+   public boolean onOptionsItemSelected(MenuItem item) {
+      switch (item.getItemId()) {
+         case android.R.id.home:
+            this.finish();
+            return true;
+         default:
+            return super.onOptionsItemSelected(item);
+      }
    }
 
 //   private void myRegisterReceiver(BroadcastReceiver receiver, IntentFilter filter) {
