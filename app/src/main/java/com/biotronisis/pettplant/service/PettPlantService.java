@@ -31,6 +31,7 @@ import com.biotronisis.pettplant.communication.transfer.ResumeColorModeCommand;
 import com.biotronisis.pettplant.communication.transfer.ResumeEntrainmentCommand;
 import com.biotronisis.pettplant.communication.transfer.RunColorModeCommand;
 import com.biotronisis.pettplant.communication.transfer.RunEntrainmentCommand;
+import com.biotronisis.pettplant.communication.transfer.RunEntrainmentResponse;
 import com.biotronisis.pettplant.communication.transfer.SetColorModeCommand;
 import com.biotronisis.pettplant.communication.transfer.SetSpeedColorModeCommand;
 import com.biotronisis.pettplant.communication.transfer.StopEntrainmentCommand;
@@ -733,7 +734,7 @@ public class PettPlantService extends Service {
    //
    // ----------- Command Response Callbacks -----------
    //
-   private class RunEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
+   private class RunEntrainmentResponseCallback implements ResponseCallback<RunEntrainmentResponse> {
 
       private RunEntrainmentCallback callback;
 
@@ -741,7 +742,7 @@ public class PettPlantService extends Service {
          this.callback = callback;
       }
 
-      public void onResponse(EmptyResponse response) {
+      public void onResponse(RunEntrainmentResponse response) {
          uiHandler.post(new Runnable() {
             public void run() {
                callback.onSuccess();
