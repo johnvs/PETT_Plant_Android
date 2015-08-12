@@ -27,6 +27,8 @@ public class MainActivity extends AbstractBaseActivity {
 
    private static String TAG = "MainActivity";
 
+   private boolean illBeBack = false;
+
 //   private Context activityContext;
 
    private MyCommunicationManagerListener myCommunicationManagerListener =
@@ -75,6 +77,9 @@ public class MainActivity extends AbstractBaseActivity {
    @Override
    public void onResume() {
       super.onResume();
+
+      illBeBack = false;
+
       PettPlantService pettPlantService = PettPlantService.getInstance();
       if (pettPlantService != null) {
          pettPlantService.addCommStatusListener(myCommunicationManagerListener);
@@ -121,6 +126,7 @@ public class MainActivity extends AbstractBaseActivity {
       switch (item.getItemId()) {
          case R.id.settings: {
             // Launch the SettingsActivity
+            illBeBack = true;
             Intent intent = SettingsActivity.createIntent(this);
             startActivity(intent);
             return true;
@@ -140,10 +146,10 @@ public class MainActivity extends AbstractBaseActivity {
       super.onStop();
 
       // Don't stop the service if we are only rotating the device
-//      if (!isChangingConfigurations()) {
-//         Intent intent = PettPlantService.createIntent(this);
-//         stopService(intent);
-//      }
+      if (!isChangingConfigurations() && !illBeBack) {
+         Intent intent = PettPlantService.createIntent(this);
+         stopService(intent);
+      }
 
    }
 
@@ -151,10 +157,10 @@ public class MainActivity extends AbstractBaseActivity {
    public void onDestroy() {
       super.onDestroy();
 
-      if (!isChangingConfigurations()) {
-         Intent intent = PettPlantService.createIntent(this);
-         stopService(intent);
-      }
+//      if (!isChangingConfigurations()) {
+//         Intent intent = PettPlantService.createIntent(this);
+//         stopService(intent);
+//      }
    }
 
    /**
