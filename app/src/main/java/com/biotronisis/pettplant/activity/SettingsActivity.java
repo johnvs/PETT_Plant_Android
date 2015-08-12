@@ -115,7 +115,7 @@ public class SettingsActivity extends AbstractBaseActivity {
       }
       LocalBroadcastManager.getInstance(this).
             registerReceiver(pettPlantServiceEventReceiver,
-                  new IntentFilter(PettPlantService.PETT_PLANT_SERVICE_EVENT));
+                             new IntentFilter(PettPlantService.PETT_PLANT_SERVICE_EVENT));
    }
 
    @Override
