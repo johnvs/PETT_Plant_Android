@@ -58,7 +58,7 @@ public class MainActivity extends AbstractBaseActivity {
          Intent intent = PettPlantService.createIntent(this);
          startService(intent);
          if (MyDebug.LOG) {
-            Log.d(TAG, "Started PettPlantService.");
+            Log.d(TAG, "MainActivity:onCreate - Started PettPlantService.");
          }
       }
 
@@ -80,6 +80,12 @@ public class MainActivity extends AbstractBaseActivity {
          pettPlantService.addCommStatusListener(myCommunicationManagerListener);
 
          updateActionBar();
+      } else {
+         Intent intent = PettPlantService.createIntent(this);
+         startService(intent);
+         if (MyDebug.LOG) {
+            Log.d(TAG, "MainActivity:onResume - Started PettPlantService.");
+         }
       }
 
       LocalBroadcastManager.getInstance(this).
@@ -134,18 +140,22 @@ public class MainActivity extends AbstractBaseActivity {
       super.onStop();
 
       // Don't stop the service if we are only rotating the device
+//      if (!isChangingConfigurations()) {
+//         Intent intent = PettPlantService.createIntent(this);
+//         stopService(intent);
+//      }
+
+   }
+
+   @Override
+   public void onDestroy() {
+      super.onDestroy();
+
       if (!isChangingConfigurations()) {
          Intent intent = PettPlantService.createIntent(this);
          stopService(intent);
       }
-
    }
-
-//   @Override
-//   public void onDestroy() {
-//      super.onDestroy();
-//
-//   }
 
    /**
     * Creates an Intent for this Activity.
