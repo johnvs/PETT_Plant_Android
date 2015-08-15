@@ -30,14 +30,12 @@
     <string name="off">Off</string>
     <string-array name="color_mode_array">
         <item>Sound Responsive</item>
-        <item>Rainbow Cycle 1</item>
-        <item>Rainbow Cycle 2</item>
-        <item>Rainbow Cycle 3</item>
-        <item>Preset 1</item>
-        <item>Preset 2</item>
-        <item>Preset 3</item>
-        <item>Preset 4</item>
-        <item>Preset 5</item>
+        <item>Rainbow Loop All</item>
+        <item>Rainbow Loop Whole</item>
+        <item>Rainbow Loop Spectrum</item>
+        <item>Around The World</item>
+        <item>Random Pop</item>
+        <item>Fck Yeah Colors</item>
     </string-array>
 
     <!--  Bluetooth connection messages  -->
