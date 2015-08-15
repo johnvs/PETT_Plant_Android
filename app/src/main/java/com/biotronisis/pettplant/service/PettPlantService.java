@@ -40,8 +40,8 @@ import com.biotronisis.pettplant.communication.CommunicationManager;
 import com.biotronisis.pettplant.communication.CommunicationManager.CommunicationManagerListener;
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.model.CommunicationParams;
-import com.biotronisis.pettplant.type.ColorMode;
-import com.biotronisis.pettplant.type.EntrainmentMode;
+import com.biotronisis.pettplant.model.Entrainment;
+import com.biotronisis.pettplant.model.ColorMode;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -487,7 +487,7 @@ public class PettPlantService extends Service {
    //
    // ----------- Commands -----------
    //
-   public void runEntrainmentSequence(EntrainmentMode eMode, RunEntrainmentCallback callback) {
+   public void runEntrainmentSequence(Entrainment.Sequence eMode, RunEntrainmentCallback callback) {
       try {
          RunEntrainmentCommand command = new RunEntrainmentCommand();
          command.setEntrainmentSequence(eMode);
@@ -608,7 +608,7 @@ public class PettPlantService extends Service {
       }
    }
 
-   public void setColorMode(ColorMode cMode, SetColorModeCallback callback) {
+   public void setColorMode(ColorMode.Mode cMode, SetColorModeCallback callback) {
       try {
          SetColorModeCommand command = new SetColorModeCommand();
          command.setColorMode(cMode);
@@ -629,7 +629,7 @@ public class PettPlantService extends Service {
       }
    }
 
-   public void runColorMode(ColorMode cMode, RunColorModeCallback callback) {
+   public void runColorMode(ColorMode.Mode cMode, RunColorModeCallback callback) {
       try {
          RunColorModeCommand command = new RunColorModeCommand();
          command.setColorMode(cMode);

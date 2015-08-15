@@ -1,13 +1,13 @@
 package com.biotronisis.pettplant.communication.transfer;
 
-import com.biotronisis.pettplant.type.ColorMode;
+import com.biotronisis.pettplant.model.ColorMode;
 
 public class SetColorModeCommand extends AbstractCommand<EmptyResponse> {
 	private static final long serialVersionUID = 1L;
 	
 	public static final Byte COMMAND_ID = (byte)0x35;
 
-	private ColorMode cMode;
+	private ColorMode.Mode cMode;
 
 	@Override
 	public byte[] toCommandBytes() {
@@ -37,7 +37,7 @@ public class SetColorModeCommand extends AbstractCommand<EmptyResponse> {
 		return EmptyResponse.RESPONSE_ID;
 	}
 
-	public void setColorMode(ColorMode cMode) {
+	public void setColorMode(ColorMode.Mode cMode) {
 		this.cMode = cMode;
 	}
 }

@@ -8,8 +8,7 @@ import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.persist.AppParams;
-import com.biotronisis.pettplant.type.ColorMode;
-import com.biotronisis.pettplant.type.EntrainmentMode;
+import com.biotronisis.pettplant.model.ColorMode;
 
 import java.util.logging.Level;
 
@@ -29,32 +28,43 @@ public class PettPlantParams {
 
    private SharedPreferences appParams;
 
-	private ColorMode colorMode;
+	private ColorMode.Mode colorMode;
 	private int colorModeSpeed;
 	private String colorModeRunButton;
 	private String colorModePauseButton;
-	private EntrainmentMode entrainmentSequence;
-	private boolean entrainmentLoopCheckbox;
+//	private EntrainmentMode entrainmentSequence;
+	private Entrainment.Sequence entrainmentSequence;
+	private Entrainment.LoopCheckbox entrainmentLoopCheckbox;
+//	private boolean entrainmentLoopCheckbox;
 	private String entrainmentRunButton;
 	private String entrainmentPauseButton;
 
 	public PettPlantParams(Context context) {
 		appParams = context.getSharedPreferences(AppParams.PETT_PLANT_DATA_FILE, 0);
 
-		colorMode = ColorMode.getColorMode(appParams.getInt(COLOR_MODE, ColorMode.SOUND_RESPONSIVE.getValue()));
+		colorMode = ColorMode.Mode.getMode(appParams.getInt(COLOR_MODE, ColorMode.Mode.SOUND_RESPONSIVE.getValue()));
 		colorModeSpeed = appParams.getInt(COLOR_MODE_SPEED, ColorMode.SPEED_DEFAULT);
       colorModeRunButton = appParams.getString(COLOR_MODE_RUN_BUTTON, ColorMode.OFF);
       colorModePauseButton = appParams.getString(COLOR_MODE_PAUSE_BUTTON, ColorMode.PAUSE);
 
-      entrainmentSequence = EntrainmentMode.getEntrainmentMode(appParams.getInt(ENTRAINMENT_SEQUENCE, EntrainmentMode.MEDITATE.getValue()));
-      entrainmentLoopCheckbox = appParams.getBoolean(ENTRAINMENT_LOOP_CHECKBOX, EntrainmentMode.LOOP_CHECKBOX_DEFAULT);
-      entrainmentRunButton = appParams.getString(ENTRAINMENT_RUN_BUTTON, EntrainmentMode.STOP);
-      entrainmentPauseButton = appParams.getString(ENTRAINMENT_PAUSE_BUTTON, EntrainmentMode.PAUSE);
+      entrainmentSequence = Entrainment.Sequence.getSequence(appParams.getInt(
+				ENTRAINMENT_SEQUENCE, Entrainment.Sequence.MEDITATE.getValue()));
+
+		entrainmentLoopCheckbox = Entrainment.LoopCheckbox.getState(appParams.getInt(
+				ENTRAINMENT_LOOP_CHECKBOX, Entrainment.LoopCheckbox.OFF.getValue()));
+
+		entrainmentRunButton = appParams.getString(ENTRAINMENT_RUN_BUTTON, Entrainment.STOP);
+		entrainmentPauseButton = appParams.getString(ENTRAINMENT_PAUSE_BUTTON, Entrainment.PAUSE);
+
+//      entrainmentSequence = EntrainmentMode.getEntrainmentMode(appParams.getInt(ENTRAINMENT_SEQUENCE, EntrainmentMode.MEDITATE.getValue()));
+//      entrainmentLoopCheckbox = appParams.getBoolean(ENTRAINMENT_LOOP_CHECKBOX, EntrainmentMode.LOOP_CHECKBOX_DEFAULT);
+//      entrainmentRunButton = appParams.getString(ENTRAINMENT_RUN_BUTTON, EntrainmentMode.STOP);
+//      entrainmentPauseButton = appParams.getString(ENTRAINMENT_PAUSE_BUTTON, EntrainmentMode.PAUSE);
 
 	}
 
 
-	public ColorMode getColorMode() {
+	public ColorMode.Mode getColorMode() {
 		return colorMode;
 	}
 
@@ -70,7 +80,7 @@ public class PettPlantParams {
       editor.putInt(ENTRAINMENT_SEQUENCE, entrainmentSequence.getValue());
       editor.putString(ENTRAINMENT_RUN_BUTTON, entrainmentRunButton);
       editor.putString(ENTRAINMENT_PAUSE_BUTTON, entrainmentPauseButton);
-      editor.putBoolean(ENTRAINMENT_LOOP_CHECKBOX, entrainmentLoopCheckbox);
+      editor.putInt(ENTRAINMENT_LOOP_CHECKBOX, entrainmentLoopCheckbox.getValue());
 
       // Commit the edits!
       boolean success = editor.commit();
@@ -88,8 +98,8 @@ public class PettPlantParams {
 		return success;
    }
 
-   public void setColorMode(ColorMode colorMode) {
-		this.colorMode = colorMode;
+   public void setColorMode(ColorMode.Mode cMode) {
+		this.colorMode = cMode;
 	}
 
 	public int getColorModeSpeed() {
@@ -116,19 +126,27 @@ public class PettPlantParams {
 		this.colorModePauseButton = colorModePauseButton;
 	}
 
-	public EntrainmentMode getEntrainmentSequence() {
+	public Entrainment.Sequence getEntrainmentSequence() {
 		return entrainmentSequence;
 	}
 
-	public void setEntrainmentSequence(EntrainmentMode entrainmentSequence) {
+//	public EntrainmentMode getEntrainmentSequence() {
+//		return entrainmentSequence;
+//	}
+
+	public void setEntrainmentSequence(Entrainment.Sequence entrainmentSequence) {
 		this.entrainmentSequence = entrainmentSequence;
 	}
 
-	public boolean getEntrainmentLoopCheckbox() {
+//	public void setEntrainmentSequence(EntrainmentMode entrainmentSequence) {
+//		this.entrainmentSequence = entrainmentSequence;
+//	}
+
+	public Entrainment.LoopCheckbox getEntrainmentLoopCheckbox() {
 		return entrainmentLoopCheckbox;
 	}
 
-	public void setEntrainmentLoopCheckbox(boolean entrainmentLoopCheckbox) {
+	public void setEntrainmentLoopCheckbox(Entrainment.LoopCheckbox entrainmentLoopCheckbox) {
 		this.entrainmentLoopCheckbox = entrainmentLoopCheckbox;
 	}
 

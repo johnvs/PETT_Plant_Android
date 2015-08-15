@@ -34,10 +34,10 @@ import android.widget.Toast;
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.AbstractBaseActivity;
 import com.biotronisis.pettplant.file.ErrorHandler;
+import com.biotronisis.pettplant.model.Entrainment;
 import com.biotronisis.pettplant.model.PettPlantParams;
 import com.biotronisis.pettplant.service.PettPlantService;
-import com.biotronisis.pettplant.type.ColorMode;
-import com.biotronisis.pettplant.type.EntrainmentMode;
+import com.biotronisis.pettplant.model.ColorMode;
 
 import java.util.logging.Level;
 
@@ -175,7 +175,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
       entrainmentSpinner.setSelection(pettPlantParams.getEntrainmentSequence().getValue());
       entrainRunStopButton.setText(pettPlantParams.getEntrainmentRunButton());
       entrainPauseResumeButton.setText(pettPlantParams.getEntrainmentPauseButton());
-      loopCheckbox.setChecked(pettPlantParams.getEntrainmentLoopCheckbox());
+      loopCheckbox.setChecked(pettPlantParams.getEntrainmentLoopCheckbox().getValue() != 0); // Convert int to boolean
 
       colorModeSpinner.setSelection(pettPlantParams.getColorMode().getValue());
       colorModeSeekbar.setProgress(pettPlantParams.getColorModeSpeed());
@@ -191,12 +191,14 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
    @Override
    public void persistData() {
-      pettPlantParams.setEntrainmentSequence(EntrainmentMode.getEntrainmentMode(entrainmentSpinner.getSelectedItemPosition()));
+//      pettPlantParams.setEntrainmentSequence(EntrainmentMode.getEntrainmentMode(entrainmentSpinner.getSelectedItemPosition()));
+      pettPlantParams.setEntrainmentSequence(Entrainment.Sequence.getSequence(entrainmentSpinner.getSelectedItemPosition()));
       pettPlantParams.setEntrainmentRunButton(entrainRunStopButton.getText().toString());
       pettPlantParams.setColorModePauseButton(entrainPauseResumeButton.getText().toString());
-      pettPlantParams.setEntrainmentLoopCheckbox(loopCheckbox.isChecked());
+      pettPlantParams.setEntrainmentLoopCheckbox(loopCheckbox.isChecked() ?
+                  Entrainment.LoopCheckbox.OFF : Entrainment.LoopCheckbox.ON);
 
-      pettPlantParams.setColorMode(ColorMode.getColorMode(colorModeSpinner.getSelectedItemPosition()));
+      pettPlantParams.setColorMode(ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition()));
       pettPlantParams.setColorModeRunButton(colorRunOffButton.getText().toString());
       pettPlantParams.setColorModePauseButton(colorPauseResumeButton.getText().toString());
       pettPlantParams.setColorModeSpeed(colorModeSeekbar.getProgress());
@@ -247,11 +249,11 @@ public class PettPlantFragment extends AbstractBaseFragment {
             // Make sure we are connected to a plant before trying to send it the command
             if (pettPlantService.isConnected()) {
                // Check the current mode of the button
-               if (entrainRunStopButton.getText().equals(EntrainmentMode.RUN)) {
+               if (entrainRunStopButton.getText().equals(Entrainment.RUN)) {
 
                   // Send the Run command
                   pettPlantService.runEntrainmentSequence(
-                        EntrainmentMode.getEntrainmentMode(entrainmentSpinner.getSelectedItemPosition()),
+                        Entrainment.Sequence.getSequence(entrainmentSpinner.getSelectedItemPosition()),
                         new PettPlantService.RunEntrainmentCallback() {
 
                            @Override
@@ -259,7 +261,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                               Toast.makeText(getActivity(), getString(R.string.run_entrainment_success),
                                     Toast.LENGTH_LONG).show();
                               // Entrainment is now running, so change the Run/Stop button to Stop
-                              entrainRunStopButton.setText(EntrainmentMode.STOP);
+                              entrainRunStopButton.setText(Entrainment.STOP);
                            }
 
                            @Override
@@ -272,7 +274,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                            }
                         });
 
-               } else if (entrainRunStopButton.getText().equals(EntrainmentMode.STOP)) {
+               } else if (entrainRunStopButton.getText().equals(Entrainment.STOP)) {
 
                   // Send the Stop command
                   pettPlantService.stopEntrainmentSequence(new PettPlantService.StopEntrainmentCallback() {
@@ -282,7 +284,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                         Toast.makeText(getActivity(), getString(R.string.stop_entrainment_success),
                               Toast.LENGTH_LONG).show();
                         // Entrainment is now stopped, so change the Run/Stop button to Run
-                        entrainRunStopButton.setText(EntrainmentMode.RUN);
+                        entrainRunStopButton.setText(Entrainment.RUN);
                      }
 
                      @Override
@@ -312,7 +314,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
             // Make sure we are connected to a plant before trying to send it the command
             if (pettPlantService.isConnected()) {
                // Check the current mode of the button
-               if (entrainPauseResumeButton.getText().equals(EntrainmentMode.PAUSE)) {
+               if (entrainPauseResumeButton.getText().equals(Entrainment.PAUSE)) {
 
                   // Send the Pause command
                   pettPlantService.pauseEntrainmentSequence(
@@ -323,7 +325,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                               Toast.makeText(getActivity(), getString(R.string.pause_entrainment_success),
                                     Toast.LENGTH_LONG).show();
                               // Entrainment is now pause, so change the Pause/Resume button to Resume
-                              entrainPauseResumeButton.setText(EntrainmentMode.RESUME);
+                              entrainPauseResumeButton.setText(Entrainment.RESUME);
                            }
 
                            @Override
@@ -336,7 +338,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                            }
                         });
 
-               } else if (entrainPauseResumeButton.getText().equals(EntrainmentMode.RESUME)) {
+               } else if (entrainPauseResumeButton.getText().equals(Entrainment.RESUME)) {
 
                   // Send the Resume command
                   pettPlantService.resumeEntrainmentSequence(new PettPlantService.ResumeEntrainmentCallback() {
@@ -346,7 +348,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                         Toast.makeText(getActivity(), getString(R.string.resume_entrainment_success),
                               Toast.LENGTH_LONG).show();
                         // Entrainment is now resumed, so change the Pause/Resume button to Pause
-                        entrainPauseResumeButton.setText(EntrainmentMode.PAUSE);
+                        entrainPauseResumeButton.setText(Entrainment.PAUSE);
                      }
 
                      @Override
@@ -443,7 +445,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
                   // Send the Set Color Mode command
                   pettPlantService.setColorMode(
-                        ColorMode.getColorMode(colorModeSpinner.getSelectedItemPosition()),
+                        ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition()),
                         new PettPlantService.SetColorModeCallback() {
 
                            @Override
@@ -487,7 +489,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
                   // Send the Run command
                   pettPlantService.runColorMode(
-                        ColorMode.getColorMode(colorModeSpinner.getSelectedItemPosition()),
+                        ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition()),
                         new PettPlantService.RunColorModeCallback() {
 
                            @Override
@@ -602,7 +604,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
       @Override
       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-         if (progress != lastColorModeSpeed) {
+         if (progress != lastColorModeSpeed && progress != 0) {
             lastColorModeSpeed = progress;
             colorModeSpeedTV.setText(Integer.toString(progress));
 
