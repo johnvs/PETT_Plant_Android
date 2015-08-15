@@ -1,10 +1,17 @@
 package com.biotronisis.pettplant.communication.transfer;
 
+import com.biotronisis.pettplant.model.Entrainment;
+
 public class RequestStateResponse extends AbstractResponse {
     private static final long serialVersionUID = 1L;
 
-    public static final Byte RESPONSE_ID = (byte) 0x90;
-    public static final int MIN_RESPONSE_BYTES = 0;
+    public static final Byte RESPONSE_ID = (byte) 0xC0;
+    public static final int MIN_RESPONSE_BYTES = 7;       // CommandID, 5 data bytes and checksum
+
+    private Entrainment.Sequence entrainSequence;
+    private Entrainment.State entrainmentState;
+    private Entrainment.LoopCheckbox loopCheckbox;
+
 
     @Override
     public Byte getResponseId() {
