@@ -19,6 +19,7 @@ package com.biotronisis.pettplant.activity.fragment;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,10 +34,13 @@ import android.widget.Toast;
 
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.AbstractBaseActivity;
+import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.model.Entrainment;
 import com.biotronisis.pettplant.model.PettPlantParams;
-import com.biotronisis.pettplant.service.PettPlantService;
+import com.biotronisis.pettplant.plant.processor.PlantState;
+import com.biotronisis.pettplant.plant.PettPlantService;
+import com.biotronisis.pettplant.plant.PettPlantService.PlantStateListener;
 import com.biotronisis.pettplant.model.ColorMode;
 
 import java.util.logging.Level;
@@ -153,6 +157,12 @@ public class PettPlantFragment extends AbstractBaseFragment {
    @Override
    public void onResume() {
       super.onResume();
+
+      PettPlantService plantService = PettPlantService.getInstance();
+      if (plantService != null) {
+         plantService.addCommStatusListener(new MyPlantStateListener());
+
+      }
 
       AbstractBaseActivity.fragmentName = this.getClass().getSimpleName();
 
@@ -641,6 +651,84 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
       @Override
       public void onStopTrackingTouch(SeekBar seekBar) {}
+   }
+
+   private class MyPlantStateListener implements PlantStateListener {
+
+      @Override
+      public void onPlantState(PlantState plantState) {
+         if (MyDebug.LOG) {
+            Log.d(TAG, "processor state changed. state=" + plantState);
+         }
+
+         int entrainSeq = plantState.getEntrainSequence().getValue();
+         if (entrainSeq >= 0 && entrainSeq < Entrainment.Sequence.values().length) {
+            entrainmentSpinner.setSelection(entrainSeq);
+         }
+
+         switch (plantState.getEntrainmentState()) {
+            case STOPPED:
+               entrainRunStopButton.setText(Entrainment.RUN);
+               entrainPauseResumeButton.setText(Entrainment.PAUSE);
+               entrainPauseResumeButton.setEnabled(false);
+
+               // Make sure any future time indicator gets reset here.
+
+               break;
+
+            case RUNNING:
+               entrainRunStopButton.setText(Entrainment.STOP);
+               entrainPauseResumeButton.setText(Entrainment.PAUSE);
+               entrainPauseResumeButton.setEnabled(true);
+
+               break;
+
+            case PAUSED:
+               entrainRunStopButton.setText(Entrainment.STOP);
+               entrainPauseResumeButton.setText(Entrainment.RESUME);
+               entrainPauseResumeButton.setEnabled(true);
+
+               break;
+         }
+
+         loopCheckbox.setChecked(plantState.getLoopCheckbox().getValue() != 0);  // Convert from
+
+         int colorMode = plantState.getColorMode().getValue();
+         if (colorMode >= 0 && colorMode < ColorMode.Mode.values().length) {
+            colorModeSpinner.setSelection(colorMode);
+         }
+
+         switch (plantState.getColorModeState()) {
+            case OFF:
+               colorRunOffButton.setText(ColorMode.OFF);
+               colorPauseResumeButton.setText(ColorMode.PAUSE);
+               colorPauseResumeButton.setEnabled(false);
+               break;
+
+            case RUNNING:
+               colorRunOffButton.setText(ColorMode.OFF);
+               colorPauseResumeButton.setText(ColorMode.PAUSE);
+               colorPauseResumeButton.setEnabled(true);
+               break;
+
+            case PAUSED:
+               colorRunOffButton.setText(ColorMode.OFF);
+               colorPauseResumeButton.setText(ColorMode.RESUME);
+               colorPauseResumeButton.setEnabled(true);
+               break;
+         }
+
+         colorModeSeekbar.setProgress(plantState.getColorModeSpeed());
+
+      }
+
+      @Override
+      public void onError(String reason) {
+         Toast.makeText(getActivity(), reason, Toast.LENGTH_LONG).show();
+         if (MyDebug.LOG) {
+            Log.d(TAG, "processor state failed. " + reason);
+         }
+      }
    }
 
 }

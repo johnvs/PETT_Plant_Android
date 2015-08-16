@@ -1,4 +1,4 @@
-package com.biotronisis.pettplant.service;
+package com.biotronisis.pettplant.plant;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -26,6 +26,8 @@ import com.biotronisis.pettplant.communication.transfer.LoopOnEntrainmentCommand
 import com.biotronisis.pettplant.communication.transfer.OffColorModeCommand;
 import com.biotronisis.pettplant.communication.transfer.PauseEntrainmentCommand;
 import com.biotronisis.pettplant.communication.transfer.PauseColorModeCommand;
+import com.biotronisis.pettplant.communication.transfer.RequestStateCommand;
+import com.biotronisis.pettplant.communication.transfer.RequestStateResponse;
 import com.biotronisis.pettplant.communication.transfer.ResponseCallback;
 import com.biotronisis.pettplant.communication.transfer.ResumeColorModeCommand;
 import com.biotronisis.pettplant.communication.transfer.ResumeEntrainmentCommand;
@@ -42,6 +44,7 @@ import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.model.CommunicationParams;
 import com.biotronisis.pettplant.model.Entrainment;
 import com.biotronisis.pettplant.model.ColorMode;
+import com.biotronisis.pettplant.plant.processor.PlantState;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -271,56 +274,33 @@ public class PettPlantService extends Service {
          Log.d(TAG, "onCommConnected");
       }
 
-      dispatchCommConnected(); // This represents a simple BT connection, not any communications
+//      dispatchCommConnected(); // This represents a simple BT connection, not any communications
                                // between the app and the plant's code.
 
+      // Send an RequestState command right after comm connect,
+      // then dispatch connected if the command was responded to
+      RequestStateCommand requestStateCommand = new RequestStateCommand();
 
-      // send an AlternateBreak right after comm connect then dispatch connected if the command
-      // was responded to
-//      AlternateBreakCommand breakCommand = new AlternateBreakCommand();
-//      breakCommand.setResponseCallback(new ResponseCallback<AlternateBreakResponse>() {
-//         @Override
-//         public void onResponse(AlternateBreakResponse response) {
-//            dispatchCommConnected();
-//
-//            // Initialize the meter's duty cycle to 50%
-//            runEntrainmentSequence(32767, new RunEntrainmentCallback() {
-//
-//               @Override
-//               public void onSuccess() {
-//                  if (MyDebug.LOG) {
-//                     Log.d(TAG, "OnCommConnected runEntrainmentSequence success.");
-//                  }
-//               }
-//
-//               @Override
-//               public void onFailed(String reason) {
-//                  if (MyDebug.LOG) {
-//                     Log.e(TAG, "OnCommConnected runEntrainmentSequence failed. " + reason);
-//                  }
-//
-//                  ErrorHandler errorHandler = ErrorHandler.getInstance();
-//                  errorHandler.logError(Level.WARNING, "MeterService.onCommConnected()$" +
-//                              "onResponse$RunEntrainmentCallback.onFailed(): " +
-//                              "runEntrainmentSequence() failed - " + reason,
-//                        R.string.run_entrainment_failed_title,
-//                        R.string.run_entrainment_failed_message);
-//               }
-//            });
-//         }
-//
-//         @Override
-//         public void onFailed(CommunicationErrorType type) {
-//            dispatchCommError(type, toUserMessage(type), AlternateBreakCommand.COMMAND_ID);
-//
-//            ErrorHandler errorHandler = ErrorHandler.getInstance();
-//            errorHandler.logError(Level.WARNING, "MeterService.onCommConnected()$" +
-//                        "ResponseCallback.onFailed(): breakCommand failed with the error - " + type,
-//                  R.string.meter_not_responding_title,
-//                  R.string.meter_not_responding_message);
-//         }
-//      });
-//      communicationManager.sendCommand(breakCommand);
+      requestStateCommand.setResponseCallback(new ResponseCallback<RequestStateResponse>() {
+         @Override
+         public void onResponse(RequestStateResponse response) {
+            dispatchCommConnected();
+
+         }
+
+         @Override
+         public void onFailed(CommunicationErrorType type) {
+            dispatchCommError(type, toUserMessage(type), RequestStateCommand.COMMAND_ID);
+
+            ErrorHandler errorHandler = ErrorHandler.getInstance();
+            errorHandler.logError(Level.WARNING, "PettPlantService.onCommConnected()$" +
+                        "ResponseCallback.onFailed(): requestStateCommand failed with the error - " + type,
+                  R.string.plant_not_responding_title,
+                  R.string.plant_not_responding_message);
+         }
+      });
+
+      communicationManager.sendCommand(requestStateCommand);
    }
 
    private void dispatchCommConnected() {
@@ -393,7 +373,7 @@ public class PettPlantService extends Service {
       uiHandler.post(run);
    }
 
-   public void dispatchCommRecieved() {
+   public void dispatchCommReceived() {
       Runnable run = new Runnable() {
          public void run() {
             synchronized (statusListeners) {
@@ -1034,6 +1014,29 @@ public class PettPlantService extends Service {
       }
    }
 
+   private  class RequestStateResponseCallback implements ResponseCallback<RequestStateResponse> {
+
+      private RequestStateResponseCallback callback;
+      private PlantStateListener listener;
+
+      public RequestStateResponseCallback(RequestStateResponseCallback callback,
+                                          PlantStateListener listener) {
+         this.callback = callback;
+         this.listener = listener;
+      }
+
+      @Override
+      public void onResponse(RequestStateResponse response) {
+
+      }
+
+      @Override
+      public void onFailed(CommunicationErrorType type) {
+
+      }
+   }
+
+
    //
    // ----------- Command Callbacks -----------
    //
@@ -1121,4 +1124,10 @@ public class PettPlantService extends Service {
       void onFailed(String reason);
    }
 
+   public interface PlantStateListener {
+
+      public void onPlantState(PlantState plantState);
+
+      public void onError(String reason);
+   }
 }
