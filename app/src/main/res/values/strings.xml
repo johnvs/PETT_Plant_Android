@@ -198,4 +198,8 @@
     <string name="transmit_failed">Transmit Failed</string>
     <string name="unexpected_response">Unexpected Response</string>
     <string name="unknown_response">Unknown Response</string>
+    <string name="plant_not_responding_title">Alert - The Plant is Not Responding</string>
+    <string name="plant_not_responding_message">The plant is not responding. Verify that the
+        Bluetooth connection is active.</string>
+
 </resources>
