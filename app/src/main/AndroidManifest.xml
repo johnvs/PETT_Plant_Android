@@ -19,7 +19,7 @@
         android:allowBackup="true" >
 
         <service
-            android:name=".service.PettPlantService"
+            android:name=".plant.PettPlantService"
             android:label="PettPlantService" />
 
         <activity

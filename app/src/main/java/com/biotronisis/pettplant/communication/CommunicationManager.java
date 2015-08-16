@@ -15,7 +15,7 @@ import com.biotronisis.pettplant.communication.transfer.ResponseCallback;
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.model.CommunicationParams;
-import com.biotronisis.pettplant.service.PettPlantService;
+import com.biotronisis.pettplant.plant.PettPlantService;
 import com.biotronisis.pettplant.type.CommunicationType;
 
 import java.math.BigInteger;
@@ -262,25 +262,25 @@ public class CommunicationManager {
       AbstractCommand<?> waitingCommand = responseIdToWaitingCommands.get(responseId);
 
       if (waitingCommand == null) {
-         if (justEndedInterval) {
-            if (MyDebug.LOG) {
-               Log.d("EndObsRaceCond", "Caught one last message");
-            }
-            // Eat the response - its probably one last response received after sending
-            // EndIntervalReading command
-            justEndedInterval = false;
-            return;
-         } else {
+//         if (justEndedInterval) {
+//            if (MyDebug.LOG) {
+//               Log.d("EndObsRaceCond", "Caught one last message");
+//            }
+//            // Eat the response - its probably one last response received after sending
+//            // EndIntervalReading command
+//            justEndedInterval = false;
+//            return;
+//         } else {
             // got a response for a command that was not send or had previously timed out
-            if (MyDebug.LOG) {
-               Log.d("EndObsRaceCond", "Obs data set sent after response removed from list");
-            }
+//            if (MyDebug.LOG) {
+//               Log.d("EndObsRaceCond", "Obs data set sent after response removed from list");
+//            }
             pettPlantService.dispatchCommError(CommunicationErrorType.UNEXPECTED_RESPONSE,
                   "received response but none requested", responseId);
 
             // can't call onFailed on a callback, because we don't know who this belongs to
             return;
-         }
+//         }
       }
 
       AbstractResponse response;
@@ -303,7 +303,7 @@ public class CommunicationManager {
       response.fromResponseBytes(responseBytes);
 
       // notify all listeners data has been received
-      pettPlantService.dispatchCommRecieved();
+      pettPlantService.dispatchCommReceived();
 
       TimeoutBackgroundRunnable timeout = waitingCommandsToTimeouts.get(waitingCommand);
       backgroundHandler.removeCallbacks(timeout);

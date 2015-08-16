@@ -3,7 +3,7 @@ package com.biotronisis.pettplant.file;
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.AbstractBaseActivity;
 import com.biotronisis.pettplant.debug.MyDebug;
-import com.biotronisis.pettplant.service.PettPlantService;
+import com.biotronisis.pettplant.plant.PettPlantService;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;

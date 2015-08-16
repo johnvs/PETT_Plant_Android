@@ -19,7 +19,7 @@ import com.biotronisis.pettplant.communication.CommunicationManager;
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.model.CommunicationParams;
-import com.biotronisis.pettplant.service.PettPlantService;
+import com.biotronisis.pettplant.plant.PettPlantService;
 
 public class MainActivity extends AbstractBaseActivity {
 

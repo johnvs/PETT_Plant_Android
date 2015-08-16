@@ -3,7 +3,7 @@ package com.biotronisis.pettplant.communication;
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.file.ErrorHandler;
-import com.biotronisis.pettplant.service.PettPlantService;
+import com.biotronisis.pettplant.plant.PettPlantService;
 
 import java.io.IOException;
 import java.io.InputStream;

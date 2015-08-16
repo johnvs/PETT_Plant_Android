@@ -26,7 +26,7 @@ import com.biotronisis.pettplant.communication.CommunicationErrorType;
 import com.biotronisis.pettplant.communication.CommunicationManager.CommunicationManagerListener;
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.model.CommunicationParams;
-import com.biotronisis.pettplant.service.PettPlantService;
+import com.biotronisis.pettplant.plant.PettPlantService;
 import com.biotronisis.pettplant.type.CommunicationType;
 
 /**
