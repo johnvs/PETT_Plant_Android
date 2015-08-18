@@ -39,6 +39,30 @@ public class RequestStateResponse extends AbstractResponse {
       colorModeSpeed = asInt(responseBytes[7]);
    }
 
+   public Entrainment.Sequence getEntrainSequence() {
+      return entrainSequence;
+   }
+
+   public Entrainment.State getEntrainmentState() {
+      return entrainmentState;
+   }
+
+   public Entrainment.LoopCheckbox getLoopCheckbox() {
+      return loopCheckbox;
+   }
+
+   public ColorMode.Mode getColorMode() {
+      return colorMode;
+   }
+
+   public ColorMode.State getColorModeState() {
+      return colorModeState;
+   }
+
+   public int getColorModeSpeed() {
+      return colorModeSpeed;
+   }
+
    @Override
    public String toString() {
       return "RequestStateResponse{" +
