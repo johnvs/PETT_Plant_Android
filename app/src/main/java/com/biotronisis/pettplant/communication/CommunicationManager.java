@@ -58,9 +58,9 @@ public class CommunicationManager {
    private Map<AbstractCommand<?>, TimeoutBackgroundRunnable> waitingCommandsToTimeouts;
 
    // maps the end interval command id to the waitingCommand id
-   private Map<Byte, Byte> endCommandIdToStartCommandId;
+//   private Map<Byte, Byte> endCommandIdToStartCommandId;
 
-   private boolean justEndedInterval;
+//   private boolean justEndedInterval;
 
    @SuppressLint("UseSparseArrays")
    public CommunicationManager(PettPlantService pettPlantService, CommunicationParams communicationParams) {
@@ -77,7 +77,7 @@ public class CommunicationManager {
       this.responseIdToWaitingCommands = new HashMap<Byte, AbstractCommand<?>>();
       this.commandIdToWaitingCommands = new HashMap<Byte, AbstractCommand<?>>();
       this.waitingCommandsToTimeouts = new HashMap<AbstractCommand<?>, TimeoutBackgroundRunnable>();
-      this.endCommandIdToStartCommandId = new HashMap<Byte, Byte>();
+//      this.endCommandIdToStartCommandId = new HashMap<Byte, Byte>();
 
       // Test
 //		switch (CommunicationType.TEST) {
@@ -103,9 +103,6 @@ public class CommunicationManager {
    public boolean isReConnectingToBtDevice(String address) {
       return (communicationParams.getCommunicationType() == CommunicationType.BLUETOOTH &&
             commAdapter.isReConnectingToDevice(address));
-
-//      return (communicationParams.getCommunicationType() == CommunicationType.BLUETOOTH &&
-//            commAdapter.isReConnectingToDevice(address));
    }
 
 //    public boolean isUsbDeviceAttached(PettPlantService meter) {
@@ -182,21 +179,21 @@ public class CommunicationManager {
       adapter.sendBytes(bytes);
 
       // check if this command ends an interval
-      if (endCommandIdToStartCommandId.containsKey(commandId)) {
-
-         Byte startCommandId = endCommandIdToStartCommandId.remove(commandId);
-         AbstractCommand<?> startCommand = commandIdToWaitingCommands.remove(startCommandId);
-
-         if (MyDebug.LOG) {
-            Log.d("EndObsRaceCond", "Unregistering Interval command");
-         }
-         responseIdToWaitingCommands.remove(startCommand.getResponseId());
-
-         // cancel timeout for interval command
-         TimeoutBackgroundRunnable timeout = waitingCommandsToTimeouts.remove(startCommand);
-         backgroundHandler.removeCallbacks(timeout);
-         justEndedInterval = true;
-      }
+//      if (endCommandIdToStartCommandId.containsKey(commandId)) {
+//
+//         Byte startCommandId = endCommandIdToStartCommandId.remove(commandId);
+//         AbstractCommand<?> startCommand = commandIdToWaitingCommands.remove(startCommandId);
+//
+//         if (MyDebug.LOG) {
+//            Log.d("EndObsRaceCond", "Unregistering Interval command");
+//         }
+//         responseIdToWaitingCommands.remove(startCommand.getResponseId());
+//
+//         // cancel timeout for interval command
+//         TimeoutBackgroundRunnable timeout = waitingCommandsToTimeouts.remove(startCommand);
+//         backgroundHandler.removeCallbacks(timeout);
+//         justEndedInterval = true;
+//      }
 
       ResponseCallback<? extends AbstractResponse> callback = command.getResponseCallback();
       if (callback != null) {
