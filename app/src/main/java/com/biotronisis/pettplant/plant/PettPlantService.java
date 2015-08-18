@@ -44,6 +44,7 @@ import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.model.CommunicationParams;
 import com.biotronisis.pettplant.model.Entrainment;
 import com.biotronisis.pettplant.model.ColorMode;
+import com.biotronisis.pettplant.plant.processor.Plant;
 import com.biotronisis.pettplant.plant.processor.PlantState;
 
 import java.util.LinkedHashSet;
@@ -74,7 +75,12 @@ public class PettPlantService extends Service {
    public Set<CommunicationManagerListener> statusListeners =
          new LinkedHashSet<CommunicationManagerListener>();
 
-   private boolean readingInProgress = false;
+   // registry of listeners that want to be notified for the status of communications *access
+   // synchronized on statusListeners*
+   public Set<PlantStateListener> plantStateListeners =
+         new LinkedHashSet<PlantStateListener>();
+
+//   private boolean readingInProgress = false;
 
    private CommunicationManager communicationManager;
 
@@ -199,6 +205,31 @@ public class PettPlantService extends Service {
       }
    }
 
+   /**
+    * Adds a listener to be notified for the state of the plant
+    */
+   public synchronized void addPlantStateListener(PlantStateListener listener) {
+      if (MyDebug.LOG) {
+         Log.d(TAG, "Adding PlantStateListener");
+      }
+      synchronized (plantStateListeners) {
+         plantStateListeners.add(listener);
+      }
+   }
+
+   /**
+    * Removes a listener to be notified of the state of the plant
+    */
+   public synchronized void removePlantStateListener(PlantStateListener listener) {
+      boolean result;
+      synchronized (plantStateListeners) {
+         result = plantStateListeners.remove(listener);
+      }
+      if (MyDebug.LOG) {
+         Log.d(TAG, "Removing PlantStateListener " + result);
+      }
+   }
+
    public boolean isReConnectingToBtDevice(String address) {
       return communicationManager.isReConnectingToBtDevice(address);
    }
@@ -281,11 +312,16 @@ public class PettPlantService extends Service {
       // then dispatch connected if the command was responded to
       RequestStateCommand requestStateCommand = new RequestStateCommand();
 
+      Plant plant = new Plant();
       requestStateCommand.setResponseCallback(new ResponseCallback<RequestStateResponse>() {
          @Override
          public void onResponse(RequestStateResponse response) {
-            dispatchCommConnected();
-
+            // Validate data
+            if (Plant.isValidState(response)) {
+               plant.setState(response);
+               dispatchPlantStateChanged(plant.state);
+               dispatchCommConnected();
+            }
          }
 
          @Override
@@ -303,6 +339,25 @@ public class PettPlantService extends Service {
       communicationManager.sendCommand(requestStateCommand);
    }
 
+   private void dispatchPlantStateChanged(PlantState state) {
+//      final CommunicationParams communicationParams = new CommunicationParams(this);
+
+      Runnable run = new Runnable() {
+         public void run() {
+            String message = getString(R.string.got_me_some_state_yo);
+            notificationManager.notify(NOTIFICATION_ID, createNotification(message, true));
+            Toast.makeText(PettPlantService.this, message, Toast.LENGTH_SHORT).show();
+
+            synchronized (plantStateListeners) {
+               for (PlantStateListener listener : plantStateListeners) {
+                  listener.onPlantState(state);
+               }
+            }
+         }
+      };
+      uiHandler.post(run);
+   }
+
    private void dispatchCommConnected() {
       final CommunicationParams communicationParams = new CommunicationParams(this);
 
@@ -317,6 +372,11 @@ public class PettPlantService extends Service {
                   listener.onConnected();
                }
             }
+//            synchronized (plantStateListeners) {
+//               for (PlantStateListener listener : plantStateListeners) {
+//                  listener.onPlantState();
+//               }
+//            }
          }
       };
       uiHandler.post(run);

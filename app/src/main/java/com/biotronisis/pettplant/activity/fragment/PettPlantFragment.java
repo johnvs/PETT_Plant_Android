@@ -76,6 +76,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
    static final String STATE_COLOR_MODE = "colorMode";
    static final String STATE_COLOR_MODE_SPEED = "colorModeSpeed";
 
+   private MyPlantStateListener myPlantStateListener = new MyPlantStateListener();
+
    @Override
    public void onSaveInstanceState(Bundle savedInstanceState) {
       // Save the fragment state
@@ -155,13 +157,23 @@ public class PettPlantFragment extends AbstractBaseFragment {
    }
 
    @Override
+   public void onPause() {
+
+      PettPlantService plantService = PettPlantService.getInstance();
+      if (plantService != null) {
+         plantService.removePlantStateListener(myPlantStateListener);
+      }
+
+      super.onPause();
+   }
+
+   @Override
    public void onResume() {
       super.onResume();
 
       PettPlantService plantService = PettPlantService.getInstance();
       if (plantService != null) {
-         plantService.addCommStatusListener(new MyPlantStateListener());
-
+         plantService.addPlantStateListener(myPlantStateListener);
       }
 
       AbstractBaseActivity.fragmentName = this.getClass().getSimpleName();
