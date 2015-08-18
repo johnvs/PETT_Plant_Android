@@ -5,6 +5,31 @@ package com.biotronisis.pettplant.model;
  */
 public class Entrainment {
 
+   public enum Sequence {
+
+      MEDITATE(0),
+      SLEEP(1),
+      STAY_AWAKE(2);
+
+      private int id;
+
+      private Sequence(int id) {
+         this.id = id;
+      }
+
+      public int getValue() { return id; }
+      public int getId()    { return id; }
+
+      public static Sequence getSequence(int id) {
+         return Sequence.values()[id];
+      }
+
+      public static boolean isValid (int id) {
+         if (id >= 0 && id <= 2) { return true;  }
+         else                    { return false; }
+      }
+   }
+
    public enum State {
 
       STOPPED(0),
@@ -23,25 +48,10 @@ public class Entrainment {
       public static State getState(int id) {
          return State.values()[id];
       }
-   }
 
-   public enum Sequence {
-
-      MEDITATE(0),
-      SLEEP(1),
-      STAY_AWAKE(2);
-
-      private int id;
-
-      private Sequence(int id) {
-         this.id = id;
-      }
-
-      public int getValue() { return id; }
-      public int getId()    { return id; }
-
-      public static Sequence getSequence(int id) {
-         return Sequence.values()[id];
+      public static boolean isValid (int id) {
+         if (id >= 0 && id <= 2) { return true;  }
+         else                    { return false; }
       }
    }
 
@@ -69,6 +79,11 @@ public class Entrainment {
 
       public static LoopCheckbox getState(int id) {
          return LoopCheckbox.values()[id];
+      }
+
+      public static boolean isValid (int id) {
+         if (id >= 0 && id <= 1) { return true;  }
+         else                    { return false; }
       }
    }
 

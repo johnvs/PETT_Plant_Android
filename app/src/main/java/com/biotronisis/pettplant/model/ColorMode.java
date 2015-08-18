@@ -5,26 +5,6 @@ package com.biotronisis.pettplant.model;
  */
 public class ColorMode {
 
-   public enum State {
-
-      OFF(0),
-      RUNNING(1),
-      PAUSED(2);
-
-      private int id;
-
-      private State(int id) {
-         this.id = id;
-      }
-
-      public int getValue() { return id; }
-      public int getId()    { return id; }
-
-      public static State getState(int id) {
-         return State.values()[id];
-      }
-   }
-
    public enum Mode {
 
       SOUND_RESPONSIVE(0),
@@ -54,6 +34,41 @@ public class ColorMode {
       public static Mode getMode(int id) {
          return Mode.values()[id];
       }
+
+      public static boolean isValid (int id) {
+         if (id >= 0 && id <= 6) { return true;  }
+         else                    { return false; }
+      }
+   }
+
+   public enum State {
+
+      OFF(0),
+      RUNNING(1),
+      PAUSED(2);
+
+      private int id;
+
+      private State(int id) {
+         this.id = id;
+      }
+
+      public int getValue() { return id; }
+      public int getId()    { return id; }
+
+      public static State getState(int id) {
+         return State.values()[id];
+      }
+
+      public static boolean isValid (int id) {
+         if (id >= 0 && id <= 2) { return true;  }
+         else                    { return false; }
+      }
+   }
+
+   public static boolean isSpeedValid(int speed) {
+      if (speed > 0 && speed <= 100) { return true;  }
+      else                           { return false; }
    }
 
    public static final int SPEED_DEFAULT = 50;
