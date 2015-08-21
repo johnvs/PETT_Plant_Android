@@ -68,19 +68,15 @@ public class PettPlantService extends Service {
 
    private NotificationManager notificationManager;
 
-//   private CommunicationParamsDao communicationParamsDao;
-
-   // registry of listeners that want to be notified for the status of communications *access
-   // synchronized on statusListeners*
+   // Registry of listeners that want to be notified for the status of communications
+   // *access synchronized on statusListeners*
    public Set<CommunicationManagerListener> statusListeners =
          new LinkedHashSet<CommunicationManagerListener>();
 
-   // registry of listeners that want to be notified for the status of communications *access
-   // synchronized on statusListeners*
+   // registry of listeners that want to be notified for the status of communications
+   // *access synchronized on plantStateListeners*
    public Set<PlantStateListener> plantStateListeners =
          new LinkedHashSet<PlantStateListener>();
-
-//   private boolean readingInProgress = false;
 
    private CommunicationManager communicationManager;
 
@@ -114,23 +110,10 @@ public class PettPlantService extends Service {
 
       uiHandler = new Handler(getMainLooper());
 
-//      try {
       CommunicationParams communicationParams = new CommunicationParams(this);
 
-//         CommunicationParams communicationParams = communicationParamsDao.queryForDefault();
-//         communicationManager = new CommunicationManager(this, communicationParams);
       communicationManager = new CommunicationManager(this, communicationParams);
       communicationManager.connect();
-//      } catch (SQLException e) {
-//         if (MyDebug.LOG) {
-//            Log.e(TAG, "failed to retrieve default CommunicationsParams or a valid commAdapter " +
-//                  "was not created", e);
-//         }
-////         errorHandler.logError(Level.SEVERE, "MeterService.onCreate(): " +
-////                     "Failed to retrieve default CommunicationsParams - " + e,
-////               R.string.communication_params_file_open_error_title,
-////               R.string.communication_params_file_open_error_message);
-//      }
 
 //      IntentFilter usbFilter = new IntentFilter();
 //      usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
@@ -304,22 +287,18 @@ public class PettPlantService extends Service {
       if (MyDebug.LOG) {
          Log.d(TAG, "onCommConnected");
       }
-
-//      dispatchCommConnected(); // This represents a simple BT connection, not any communications
-                               // between the app and the plant's code.
-
       // Send an RequestState command right after comm connect,
       // then dispatch connected if the command was responded to
       RequestStateCommand requestStateCommand = new RequestStateCommand();
 
-      Plant plant = new Plant();
+      final Plant plant = new Plant();
       requestStateCommand.setResponseCallback(new ResponseCallback<RequestStateResponse>() {
          @Override
          public void onResponse(RequestStateResponse response) {
             // Validate data
             if (Plant.isValidState(response)) {
                plant.setState(response);
-               dispatchPlantStateChanged(plant.state);
+               dispatchPlantStateChanged(plant);
                dispatchCommConnected();
             }
          }
@@ -339,8 +318,7 @@ public class PettPlantService extends Service {
       communicationManager.sendCommand(requestStateCommand);
    }
 
-   private void dispatchPlantStateChanged(PlantState state) {
-//      final CommunicationParams communicationParams = new CommunicationParams(this);
+   private void dispatchPlantStateChanged(final Plant plant) {
 
       Runnable run = new Runnable() {
          public void run() {
@@ -350,7 +328,7 @@ public class PettPlantService extends Service {
 
             synchronized (plantStateListeners) {
                for (PlantStateListener listener : plantStateListeners) {
-                  listener.onPlantState(state);
+                  listener.onPlantState(plant.getState());
                }
             }
          }
@@ -372,11 +350,6 @@ public class PettPlantService extends Service {
                   listener.onConnected();
                }
             }
-//            synchronized (plantStateListeners) {
-//               for (PlantStateListener listener : plantStateListeners) {
-//                  listener.onPlantState();
-//               }
-//            }
          }
       };
       uiHandler.post(run);
@@ -401,6 +374,10 @@ public class PettPlantService extends Service {
          }
       };
       uiHandler.post(run);
+   }
+
+   public void onConnectionLost() {
+      communicationManager.connectionLost();
    }
 
    public void onCommFailed() {
