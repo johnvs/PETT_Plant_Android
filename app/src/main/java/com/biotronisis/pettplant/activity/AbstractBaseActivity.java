@@ -9,7 +9,7 @@ import android.view.MenuItem;
 /*
  * Created by john on 7/5/15.
  */
-public abstract class AbstractBaseActivity extends AppCompatActivity {
+public abstract class AbstractBaseActivity extends AppCompatActivity implements IntentParams {
 
    private boolean active;
    protected boolean hasFragments;

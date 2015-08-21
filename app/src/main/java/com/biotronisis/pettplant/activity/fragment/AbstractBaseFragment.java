@@ -13,12 +13,13 @@ import android.widget.LinearLayout;
 
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.AbstractBaseActivity.MyOnClickListener;
+import com.biotronisis.pettplant.activity.IntentParams;
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.file.ErrorHandler;
 
 import java.util.logging.Level;
 
-public abstract class AbstractBaseFragment extends Fragment {
+public abstract class AbstractBaseFragment extends Fragment implements IntentParams {
 
    private static final String TAG = "AbstractBaseFragment";
 //    protected boolean dummyLLHasFocus;
