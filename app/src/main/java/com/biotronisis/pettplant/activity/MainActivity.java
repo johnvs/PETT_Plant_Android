@@ -20,6 +20,8 @@ import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.model.CommunicationParams;
 import com.biotronisis.pettplant.plant.PettPlantService;
+//import com.biotronisis.pettplant.plant.processor.Plant;
+import com.biotronisis.pettplant.plant.processor.PlantState;
 
 public class MainActivity extends AbstractBaseActivity {
 
@@ -28,6 +30,7 @@ public class MainActivity extends AbstractBaseActivity {
    private static String TAG = "MainActivity";
 
    private boolean illBeBack = false;
+   private PlantState plantState;
 
 //   private Context activityContext;
 
@@ -82,9 +85,11 @@ public class MainActivity extends AbstractBaseActivity {
 
       PettPlantService pettPlantService = PettPlantService.getInstance();
       if (pettPlantService != null) {
-         pettPlantService.addCommStatusListener(myCommunicationManagerListener);
 
          updateActionBar();
+         pettPlantService.addCommStatusListener(myCommunicationManagerListener);
+
+
       } else {
          Intent intent = PettPlantService.createIntent(this);
          startService(intent);
@@ -127,11 +132,15 @@ public class MainActivity extends AbstractBaseActivity {
          case R.id.settings: {
             // Launch the SettingsActivity
             illBeBack = true;
-            Intent intent = SettingsActivity.createIntent(this);
-            startActivity(intent);
+
+            // If its null on return, we know we didn't get any new plantState in Settings
+            PlantState plantState = null;
+            Intent intent = SettingsActivity.createIntent(this, plantState);
+            startActivityForResult(intent, REQUEST_STATE);
             return true;
          }
          case R.id.action_help: {
+            illBeBack = true;
             Intent intent = HelpActivity.createIntent(this, getActivityName(), fragmentName);
             startActivity(intent);
             return true;
@@ -139,6 +148,21 @@ public class MainActivity extends AbstractBaseActivity {
       }
 
       return super.onOptionsItemSelected(item);
+   }
+
+   @Override
+   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+      if (requestCode == REQUEST_STATE) {
+         if (resultCode == RESULT_OK) {
+            plantState = (PlantState) data.getSerializableExtra(EXTRA_PLANT_STATE);
+
+            PettPlantFragment pettPlantFragment = (PettPlantFragment) getSupportFragmentManager().
+                  findFragmentById(R.id.pett_plant_fragment);
+            if (plantState != null) {
+               pettPlantFragment.updateState(plantState);
+            }
+         }
+      }
    }
 
    @Override
@@ -242,6 +266,7 @@ public class MainActivity extends AbstractBaseActivity {
             PettPlantService pettPlantService = PettPlantService.getInstance();
             if (pettPlantService != null) {
                pettPlantService.addCommStatusListener(myCommunicationManagerListener);
+               updateActionBar();
             }
 
 //         } else if (message.equals(PettPlantService.PETT_PLANT_SERVICE_DESTROYED)) {
