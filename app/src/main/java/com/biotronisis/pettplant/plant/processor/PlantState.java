@@ -3,10 +3,13 @@ package com.biotronisis.pettplant.plant.processor;
 import com.biotronisis.pettplant.model.ColorMode;
 import com.biotronisis.pettplant.model.Entrainment;
 
+import java.io.Serializable;
+
 /**
  * Created by john on 8/15/15.
  */
-public class PlantState {
+public class PlantState implements Serializable {
+   // Using Serializable to send objects from one activity to another
 
    private Entrainment.Sequence entrainSequence;
    private Entrainment.State entrainmentState;
