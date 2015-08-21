@@ -11,7 +11,7 @@ public class Plant {
 
    private static final String TAG = "Plant_Class";
 
-   public PlantState state;
+   private PlantState state;
 
    public Plant() {
       state = new PlantState();
@@ -26,9 +26,13 @@ public class Plant {
 
       if (!ColorMode.Mode.isValid(response.getColorMode().getId()))              { return false; }
       if (!ColorMode.State.isValid(response.getColorModeState().getId()))        { return false; }
-      if (!ColorMode.isSpeedValid(response.getColorModeSpeed()))                 { return false; }
+      if (!ColorMode.Speed.isValid(response.getColorModeSpeed()))                { return false; }
 
       return true;
+   }
+
+   public PlantState getState() {
+      return state;
    }
 
    public void setState(RequestStateResponse response) {
@@ -42,4 +46,5 @@ public class Plant {
       state.setColorModeState(response.getColorModeState());
       state.setColorModeSpeed(response.getColorModeSpeed());
    }
+
 }
