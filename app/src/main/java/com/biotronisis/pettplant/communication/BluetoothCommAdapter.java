@@ -320,6 +320,10 @@ public class BluetoothCommAdapter implements ICommAdapter {
       setState(ConnectionState.FAILED);
    }
 
+   public void connLost() {
+      connectionLost();
+   }
+
    /**
     * Indicate that the connection was lost and notify the UI Activity.
     */
@@ -731,13 +735,16 @@ public class BluetoothCommAdapter implements ICommAdapter {
          while (!cancelled) {
             try {
                // Read from the InputStream
-               bytes = mmInStream.read(buffer);
+               if (mmInStream.available() > 2) {
+                  bytes = mmInStream.read(buffer);
 
-               byte[] response = new byte[bytes];
-               System.arraycopy(buffer, 0, response, 0, bytes);
+                  byte[] response = new byte[bytes];
+                  System.arraycopy(buffer, 0, response, 0, bytes);
 
-               if (listener != null) {
-                  listener.onReceiveBytes(response);
+                  if (listener != null) {
+                     listener.onReceiveBytes(response);
+                  }
+
                }
             } catch (IOException e) {
                if (!cancelled) {

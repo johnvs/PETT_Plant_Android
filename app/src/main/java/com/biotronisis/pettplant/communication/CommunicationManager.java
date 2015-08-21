@@ -125,6 +125,10 @@ public class CommunicationManager {
       }
    }
 
+   public void connectionLost() {
+      commAdapter.connLost();
+   }
+
    public void disconnect() {
       commAdapter.deactivate();
    }

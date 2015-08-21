@@ -7,6 +7,8 @@ public interface ICommAdapter {
 
    public void deactivate();
 
+   public void connLost();
+
    public boolean isReConnectingToDevice(String address);
 
    public ConnectionState getConnectionState();
