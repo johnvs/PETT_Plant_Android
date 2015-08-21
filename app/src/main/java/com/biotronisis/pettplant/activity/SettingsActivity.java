@@ -23,10 +23,12 @@ import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.fragment.BluetoothScanFragment;
 import com.biotronisis.pettplant.activity.fragment.BluetoothScanFragment.OnBluetoothDeviceSelectedListener;
 import com.biotronisis.pettplant.communication.CommunicationErrorType;
+import com.biotronisis.pettplant.communication.CommunicationManager;
 import com.biotronisis.pettplant.communication.CommunicationManager.CommunicationManagerListener;
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.model.CommunicationParams;
 import com.biotronisis.pettplant.plant.PettPlantService;
+import com.biotronisis.pettplant.plant.processor.PlantState;
 import com.biotronisis.pettplant.type.CommunicationType;
 
 /**
@@ -45,10 +47,13 @@ public class SettingsActivity extends AbstractBaseActivity {
    private CommunicationParams communicationParams;
 
    private Context activityContext;
-//   private boolean isRegistered;
 
    private MyCommunicationManagerListener myCommunicationManagerListener =
          new MyCommunicationManagerListener();
+
+   private PlantState plantState = null;
+
+   private MyPlantStateListener myPlantStateListener = new MyPlantStateListener(this);
 
    @Override
    public String getActivityName() {
@@ -60,8 +65,10 @@ public class SettingsActivity extends AbstractBaseActivity {
       return "settings";
    }
 
-   public static Intent createIntent(Context context) {
-      return new Intent(context, SettingsActivity.class);
+   public static Intent createIntent(Context context, PlantState plantState) {
+      Intent intent = new Intent(context, SettingsActivity.class);
+      intent.putExtra(EXTRA_PLANT_STATE, plantState);
+      return intent;
    }
 
    @Override
@@ -86,7 +93,6 @@ public class SettingsActivity extends AbstractBaseActivity {
          if (pettPlantService.isConnected()) {
             connectionStatusTV.setText(getString(R.string.connected));
          } else {
-//                Toast.makeText(getActivity(), getString(R.string.meter_not_connected) , Toast.LENGTH_LONG).show();
             if (pettPlantService.isReConnectingToBtDevice(communicationParams.getAddress())) {
                connectionStatusTV.setText(getString(R.string.attempting_to_reconnect));
             } else {
@@ -101,6 +107,9 @@ public class SettingsActivity extends AbstractBaseActivity {
 
       bluetoothScanButton.setOnClickListener(new BluetoothScanClickListener());
 
+      Bundle extras = getIntent().getExtras();
+      plantState = (PlantState) extras.get(EXTRA_PLANT_STATE);
+
       ActionBar actionBar = getSupportActionBar();
       actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -109,25 +118,50 @@ public class SettingsActivity extends AbstractBaseActivity {
    @Override
    public void onResume() {
       super.onResume();
-      PettPlantService pettPlantService = PettPlantService.getInstance();
-      if (pettPlantService != null) {
-         pettPlantService.addCommStatusListener(myCommunicationManagerListener);
+      PettPlantService plantService = PettPlantService.getInstance();
+      if (plantService != null) {
+         plantService.addCommStatusListener(myCommunicationManagerListener);
+         plantService.addPlantStateListener(myPlantStateListener);
       }
+
       LocalBroadcastManager.getInstance(this).
             registerReceiver(pettPlantServiceEventReceiver,
                              new IntentFilter(PettPlantService.PETT_PLANT_SERVICE_EVENT));
+
+      // Register the Bluetooth BroadcastReceiver
+      IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+      registerReceiver(bluetoothReceiver, filter); // Don't forget to unregister during onDestroy
    }
+
+   // Create a BroadcastReceiver for ACTION_FOUND
+   private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
+      public void onReceive(Context context, Intent intent) {
+         String action = intent.getAction();
+         // When discovery finds a device
+         if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
+
+            connectionStatusTV.setText(getString(R.string.disconnected));
+            PettPlantService plantService = PettPlantService.getInstance();
+            if (plantService != null) {
+               plantService.onConnectionLost();
+            }
+         }
+      }
+   };
 
    @Override
    public void onPause() {
       super.onPause();
-      PettPlantService pettPlantService = PettPlantService.getInstance();
-      if (pettPlantService != null) {
-         pettPlantService.removeCommStatusListener(myCommunicationManagerListener);
+      PettPlantService plantService = PettPlantService.getInstance();
+      if (plantService != null) {
+         plantService.removeCommStatusListener(myCommunicationManagerListener);
+         plantService.removePlantStateListener(myPlantStateListener);
       }
+
       LocalBroadcastManager.getInstance(this).unregisterReceiver(pettPlantServiceEventReceiver);
 
 //      myUnregisterReceiver(mUsbReceiver);
+
    }
 
    @Override
@@ -143,12 +177,13 @@ public class SettingsActivity extends AbstractBaseActivity {
    public boolean onOptionsItemSelected(MenuItem item) {
       switch (item.getItemId()) {
          case android.R.id.home:
-            this.finish();
+            onBackPressed();
             return true;
          default:
             return super.onOptionsItemSelected(item);
       }
    }
+
 
 //   private void myRegisterReceiver(BroadcastReceiver receiver, IntentFilter filter) {
 //      if (!isRegistered) {
@@ -170,6 +205,14 @@ public class SettingsActivity extends AbstractBaseActivity {
 //         }
 //      }
 //   }
+
+   @Override
+   public void onBackPressed() {
+      Intent intent = new Intent();
+      intent.putExtra(EXTRA_PLANT_STATE, plantState);
+      setResult(RESULT_OK, intent);
+      super.onBackPressed();
+   }
 
    private void updateCommunicationDisplay() {
       communicationTypeTV.setText(communicationParams.getCommunicationType().name());
@@ -224,6 +267,7 @@ public class SettingsActivity extends AbstractBaseActivity {
             PettPlantService pettPlantService = PettPlantService.getInstance();
             if (pettPlantService != null) {
                pettPlantService.addCommStatusListener(myCommunicationManagerListener);
+               pettPlantService.addPlantStateListener(myPlantStateListener);
             }
 
          } else if (message.equals(PettPlantService.PETT_PLANT_SERVICE_DESTROYED)) {
@@ -282,27 +326,31 @@ public class SettingsActivity extends AbstractBaseActivity {
                   communicationParams.setAddress(device.getAddress());
                }
 
-               // This code was moved to pettPlantServiceEventReceiver
-               // so it gets executed after the meter service has shut down
-//                   communicationParamsDao.updateDefault(communicationParams, new TransactionCallback() {
-//
-//                       @Override
-//                       public void onSuccess() {
-//                           getActivity().startService(intent);
-//                           MeterService meter = MeterService.getInstance();
-//                           if (meter != null) {
-//                               meter.addCommStatusListener(myCommunicationManagerListener);
-//                           }
-//                       }
-//
-//                       @Override
-//                       public void onFailed(Exception e) {
-//                           Log.e(TAG, "failed to save communication params", e);
-//                       }
-//                   });
             }
          });
          dialog.show(getSupportFragmentManager().beginTransaction(), "dialog");
+      }
+   }
+
+   private class MyPlantStateListener implements PettPlantService.PlantStateListener {
+
+      private SettingsActivity outerClass;
+
+      MyPlantStateListener(SettingsActivity oClass) {
+         outerClass = oClass;
+      }
+
+      @Override
+      public void onPlantState(PlantState plantState) {
+         outerClass.plantState = plantState;
+      }
+
+      @Override
+      public void onError(String reason) {
+         Toast.makeText(activityContext, reason, Toast.LENGTH_LONG).show();
+         if (MyDebug.LOG) {
+            Log.d(TAG, "processor state failed. " + reason);
+         }
       }
    }
 }
