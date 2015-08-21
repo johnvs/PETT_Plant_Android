@@ -17,8 +17,14 @@
 package com.biotronisis.pettplant.activity.fragment;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,7 +72,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
    private TextView colorModeSpeedTV;
 
    private PettPlantParams pettPlantParams;
-   private PettPlantService pettPlantService;
+   private PlantState plantState;
 
    private int lastEntrainmentPos;
    private int lastColorModePos;
@@ -164,6 +170,10 @@ public class PettPlantFragment extends AbstractBaseFragment {
          plantService.removePlantStateListener(myPlantStateListener);
       }
 
+      plantService = null;
+
+      LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(pettPlantServiceEventReceiver);
+
       super.onPause();
    }
 
@@ -176,6 +186,14 @@ public class PettPlantFragment extends AbstractBaseFragment {
          plantService.addPlantStateListener(myPlantStateListener);
       }
 
+      LocalBroadcastManager.getInstance(getActivity()).
+            registerReceiver(pettPlantServiceEventReceiver,
+                  new IntentFilter(PettPlantService.PETT_PLANT_SERVICE_EVENT));
+
+      // Register the Bluetooth BroadcastReceiver
+      IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+      getActivity().registerReceiver(bluetoothReceiver, filter); // Don't forget to unregister during onDestroy
+
       AbstractBaseActivity.fragmentName = this.getClass().getSimpleName();
 
       // These are here (and not in setupView) because they execute as soon as they are created
@@ -185,25 +203,70 @@ public class PettPlantFragment extends AbstractBaseFragment {
       colorModeSeekbar.setOnSeekBarChangeListener(new ColorModeOnSeekbarChange());
    }
 
-   @Override
-   public void onDestroy() {
-      super.onDestroy();
-   }
+//   @Override
+//   public void onDestroy() {
+//      super.onDestroy();
+//   }
+
+   // Create a BroadcastReceiver for ACTION_FOUND
+   private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
+      public void onReceive(Context context, Intent intent) {
+         String action = intent.getAction();
+         // When discovery finds a device
+         if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
+
+            // Update actionbar
+
+//            connectionStatusTV.setText(getString(R.string.disconnected));
+            PettPlantService plantService = PettPlantService.getInstance();
+            if (plantService != null) {
+               plantService.onConnectionLost();
+            }
+         }
+      }
+   };
 
    @Override
    public void populateData() {
-      pettPlantParams = new PettPlantParams(getActivity());
 
-      entrainmentSpinner.setSelection(pettPlantParams.getEntrainmentSequence().getValue());
-      entrainRunStopButton.setText(pettPlantParams.getEntrainmentRunButton());
-      entrainPauseResumeButton.setText(pettPlantParams.getEntrainmentPauseButton());
-      loopCheckbox.setChecked(pettPlantParams.getEntrainmentLoopCheckbox().getValue() != 0); // Convert int to boolean
+      if (plantState != null) {
 
-      colorModeSpinner.setSelection(pettPlantParams.getColorMode().getValue());
-      colorModeSeekbar.setProgress(pettPlantParams.getColorModeSpeed());
-      colorModeSpeedTV.setText(Integer.toString(pettPlantParams.getColorModeSpeed()));
-      colorRunOffButton.setText(pettPlantParams.getColorModeRunButton());
-      colorPauseResumeButton.setText(pettPlantParams.getColorModePauseButton());
+//         myPlantStateListener.onPlantState(plantState);
+
+      } else {
+
+         pettPlantParams = new PettPlantParams(getActivity());
+
+         entrainmentSpinner.setSelection(pettPlantParams.getEntrainmentSequence().getValue());
+
+         entrainRunStopButton.setText(pettPlantParams.getEntrainmentRunButton());
+
+         if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.RUN)) {
+            entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
+            entrainPauseResumeButton.setEnabled(false);
+         } else if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.STOP)) {
+            entrainPauseResumeButton.setText(pettPlantParams.getEntrainmentPauseButton());
+            entrainPauseResumeButton.setEnabled(true);
+         }
+
+         // Convert int to boolean
+         loopCheckbox.setChecked(pettPlantParams.getEntrainmentLoopCheckbox().getValue() != 0);
+
+         colorModeSpinner.setSelection(pettPlantParams.getColorMode().getValue());
+
+         colorRunOffButton.setText(pettPlantParams.getColorModeRunButton());
+
+         if (colorRunOffButton.getText().equals(ColorMode.RunOffButton.RUN)) {
+            colorPauseResumeButton.setText(pettPlantParams.getColorModePauseButton());
+            colorPauseResumeButton.setEnabled(false);
+         } else {
+            colorPauseResumeButton.setText(pettPlantParams.getColorModePauseButton());
+            colorPauseResumeButton.setEnabled(true);
+         }
+
+         colorModeSeekbar.setProgress(pettPlantParams.getColorModeSpeed());
+         colorModeSpeedTV.setText(Integer.toString(pettPlantParams.getColorModeSpeed()));
+      }
 
       lastEntrainmentPos = entrainmentSpinner.getSelectedItemPosition();
       lastColorModePos = colorModeSpinner.getSelectedItemPosition();
@@ -218,7 +281,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
       pettPlantParams.setEntrainmentRunButton(entrainRunStopButton.getText().toString());
       pettPlantParams.setColorModePauseButton(entrainPauseResumeButton.getText().toString());
       pettPlantParams.setEntrainmentLoopCheckbox(loopCheckbox.isChecked() ?
-                  Entrainment.LoopCheckbox.OFF : Entrainment.LoopCheckbox.ON);
+                  Entrainment.LoopCheckbox.ON : Entrainment.LoopCheckbox.OFF);
 
       pettPlantParams.setColorMode(ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition()));
       pettPlantParams.setColorModeRunButton(colorRunOffButton.getText().toString());
@@ -235,7 +298,6 @@ public class PettPlantFragment extends AbstractBaseFragment {
       builder.setPositiveButton(R.string.ok, null);
       builder.show();
    }
-
 
    //
    // ----------- Control OnClick Listeners -----------
@@ -271,7 +333,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
             // Make sure we are connected to a plant before trying to send it the command
             if (pettPlantService.isConnected()) {
                // Check the current mode of the button
-               if (entrainRunStopButton.getText().equals(Entrainment.RUN)) {
+               if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.RUN)) {
 
                   // Send the Run command
                   pettPlantService.runEntrainmentSequence(
@@ -283,7 +345,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
                               Toast.makeText(getActivity(), getString(R.string.run_entrainment_success),
                                     Toast.LENGTH_LONG).show();
                               // Entrainment is now running, so change the Run/Stop button to Stop
-                              entrainRunStopButton.setText(Entrainment.STOP);
+                              entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
+                              entrainPauseResumeButton.setEnabled(true);
                            }
 
                            @Override
@@ -296,7 +359,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                            }
                         });
 
-               } else if (entrainRunStopButton.getText().equals(Entrainment.STOP)) {
+               } else if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.STOP)) {
 
                   // Send the Stop command
                   pettPlantService.stopEntrainmentSequence(new PettPlantService.StopEntrainmentCallback() {
@@ -306,7 +369,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
                         Toast.makeText(getActivity(), getString(R.string.stop_entrainment_success),
                               Toast.LENGTH_LONG).show();
                         // Entrainment is now stopped, so change the Run/Stop button to Run
-                        entrainRunStopButton.setText(Entrainment.RUN);
+                        entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
+                        entrainPauseResumeButton.setEnabled(false);
                      }
 
                      @Override
@@ -336,7 +400,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
             // Make sure we are connected to a plant before trying to send it the command
             if (pettPlantService.isConnected()) {
                // Check the current mode of the button
-               if (entrainPauseResumeButton.getText().equals(Entrainment.PAUSE)) {
+               if (entrainPauseResumeButton.getText().equals(Entrainment.PauseResumeButton.PAUSE)) {
 
                   // Send the Pause command
                   pettPlantService.pauseEntrainmentSequence(
@@ -347,7 +411,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                               Toast.makeText(getActivity(), getString(R.string.pause_entrainment_success),
                                     Toast.LENGTH_LONG).show();
                               // Entrainment is now pause, so change the Pause/Resume button to Resume
-                              entrainPauseResumeButton.setText(Entrainment.RESUME);
+                              entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.RESUME);
                            }
 
                            @Override
@@ -360,7 +424,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                            }
                         });
 
-               } else if (entrainPauseResumeButton.getText().equals(Entrainment.RESUME)) {
+               } else if (entrainPauseResumeButton.getText().equals(Entrainment.PauseResumeButton.RESUME)) {
 
                   // Send the Resume command
                   pettPlantService.resumeEntrainmentSequence(new PettPlantService.ResumeEntrainmentCallback() {
@@ -370,7 +434,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                         Toast.makeText(getActivity(), getString(R.string.resume_entrainment_success),
                               Toast.LENGTH_LONG).show();
                         // Entrainment is now resumed, so change the Pause/Resume button to Pause
-                        entrainPauseResumeButton.setText(Entrainment.PAUSE);
+                        entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
                      }
 
                      @Override
@@ -507,7 +571,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
             // Make sure we are connected to a plant before trying to send it the command
             if (pettPlantService.isConnected()) {
                // Check the current mode of the button
-               if (colorRunOffButton.getText().equals(ColorMode.RUN)) {
+               if (colorRunOffButton.getText().equals(ColorMode.RunOffButton.RUN)) {
 
                   // Send the Run command
                   pettPlantService.runColorMode(
@@ -519,7 +583,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
                               Toast.makeText(getActivity(), getString(R.string.run_color_mode_success),
                                     Toast.LENGTH_LONG).show();
                               // Color Mode is now running, so change the Run/Off button to Off
-                              colorRunOffButton.setText(ColorMode.OFF);
+                              colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
+                              colorPauseResumeButton.setEnabled(true);
                            }
 
                            @Override
@@ -532,7 +597,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                            }
                         });
 
-               } else if (colorRunOffButton.getText().equals(ColorMode.OFF)) {
+               } else if (colorRunOffButton.getText().equals(ColorMode.RunOffButton.OFF)) {
 
                   // Send the Off command
                   pettPlantService.offColorMode(new PettPlantService.OffColorModeCallback() {
@@ -542,7 +607,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
                         Toast.makeText(getActivity(), getString(R.string.off_color_mode_success),
                               Toast.LENGTH_LONG).show();
                         // Color mode is now off, so change the Run/Off button to Run
-                        colorRunOffButton.setText(ColorMode.RUN);
+                        colorRunOffButton.setText(ColorMode.RunOffButton.RUN);
+                        colorPauseResumeButton.setEnabled(false);
                      }
 
                      @Override
@@ -572,7 +638,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
             // Make sure we are connected to a plant before trying to send it the command
             if (pettPlantService.isConnected()) {
                // Check the current mode of the button
-               if (colorPauseResumeButton.getText().equals(ColorMode.PAUSE)) {
+               if (colorPauseResumeButton.getText().equals(ColorMode.PauseResumeButton.PAUSE)) {
 
                   pettPlantService.pauseColorMode(new PettPlantService.PauseColorModeCallback() {
 
@@ -581,7 +647,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                         Toast.makeText(getActivity(), getString(R.string.pause_color_mode_success),
                               Toast.LENGTH_LONG).show();
                         // Color Mode is now paused, so change the Pause/Resume button to Resume
-                        colorPauseResumeButton.setText(ColorMode.RESUME);
+                        colorPauseResumeButton.setText(ColorMode.PauseResumeButton.RESUME);
                      }
 
                      @Override
@@ -594,7 +660,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                      }
                   });
 
-               } else if (colorPauseResumeButton.getText().equals(ColorMode.RESUME)) {
+               } else if (colorPauseResumeButton.getText().equals(ColorMode.PauseResumeButton.RESUME)) {
 
                   pettPlantService.resumeColorMode(new PettPlantService.ResumeColorModeCallback() {
 
@@ -603,7 +669,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                         Toast.makeText(getActivity(), getString(R.string.resume_color_mode_success),
                               Toast.LENGTH_LONG).show();
                         // Color Mode is now resumed, so change the Pause/Resume button to Pause
-                        colorPauseResumeButton.setText(ColorMode.PAUSE);
+                        colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
                      }
 
                      @Override
@@ -665,23 +731,18 @@ public class PettPlantFragment extends AbstractBaseFragment {
       public void onStopTrackingTouch(SeekBar seekBar) {}
    }
 
-   private class MyPlantStateListener implements PlantStateListener {
+   public void updateState(PlantState pState) {
 
-      @Override
-      public void onPlantState(PlantState plantState) {
-         if (MyDebug.LOG) {
-            Log.d(TAG, "processor state changed. state=" + plantState);
-         }
+      if (pState != null) {
 
-         int entrainSeq = plantState.getEntrainSequence().getValue();
-         if (entrainSeq >= 0 && entrainSeq < Entrainment.Sequence.values().length) {
-            entrainmentSpinner.setSelection(entrainSeq);
-         }
+         this.plantState = pState;
+
+         entrainmentSpinner.setSelection(plantState.getEntrainSequence().getValue());
 
          switch (plantState.getEntrainmentState()) {
             case STOPPED:
-               entrainRunStopButton.setText(Entrainment.RUN);
-               entrainPauseResumeButton.setText(Entrainment.PAUSE);
+               entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
+               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
                entrainPauseResumeButton.setEnabled(false);
 
                // Make sure any future time indicator gets reset here.
@@ -689,48 +750,123 @@ public class PettPlantFragment extends AbstractBaseFragment {
                break;
 
             case RUNNING:
-               entrainRunStopButton.setText(Entrainment.STOP);
-               entrainPauseResumeButton.setText(Entrainment.PAUSE);
+               entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
+               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
                entrainPauseResumeButton.setEnabled(true);
 
                break;
 
             case PAUSED:
-               entrainRunStopButton.setText(Entrainment.STOP);
-               entrainPauseResumeButton.setText(Entrainment.RESUME);
+               entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
+               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.RESUME);
                entrainPauseResumeButton.setEnabled(true);
 
                break;
          }
 
-         loopCheckbox.setChecked(plantState.getLoopCheckbox().getValue() != 0);  // Convert from
+         // Convert from int to boolean
+         loopCheckbox.setChecked(plantState.getLoopCheckbox().getValue() != 0);
 
-         int colorMode = plantState.getColorMode().getValue();
-         if (colorMode >= 0 && colorMode < ColorMode.Mode.values().length) {
-            colorModeSpinner.setSelection(colorMode);
-         }
+         colorModeSpinner.setSelection(plantState.getColorMode().getValue());
 
          switch (plantState.getColorModeState()) {
             case OFF:
-               colorRunOffButton.setText(ColorMode.OFF);
-               colorPauseResumeButton.setText(ColorMode.PAUSE);
+               colorRunOffButton.setText(ColorMode.RunOffButton.RUN);
+               colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
                colorPauseResumeButton.setEnabled(false);
                break;
 
             case RUNNING:
-               colorRunOffButton.setText(ColorMode.OFF);
-               colorPauseResumeButton.setText(ColorMode.PAUSE);
+               colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
+               colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
                colorPauseResumeButton.setEnabled(true);
                break;
 
             case PAUSED:
-               colorRunOffButton.setText(ColorMode.OFF);
-               colorPauseResumeButton.setText(ColorMode.RESUME);
+               colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
+               colorPauseResumeButton.setText(ColorMode.PauseResumeButton.RESUME);
                colorPauseResumeButton.setEnabled(true);
                break;
          }
 
          colorModeSeekbar.setProgress(plantState.getColorModeSpeed());
+      }
+   }
+
+   private class MyPlantStateListener implements PlantStateListener {
+
+      @Override
+      public void onPlantState(PlantState pState) {
+         if (MyDebug.LOG) {
+            Log.d(TAG, "processor state changed. state=" + pState);
+         }
+
+//         int entrainSeq = plantState.getEntrainSequence().getValue();
+//         if (entrainSeq >= 0 && entrainSeq < Entrainment.Sequence.values().length) {
+//            entrainmentSpinner.setSelection(entrainSeq);
+//         }
+
+         // All state data was validated prior to this call
+         updateState(pState);
+
+//         entrainmentSpinner.setSelection(plantState.getEntrainSequence().getValue());
+//
+//         switch (plantState.getEntrainmentState()) {
+//            case STOPPED:
+//               entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
+//               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
+//               entrainPauseResumeButton.setEnabled(false);
+//
+//               // Make sure any future time indicator gets reset here.
+//
+//               break;
+//
+//            case RUNNING:
+//               entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
+//               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
+//               entrainPauseResumeButton.setEnabled(true);
+//
+//               break;
+//
+//            case PAUSED:
+//               entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
+//               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.RESUME);
+//               entrainPauseResumeButton.setEnabled(true);
+//
+//               break;
+//         }
+//
+//         // Convert from int to boolean
+//         loopCheckbox.setChecked(plantState.getLoopCheckbox().getValue() != 0);
+//
+////         int colorMode = plantState.getColorMode().getValue();
+////         if (colorMode >= 0 && colorMode < ColorMode.Mode.values().length) {
+////            colorModeSpinner.setSelection(colorMode);
+////         }
+//
+//         colorModeSpinner.setSelection(plantState.getColorMode().getValue());
+//
+//         switch (plantState.getColorModeState()) {
+//            case OFF:
+//               colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
+//               colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
+//               colorPauseResumeButton.setEnabled(false);
+//               break;
+//
+//            case RUNNING:
+//               colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
+//               colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
+//               colorPauseResumeButton.setEnabled(true);
+//               break;
+//
+//            case PAUSED:
+//               colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
+//               colorPauseResumeButton.setText(ColorMode.PauseResumeButton.RESUME);
+//               colorPauseResumeButton.setEnabled(true);
+//               break;
+//         }
+//
+//         colorModeSeekbar.setProgress(plantState.getColorModeSpeed());
 
       }
 
@@ -742,5 +878,27 @@ public class PettPlantFragment extends AbstractBaseFragment {
          }
       }
    }
+
+   private BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+         String message = intent.getStringExtra("message");
+         if (MyDebug.LOG) {
+            Log.d("receiver", "Got message: " + message);
+         }
+
+         if (message.equals(PettPlantService.PETT_PLANT_SERVICE_CREATED)) {
+            PettPlantService pettPlantService = PettPlantService.getInstance();
+            if (pettPlantService != null) {
+               pettPlantService.addPlantStateListener(myPlantStateListener);
+            }
+//         } else if (message.equals(PettPlantService.PETT_PLANT_SERVICE_DESTROYED)) {
+//            // Save the new comm params
+//            boolean success = communicationParams.saveData();
+//            final Intent startIntent = PettPlantService.createIntent(activityContext);
+//            startService(startIntent);
+         }
+      }
+   };
 
 }
