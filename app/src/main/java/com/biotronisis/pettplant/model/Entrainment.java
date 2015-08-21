@@ -25,8 +25,12 @@ public class Entrainment {
       }
 
       public static boolean isValid (int id) {
-         if (id >= 0 && id <= 2) { return true;  }
-         else                    { return false; }
+         if (id >= MEDITATE.getId() && id <= STAY_AWAKE.getId()) { return true;  }
+         else { return false; }
+      }
+
+      public static Sequence getDefault() {
+         return MEDITATE;
       }
    }
 
@@ -50,18 +54,32 @@ public class Entrainment {
       }
 
       public static boolean isValid (int id) {
-         if (id >= 0 && id <= 2) { return true;  }
-         else                    { return false; }
+         if (id >= STOPPED.getId() && id <= PAUSED.getId()) { return true; }
+         else { return false; }
       }
    }
 
-   // Run/Stop button values
-   public static final String RUN = "Run";
-   public static final String STOP = "Stop";
+   public static class RunStopButton {
 
-   // Pause/Resume button values
-   public static final String PAUSE = "Pause";
-   public static final String RESUME = "Resume";
+      // Run/Stop button values
+      public static final String RUN = "Run";
+      public static final String STOP = "Stop";
+
+      public static String getDefault() {
+         return RUN;
+      }
+   }
+
+   public static class PauseResumeButton {
+
+      // Pause/Resume button values
+      public static final String PAUSE = "Pause";
+      public static final String RESUME = "Resume";
+
+      public static String getDefault() {
+         return PAUSE;
+      }
+   }
 
    public enum LoopCheckbox {
 
@@ -82,17 +100,13 @@ public class Entrainment {
       }
 
       public static boolean isValid (int id) {
-         if (id >= 0 && id <= 1) { return true;  }
-         else                    { return false; }
+         if (id >= OFF.getId() && id <= ON.getId()) { return true; }
+         else { return false; }
+      }
+
+      public static LoopCheckbox getDefault() {
+         return OFF;
       }
    }
-
-   // Loop checkbox values
-   public static final String LOOP_OFF = "Off";
-   public static final String LOOP_ON = "On";
-
-//   public static final boolean LOOP_CHECKBOX_DEFAULT = false;
-
-//   private EntrainmentMode entrainmentSequence;
 
 }

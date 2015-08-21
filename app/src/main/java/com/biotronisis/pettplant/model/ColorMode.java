@@ -36,8 +36,12 @@ public class ColorMode {
       }
 
       public static boolean isValid (int id) {
-         if (id >= 0 && id <= 6) { return true;  }
-         else                    { return false; }
+         if (id >= SOUND_RESPONSIVE.getId() && id <= FCK_YEAH_COLORS.getId()) { return true; }
+         else { return false; }
+      }
+
+      public static Mode getDefault() {
+         return SOUND_RESPONSIVE;
       }
    }
 
@@ -61,24 +65,45 @@ public class ColorMode {
       }
 
       public static boolean isValid (int id) {
-         if (id >= 0 && id <= 2) { return true;  }
-         else                    { return false; }
+         if (id >= OFF.getId() && id <= PAUSED.getId()) { return true; }
+         else { return false; }
       }
    }
 
-   public static boolean isSpeedValid(int speed) {
-      if (speed > 0 && speed <= 100) { return true;  }
-      else                           { return false; }
+   public static class RunOffButton {
+
+      // Run/Off button values
+      public static final String RUN = "Run";
+      public static final String OFF = "Off";
+
+      public static String getDefault() {
+         return RUN;
+      }
    }
 
-   public static final int SPEED_DEFAULT = 50;
+   public static class PauseResumeButton {
 
-   // Run/Off button values
-   public static final String RUN = "Run";
-   public static final String OFF = "Off";
+      // Pause/Resume button values
+      public static final String PAUSE = "Pause";
+      public static final String RESUME = "Resume";
 
-   // Pause/Resume button values
-   public static final String PAUSE = "Pause";
-   public static final String RESUME = "Resume";
+      public static String getDefault() {
+         return PAUSE;
+      }
+   }
+
+   public static class Speed {
+
+      public static final int SPEED_DEFAULT = 50;
+
+      public static boolean isValid(int speed) {
+         if (speed > 0 && speed <= 100) { return true;  }
+         else                           { return false; }
+      }
+
+      public static int getDefault() {
+         return SPEED_DEFAULT;
+      }
+   }
 
 }
