@@ -21,6 +21,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/layout_background"
     android:paddingTop="10dp"
     android:paddingLeft="20dp"
     android:paddingRight="20dp" >
@@ -40,7 +41,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginStart="20dp"
         android:prompt="@string/select_entrainment_mode"
-        android:layout_below="@+id/title_entrainment" />
+        android:layout_below="@+id/title_entrainment"/>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/entrainment_buttons"
@@ -52,11 +53,14 @@
         <Button
             android:id="@+id/button_run_stop"
             style="@style/AppButton"
-            android:text="@string/run"/>
+            android:background="@drawable/button_run_background"
+            android:text="@string/run"
+            android:singleLine="true"/>
 
         <Button
             android:id="@+id/button_pause_resume"
             style="@style/AppButton"
+            android:background="@drawable/button_pause_background"
             android:text="@string/pause"/>
 
     </LinearLayout>
@@ -68,6 +72,7 @@
         android:layout_marginTop="25dp"
         android:layout_marginLeft="20dp"
         android:layout_marginStart="20dp"
+        android:textColor="@color/black"
         android:layout_below="@+id/entrainment_buttons"
         android:textSize="18sp"
         android:text="@string/loop" />
@@ -81,7 +86,7 @@
         android:layout_marginStart="20dp"
         android:layout_toRightOf="@+id/title_loop"
         android:layout_toEndOf="@+id/title_loop"
-        android:layout_below="@+id/entrainment_buttons" />
+        android:layout_below="@+id/entrainment_buttons"/>
 
     <View
         android:id="@+id/seperator"
@@ -118,11 +123,13 @@
         <Button
             android:id="@+id/button_color_on_off"
             style="@style/AppButton"
+            android:background="@drawable/button_run_background"
             android:text="@string/on"/>
 
         <Button
             android:id="@+id/button_color_pause_resume"
             style="@style/AppButton"
+            android:background="@drawable/button_pause_background"
             android:text="@string/pause"/>
 
     </LinearLayout>
@@ -136,6 +143,7 @@
         android:layout_marginTop="25dp"
         android:layout_below="@+id/color_buttons"
         android:textSize="18sp"
+        android:textColor="@color/black"
         android:text="@string/speed" />
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -154,7 +162,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginRight="5dp"
             android:layout_marginEnd="5dp"
-            android:layout_weight="8" />
+            android:layout_weight="8"/>
 
         <TextView
             android:id="@+id/value_seekbar"
@@ -163,6 +171,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginEnd="20dp"
             android:textSize="18sp"
+            android:textColor="@color/black"
             android:layout_weight="1"
             android:text="100"
             android:gravity="center_horizontal"/>
