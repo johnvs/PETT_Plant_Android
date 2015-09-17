@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="blue">#FF0000FF</color>
+    <color name="translucent_blue">#800000ff</color>
+    <color name="cyan">#FF00FFFF</color>
+    <color name="dk_gray">#FF444444</color>
+    <color name="gray">#FF888888</color>
+    <color name="green">#FF00FF00</color>
+    <color name="lt_gray">#FFCCCCCC</color>
+    <color name="magenta">#FFFF00FF</color>
+    <color name="red">#FFFF0000</color>
+    <color name="orange">#FFCC5500</color>
+    <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="yellow">#FFFFFF00</color>
+
+    <color name="indigo_500">#FF3f51b5</color>
+    <color name="indigo_400">#FF5c6bc0</color>
+    <color name="indigo_300">#FF7986cb</color>
+    <color name="indigo_200">#FF9fa8da</color>
+    <color name="indigo_100">#FFc5cae9</color>
+    <color name="indigo_50">#FFe8eaf6</color>
+
+</resources>
