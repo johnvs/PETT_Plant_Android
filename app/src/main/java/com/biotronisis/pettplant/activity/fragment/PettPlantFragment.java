@@ -174,6 +174,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
       LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(pettPlantServiceEventReceiver);
 
+      getActivity().unregisterReceiver(bluetoothReceiver);
+
       super.onPause();
    }
 
@@ -208,7 +210,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
 //      super.onDestroy();
 //   }
 
-   // Create a BroadcastReceiver for ACTION_FOUND
+   // Create a BroadcastReceiver for a bluetooth disconnection
    private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
       public void onReceive(Context context, Intent intent) {
          String action = intent.getAction();
@@ -264,8 +266,9 @@ public class PettPlantFragment extends AbstractBaseFragment {
             colorPauseResumeButton.setEnabled(true);
          }
 
-         colorModeSeekbar.setProgress(pettPlantParams.getColorModeSpeed());
-         colorModeSpeedTV.setText(Integer.toString(pettPlantParams.getColorModeSpeed()));
+         int speed = pettPlantParams.getColorModeSpeed();
+         colorModeSeekbar.setProgress(speed);
+         colorModeSpeedTV.setText(Integer.toString(speed));
       }
 
       lastEntrainmentPos = entrainmentSpinner.getSelectedItemPosition();
@@ -276,7 +279,6 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
    @Override
    public void persistData() {
-//      pettPlantParams.setEntrainmentSequence(EntrainmentMode.getEntrainmentMode(entrainmentSpinner.getSelectedItemPosition()));
       pettPlantParams.setEntrainmentSequence(Entrainment.Sequence.getSequence(entrainmentSpinner.getSelectedItemPosition()));
       pettPlantParams.setEntrainmentRunButton(entrainRunStopButton.getText().toString());
       pettPlantParams.setColorModePauseButton(entrainPauseResumeButton.getText().toString());
@@ -519,10 +521,10 @@ public class PettPlantFragment extends AbstractBaseFragment {
          // The if is needed because the listener fires when the app starts
          if (position != lastColorModePos) {
             lastColorModePos = position;
-            Toast colorModeToast = Toast.makeText(getActivity(),
-                  parent.getItemAtPosition(position) + " selected",
-                  Toast.LENGTH_LONG);
-            colorModeToast.show();
+//            Toast colorModeToast = Toast.makeText(getActivity(),
+//                  parent.getItemAtPosition(position) + " selected",
+//                  Toast.LENGTH_LONG);
+//            colorModeToast.show();
 
             PettPlantService pettPlantService = PettPlantService.getInstance();
             if (pettPlantService != null) {
@@ -536,8 +538,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
                            @Override
                            public void onSuccess() {
-                              Toast.makeText(getActivity(), getString(R.string.set_color_mode_success),
-                                    Toast.LENGTH_LONG).show();
+//                              Toast.makeText(getActivity(), getString(R.string.set_color_mode_success),
+//                                    Toast.LENGTH_LONG).show();
                            }
 
                            @Override
@@ -580,10 +582,11 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
                            @Override
                            public void onSuccess() {
-                              Toast.makeText(getActivity(), getString(R.string.run_color_mode_success),
-                                    Toast.LENGTH_LONG).show();
+//                              Toast.makeText(getActivity(), getString(R.string.run_color_mode_success),
+//                                    Toast.LENGTH_LONG).show();
                               // Color Mode is now running, so change the Run/Off button to Off
                               colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
+                              colorRunOffButton.setBackgroundResource(R.drawable.button_stop_off_background);
                               colorPauseResumeButton.setEnabled(true);
                            }
 
@@ -604,11 +607,14 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
                      @Override
                      public void onSuccess() {
-                        Toast.makeText(getActivity(), getString(R.string.off_color_mode_success),
-                              Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getActivity(), getString(R.string.off_color_mode_success),
+//                              Toast.LENGTH_LONG).show();
                         // Color mode is now off, so change the Run/Off button to Run
                         colorRunOffButton.setText(ColorMode.RunOffButton.RUN);
+                        colorRunOffButton.setBackgroundResource(R.drawable.button_run_background);
+                        colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
                         colorPauseResumeButton.setEnabled(false);
+                        colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
                      }
 
                      @Override
@@ -644,10 +650,11 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
                      @Override
                      public void onSuccess() {
-                        Toast.makeText(getActivity(), getString(R.string.pause_color_mode_success),
-                              Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getActivity(), getString(R.string.pause_color_mode_success),
+//                              Toast.LENGTH_LONG).show();
                         // Color Mode is now paused, so change the Pause/Resume button to Resume
                         colorPauseResumeButton.setText(ColorMode.PauseResumeButton.RESUME);
+                        colorPauseResumeButton.setBackgroundResource(R.drawable.button_resume_background);
                      }
 
                      @Override
@@ -666,10 +673,11 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
                      @Override
                      public void onSuccess() {
-                        Toast.makeText(getActivity(), getString(R.string.resume_color_mode_success),
-                              Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getActivity(), getString(R.string.resume_color_mode_success),
+//                              Toast.LENGTH_LONG).show();
                         // Color Mode is now resumed, so change the Pause/Resume button to Pause
                         colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
+                        colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
                      }
 
                      @Override
@@ -692,9 +700,17 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
       @Override
       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-         if (progress != lastColorModeSpeed && progress != 0) {
-            lastColorModeSpeed = progress;
-            colorModeSpeedTV.setText(Integer.toString(progress));
+         int speed = progress;
+
+         if (speed == 0) {
+            speed = 1;
+            colorModeSeekbar.setProgress(speed);
+         }
+
+         colorModeSpeedTV.setText(Integer.toString(speed));
+
+         if (speed != lastColorModeSpeed) {
+            lastColorModeSpeed = speed;
 
             PettPlantService pettPlantService = PettPlantService.getInstance();
             if (pettPlantService != null) {
@@ -702,7 +718,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                if (pettPlantService.isConnected()) {
 
                   // Send command
-                  pettPlantService.setSpeedColorMode((byte) progress,
+                  pettPlantService.setSpeedColorMode((byte) speed,
                         new PettPlantService.SetSpeedColorModeCallback() {
                            @Override
                            public void onSuccess() {
@@ -716,9 +732,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                                     R.string.set_speed_color_mode_failed_title,
                                     R.string.set_speed_color_mode_failed_message);
                            }
-                        }
-                  );
-
+                        });
                }
             }
          }
@@ -772,24 +786,35 @@ public class PettPlantFragment extends AbstractBaseFragment {
          switch (plantState.getColorModeState()) {
             case OFF:
                colorRunOffButton.setText(ColorMode.RunOffButton.RUN);
+               colorRunOffButton.setBackgroundResource(R.drawable.button_run_background);
+
                colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
+               colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
                colorPauseResumeButton.setEnabled(false);
                break;
 
             case RUNNING:
                colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
+               colorRunOffButton.setBackgroundResource(R.drawable.button_stop_off_background);
+
                colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
+               colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
                colorPauseResumeButton.setEnabled(true);
                break;
 
             case PAUSED:
                colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
+               colorRunOffButton.setBackgroundResource(R.drawable.button_stop_off_background);
+
                colorPauseResumeButton.setText(ColorMode.PauseResumeButton.RESUME);
+               colorPauseResumeButton.setBackgroundResource(R.drawable.button_resume_background);
                colorPauseResumeButton.setEnabled(true);
                break;
          }
 
-         colorModeSeekbar.setProgress(plantState.getColorModeSpeed());
+         int speed = plantState.getColorModeSpeed();
+         colorModeSeekbar.setProgress(speed);
+         colorModeSpeedTV.setText(Integer.toString(speed));
       }
    }
 
