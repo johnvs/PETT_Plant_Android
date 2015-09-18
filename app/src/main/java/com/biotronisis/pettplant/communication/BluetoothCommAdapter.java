@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.SystemClock;
 import android.util.Log;
 
 public class BluetoothCommAdapter implements ICommAdapter {
@@ -318,6 +319,9 @@ public class BluetoothCommAdapter implements ICommAdapter {
          Log.w(TAG, "connection failed");
       }
       setState(ConnectionState.FAILED);
+
+      // Attempt to reconnect with the same BT device
+      reConnect();
    }
 
    public void connLost() {
@@ -729,22 +733,65 @@ public class BluetoothCommAdapter implements ICommAdapter {
             Log.i(TAG, "BEGIN mConnectedThread");
          }
          byte[] buffer = new byte[1024];
-         int bytes;
+         byte[] responseBuffer = new byte[32];
+         int numBytesRcvd;
+         int lastNumBytesRcvd = 0;
+         int totalBytesRcvd = 0;
 
          // Keep listening to the InputStream while connected
          while (!cancelled) {
             try {
                // Read from the InputStream
                if (mmInStream.available() > 2) {
-                  bytes = mmInStream.read(buffer);
+                  numBytesRcvd = mmInStream.read(buffer);
 
-                  byte[] response = new byte[bytes];
-                  System.arraycopy(buffer, 0, response, 0, bytes);
+                  byte[] response = new byte[numBytesRcvd];
+                  System.arraycopy(buffer, 0, response, 0, numBytesRcvd);
 
-                  if (listener != null) {
-                     listener.onReceiveBytes(response);
+                  // Check to see if we got a full message
+                  if (response[0] == numBytesRcvd - 1) {
+                     // We have the full message
+                     lastNumBytesRcvd = 0;           // Init
+                     totalBytesRcvd = 0;
+                     responseBuffer = new byte[32];  // Init/clear the input buffer
+                     if (listener != null) {
+                        listener.onReceiveBytes(response);
+                     }
+                  } else {
+                     // Incomplete response. Store what we just got and wait for more
+                     System.arraycopy(response, 0, responseBuffer, lastNumBytesRcvd, numBytesRcvd);
+                     totalBytesRcvd += numBytesRcvd;
+
+                     ErrorHandler errorHandler = ErrorHandler.getInstance();
+                     if (errorHandler != null) {
+                        errorHandler.logError(Level.INFO, "BluetoothCommAdapter$ConectedThread.run():" +
+                              " received " + numBytesRcvd + " bytes.", 0, 0);
+                     } else {
+                        if (MyDebug.LOG) {
+                           Log.d(TAG, "errorHandler is null.");
+                        }
+                     }
+
+                     // Do we have a complete response yet?
+                     if (responseBuffer[0] == totalBytesRcvd - 1) {
+                        // We now have the complete message
+                        response = new byte[totalBytesRcvd];
+                        System.arraycopy(responseBuffer, 0, response, 0, totalBytesRcvd);
+
+                        if (listener != null) {
+                           listener.onReceiveBytes(response);
+                        }
+
+                        // Init everything for the next time
+                        lastNumBytesRcvd = 0;
+                        totalBytesRcvd = 0;
+                        responseBuffer = new byte[32];
+
+                     } else {
+                        lastNumBytesRcvd = numBytesRcvd;
+                        SystemClock.sleep(100);
+                     }
                   }
-
                }
             } catch (IOException e) {
                if (!cancelled) {
