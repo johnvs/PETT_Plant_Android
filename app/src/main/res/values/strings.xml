@@ -29,13 +29,15 @@
     <string name="on">On</string>
     <string name="off">Off</string>
     <string-array name="color_mode_array">
-        <item>Sound Responsive</item>
         <item>Rainbow Loop All</item>
         <item>Rainbow Loop Whole</item>
         <item>Rainbow Loop Spectrum</item>
+        <item>Sound Responsive</item>
         <item>Around The World</item>
         <item>Random Pop</item>
         <item>Fck Yeah Colors</item>
+        <item>Preset 1</item>
+        <item>Preset 2</item>
     </string-array>
 
     <!--  Bluetooth connection messages  -->
