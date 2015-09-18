@@ -25,7 +25,8 @@ public class Entrainment {
       }
 
       public static boolean isValid (int id) {
-         if (id >= MEDITATE.getId() && id <= STAY_AWAKE.getId()) { return true;  }
+//         if (id >= MEDITATE.getId() && id <= STAY_AWAKE.getId()) { return true;  }
+         if (id >= 0 && id < Sequence.values().length) { return true;  }
          else { return false; }
       }
 
@@ -54,7 +55,8 @@ public class Entrainment {
       }
 
       public static boolean isValid (int id) {
-         if (id >= STOPPED.getId() && id <= PAUSED.getId()) { return true; }
+//         if (id >= STOPPED.getId() && id <= PAUSED.getId()) { return true; }
+         if (id >= 0 && id < State.values().length) { return true; }
          else { return false; }
       }
    }
@@ -100,7 +102,8 @@ public class Entrainment {
       }
 
       public static boolean isValid (int id) {
-         if (id >= OFF.getId() && id <= ON.getId()) { return true; }
+//         if (id >= OFF.getId() && id <= ON.getId()) { return true; }
+         if (id >= 0 && id < LoopCheckbox.values().length) { return true; }
          else { return false; }
       }
 
