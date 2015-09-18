@@ -162,6 +162,7 @@ public class CommunicationManager {
    }
 
    private void sendCommandBackground(AbstractCommand<? extends AbstractResponse> command) {
+
       Byte commandId = command.getCommandId();
       if (commandIdToWaitingCommands.containsKey(commandId)) {
          pettPlantService.dispatchCommError(CommunicationErrorType.TRANSMIT_FAILED,
@@ -174,6 +175,16 @@ public class CommunicationManager {
                "a command with this same response id is already in progress", commandId);
          return;
       }
+
+//      ErrorHandler errorHandler = ErrorHandler.getInstance();
+//      if (errorHandler != null) {
+//         errorHandler.logError(Level.INFO, "CommunicationManager.sendCommandBackground():" +
+//               " command ID - " + commandId, 0, 0);
+//      } else {
+//         if (MyDebug.LOG) {
+//            Log.d(TAG, "errorHandler is null.");
+//         }
+//      }
 
       ICommAdapter adapter = getCurrentCommAdapter();
       byte[] bytes = command.toCommandBytes();
@@ -246,6 +257,16 @@ public class CommunicationManager {
 //            Log.d(TAG, "responseBytes=" + new BigInteger(responseBytes).toString(16));
       }
 
+      ErrorHandler errorHandler = ErrorHandler.getInstance();
+      if (errorHandler != null) {
+         errorHandler.logError(Level.INFO, "CommunicationManager.handleResponseBytesBackground():" +
+               " received bytes - " + responseBytesStr, 0, 0);
+      } else {
+         if (MyDebug.LOG) {
+            Log.d(TAG, "errorHandler is null.");
+         }
+      }
+
       if (responseBytes.length < 3) {
          pettPlantService.dispatchCommError(CommunicationErrorType.MALFORMED_RESPONSE,
                "response length too short", null);
@@ -263,25 +284,11 @@ public class CommunicationManager {
       AbstractCommand<?> waitingCommand = responseIdToWaitingCommands.get(responseId);
 
       if (waitingCommand == null) {
-//         if (justEndedInterval) {
-//            if (MyDebug.LOG) {
-//               Log.d("EndObsRaceCond", "Caught one last message");
-//            }
-//            // Eat the response - its probably one last response received after sending
-//            // EndIntervalReading command
-//            justEndedInterval = false;
-//            return;
-//         } else {
-            // got a response for a command that was not send or had previously timed out
-//            if (MyDebug.LOG) {
-//               Log.d("EndObsRaceCond", "Obs data set sent after response removed from list");
-//            }
-            pettPlantService.dispatchCommError(CommunicationErrorType.UNEXPECTED_RESPONSE,
-                  "received response but none requested", responseId);
+         pettPlantService.dispatchCommError(CommunicationErrorType.UNEXPECTED_RESPONSE,
+               "received response but none requested", responseId);
 
-            // can't call onFailed on a callback, because we don't know who this belongs to
-            return;
-//         }
+         // can't call onFailed on a callback, because we don't know who this belongs to
+         return;
       }
 
       AbstractResponse response;
@@ -364,6 +371,16 @@ public class CommunicationManager {
             waitingCommandsToTimeouts.remove(command);
 
             uiHandler.post(new TimeoutCallbackUiRunnable(command.getResponseCallback()));
+
+            ErrorHandler errorHandler = ErrorHandler.getInstance();
+            if (errorHandler != null) {
+               errorHandler.logError(Level.INFO, "CommunicationManager$TimeoutBackgroundRunnable" +
+                     ".run() - Plant response timed out.", 0, 0);
+            } else {
+               if (MyDebug.LOG) {
+                  Log.d(TAG, "errorHandler is null.");
+               }
+            }
          }
       }
    }
