@@ -21,7 +21,8 @@ public class CommunicationParams  {
 	public static final String COMM_NAME = "name";
 	public static final String COMMUNICATION_TYPE = "communicationType";
    public static final String COMM_ADDRESS = "address";
-   public static final String NONE = "none";
+	public static final String NONE = "none";
+	public static final String MOCKING_JAY = "MockingJay";
 
 	private SharedPreferences appParams;
 
@@ -31,7 +32,7 @@ public class CommunicationParams  {
 
 	public CommunicationParams(Context context) {
       appParams = context.getSharedPreferences(AppParams.PETT_PLANT_DATA_FILE, 0);
-      name = appParams.getString(COMM_NAME, NONE);
+      name = appParams.getString(COMM_NAME, MOCKING_JAY);
       address = appParams.getString(COMM_ADDRESS, NONE);
       communicationType = CommunicationType.getCommType(appParams.getInt(COMMUNICATION_TYPE, CommunicationType.MOCK.getValue()));
    }
