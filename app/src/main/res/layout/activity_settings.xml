@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
+
         <TextView
             style="@style/LabelColumnLeft"
             android:layout_width="match_parent"
@@ -17,59 +18,71 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:text="@string/pett_plant_connection" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:orientation="horizontal" >
+
             <TextView
                 style="@style/LabelColumnLeft01"
                 android:textSize="18sp"
                 android:text="@string/pett_plant_name" />
+
             <TextView
                 android:id="@+id/deviceName"
                 style="@style/LabelColumnRight01"
                 android:textSize="18sp"
                 android:text="@string/none" />
+
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:orientation="horizontal" >
+
             <TextView
                 style="@style/LabelColumnLeft01"
                 android:textSize="18sp"
                 android:text="@string/connection_type" />
+
             <TextView
                 android:id="@+id/communicationType"
                 style="@style/LabelColumnRight01"
                 android:textSize="18sp"
                 android:text="@string/none" />
+
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:orientation="horizontal" >
+
             <TextView
                 style="@style/LabelColumnLeft01"
                 android:textSize="18sp"
                 android:text="@string/connection_status" />
+
             <TextView
                 android:id="@+id/connectionStatus"
                 style="@style/LabelColumnRight01"
                 android:textSize="18sp"
                 android:text="@string/none" />
+
         </LinearLayout>
     </LinearLayout>
+
     <View
         android:id="@+id/commDivder"
         android:layout_width="fill_parent"
-        android:layout_height="1dp"
+        android:layout_height="2dp"
         android:layout_below="@id/currentCommLayout"
         android:layout_margin="10dp"
-        android:background="#AAAAAA" />
+        android:background="@android:color/black" />
+
     <TextView
         android:id="@+id/scanForNewMeter"
         style="@style/LabelColumnLeft"
@@ -78,23 +91,27 @@
         android:layout_below="@id/commDivder"
         android:layout_marginBottom="10dp"
         android:text="@string/scan_new_plant" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/scanForNewMeter"
         android:orientation="horizontal" >
+
         <Button
             android:id="@+id/bluetoothScanButton"
             style="@style/AppButton"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:text="@string/bluetooth_scan" />
+
         <Button
             android:id="@+id/usbScanButton"
             style="@style/AppButton"
             android:layout_marginLeft="5dp"
             android:layout_weight="1"
             android:text="@string/usb_scan" />
+
     </LinearLayout>
 
 </RelativeLayout>
