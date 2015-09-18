@@ -7,15 +7,15 @@ public class ColorMode {
 
    public enum Mode {
 
-      SOUND_RESPONSIVE(0),
-      RAINBOW_LOOP_ALL(1),
-      RAINBOW_LOOP_WHOLE(2),
-      RAINBOW_LOOP_SPECTRUM(3),
+      RAINBOW_LOOP_ALL(0),
+      RAINBOW_LOOP_WHOLE(1),
+      RAINBOW_LOOP_SPECTRUM(2),
+      SOUND_RESPONSIVE(3),
       AROUND_THE_WORLD(4),
       RANDOM_POP(5),
-      FCK_YEAH_COLORS(6);
-//   PRESET_4(7),
-//   PRESET_5(8);
+      FCK_YEAH_COLORS(6),
+      PRESET_1(7),
+      PRESET_2(8);
 
       private int id;
 
@@ -36,12 +36,13 @@ public class ColorMode {
       }
 
       public static boolean isValid (int id) {
-         if (id >= SOUND_RESPONSIVE.getId() && id <= FCK_YEAH_COLORS.getId()) { return true; }
+//         if (id >= RAINBOW_LOOP_ALL.getId() && id <= PRESET_2.getId()) { return true; }
+         if (id >= 0 && id < Mode.values().length) { return true; }
          else { return false; }
       }
 
       public static Mode getDefault() {
-         return SOUND_RESPONSIVE;
+         return RAINBOW_LOOP_ALL;
       }
    }
 
@@ -65,7 +66,8 @@ public class ColorMode {
       }
 
       public static boolean isValid (int id) {
-         if (id >= OFF.getId() && id <= PAUSED.getId()) { return true; }
+//         if (id >= OFF.getId() && id <= PAUSED.getId()) { return true; }
+         if (id >= 0 && id < State.values().length) { return true; }
          else { return false; }
       }
    }
