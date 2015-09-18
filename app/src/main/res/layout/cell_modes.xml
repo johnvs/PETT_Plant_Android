@@ -8,4 +8,5 @@
     android:paddingTop="3dp"
     android:paddingBottom="3dp"
     android:ellipsize="end"
-    android:textSize="18sp" />
+    android:textSize="18sp"
+    android:textColor="@color/black"/>
