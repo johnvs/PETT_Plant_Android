@@ -349,6 +349,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                               // Entrainment is now running, so change the Run/Stop button to Stop
                               entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
                               entrainPauseResumeButton.setEnabled(true);
+                              entrainmentSpinner.setEnabled(false);
                            }
 
                            @Override
@@ -373,6 +374,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                         // Entrainment is now stopped, so change the Run/Stop button to Run
                         entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
                         entrainPauseResumeButton.setEnabled(false);
+                        entrainmentSpinner.setEnabled(true);
                      }
 
                      @Override
@@ -758,6 +760,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
                entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
                entrainPauseResumeButton.setEnabled(false);
+               entrainmentSpinner.setEnabled(true);
 
                // Make sure any future time indicator gets reset here.
 
@@ -767,6 +770,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
                entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
                entrainPauseResumeButton.setEnabled(true);
+               entrainmentSpinner.setEnabled(false);
 
                break;
 
@@ -774,6 +778,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
                entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.RESUME);
                entrainPauseResumeButton.setEnabled(true);
+               entrainmentSpinner.setEnabled(true);
 
                break;
          }
