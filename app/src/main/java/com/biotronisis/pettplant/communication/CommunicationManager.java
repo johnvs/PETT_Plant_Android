@@ -122,6 +122,17 @@ public class CommunicationManager {
                R.string.bluetooth_adapter_error_message);
       } else {
          commAdapter.activate(communicationParams.getAddress());
+
+         ErrorHandler errorHandler = ErrorHandler.getInstance();
+         if (errorHandler != null) {
+            errorHandler.logError(Level.INFO, "CommunicationManager.connect():" +
+                  " executing commAdapter.activate().", 0, 0);
+         } else {
+            if (MyDebug.LOG) {
+               Log.d(TAG, "errorHandler is null.");
+            }
+         }
+
       }
    }
 
@@ -162,6 +173,16 @@ public class CommunicationManager {
    }
 
    private void sendCommandBackground(AbstractCommand<? extends AbstractResponse> command) {
+
+      ErrorHandler errorHandler = ErrorHandler.getInstance();
+      if (errorHandler != null) {
+         errorHandler.logError(Level.INFO, "CommunicationManager.sendCommandBackground():" +
+               " sent command - " + command.getCommandId(), 0, 0);
+      } else {
+         if (MyDebug.LOG) {
+            Log.d(TAG, "errorHandler is null.");
+         }
+      }
 
       Byte commandId = command.getCommandId();
       if (commandIdToWaitingCommands.containsKey(commandId)) {
