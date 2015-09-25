@@ -310,12 +310,14 @@ public class PettPlantFragment extends AbstractBaseFragment {
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
          // The if is needed because the listener fires when the app starts
          if (position != lastEntrainmentPos) {
-            lastEntrainmentPos = position;
 
             Toast entrainmentToast = Toast.makeText(getActivity(),
-                  parent.getItemAtPosition(position) + " selected",
+                        parent.getItemAtPosition(position) + " selected, was " +
+                        parent.getItemAtPosition(lastEntrainmentPos),
                   Toast.LENGTH_LONG);
             entrainmentToast.show();
+
+            lastEntrainmentPos = position;
          }
       }
 
@@ -522,11 +524,14 @@ public class PettPlantFragment extends AbstractBaseFragment {
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
          // The if is needed because the listener fires when the app starts
          if (position != lastColorModePos) {
+
+            Toast colorModeToast = Toast.makeText(getActivity(),
+                  parent.getItemAtPosition(position) + " selected, was " +
+                        parent.getItemAtPosition(lastColorModePos),
+                  Toast.LENGTH_LONG);
+            colorModeToast.show();
+
             lastColorModePos = position;
-//            Toast colorModeToast = Toast.makeText(getActivity(),
-//                  parent.getItemAtPosition(position) + " selected",
-//                  Toast.LENGTH_LONG);
-//            colorModeToast.show();
 
             PettPlantService pettPlantService = PettPlantService.getInstance();
             if (pettPlantService != null) {
@@ -753,7 +758,9 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
          this.plantState = pState;
 
-         entrainmentSpinner.setSelection(plantState.getEntrainSequence().getValue());
+//         entrainmentSpinner.setSelection(plantState.getEntrainSequence().getValue());
+         lastEntrainmentPos = plantState.getEntrainSequence().getValue();
+         entrainmentSpinner.setSelection(lastEntrainmentPos);
 
          switch (plantState.getEntrainmentState()) {
             case STOPPED:
@@ -786,7 +793,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
          // Convert from int to boolean
          loopCheckbox.setChecked(plantState.getLoopCheckbox().getValue() != 0);
 
-         colorModeSpinner.setSelection(plantState.getColorMode().getValue());
+         lastColorModePos = plantState.getColorMode().getValue();
+         colorModeSpinner.setSelection(lastColorModePos);
 
          switch (plantState.getColorModeState()) {
             case OFF:
