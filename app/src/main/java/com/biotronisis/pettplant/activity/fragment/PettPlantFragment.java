@@ -130,7 +130,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
       entrainRunStopButton.setOnClickListener(new EntrainmentRunStopOnClick());
 
       entrainPauseResumeButton = (Button) view.findViewById(R.id.button_pause_resume);
-      entrainPauseResumeButton.setOnClickListener(new EntrainmentPauseResumeOnClick());
+      entrainPauseResumeButton.setVisibility(View.INVISIBLE);
+//      entrainPauseResumeButton.setOnClickListener(new EntrainmentPauseResumeOnClick());
 
       loopCheckbox = (CheckBox) view.findViewById(R.id.checkbox_loop);
       loopCheckbox.setOnClickListener(new EntrainmentLoopOnClickListener());
@@ -243,13 +244,13 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
          entrainRunStopButton.setText(pettPlantParams.getEntrainmentRunButton());
 
-         if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.RUN)) {
-            entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
-            entrainPauseResumeButton.setEnabled(false);
-         } else if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.STOP)) {
-            entrainPauseResumeButton.setText(pettPlantParams.getEntrainmentPauseButton());
-            entrainPauseResumeButton.setEnabled(true);
-         }
+//         if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.RUN)) {
+//            entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
+//            entrainPauseResumeButton.setEnabled(false);
+//         } else if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.STOP)) {
+//            entrainPauseResumeButton.setText(pettPlantParams.getEntrainmentPauseButton());
+//            entrainPauseResumeButton.setEnabled(true);
+//         }
 
          // Convert int to boolean
          loopCheckbox.setChecked(pettPlantParams.getEntrainmentLoopCheckbox().getValue() != 0);
@@ -281,7 +282,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
    public void persistData() {
       pettPlantParams.setEntrainmentSequence(Entrainment.Sequence.getSequence(entrainmentSpinner.getSelectedItemPosition()));
       pettPlantParams.setEntrainmentRunButton(entrainRunStopButton.getText().toString());
-      pettPlantParams.setColorModePauseButton(entrainPauseResumeButton.getText().toString());
+//      pettPlantParams.setEntrainmentPauseButton(entrainPauseResumeButton.getText().toString());
       pettPlantParams.setEntrainmentLoopCheckbox(loopCheckbox.isChecked() ?
                   Entrainment.LoopCheckbox.ON : Entrainment.LoopCheckbox.OFF);
 
@@ -350,7 +351,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                                     Toast.LENGTH_LONG).show();
                               // Entrainment is now running, so change the Run/Stop button to Stop
                               entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
-                              entrainPauseResumeButton.setEnabled(true);
+//                              entrainPauseResumeButton.setEnabled(true);
                               entrainmentSpinner.setEnabled(false);
                            }
 
@@ -375,7 +376,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
                               Toast.LENGTH_LONG).show();
                         // Entrainment is now stopped, so change the Run/Stop button to Run
                         entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
-                        entrainPauseResumeButton.setEnabled(false);
+//                        entrainPauseResumeButton.setEnabled(false);
                         entrainmentSpinner.setEnabled(true);
                      }
 
@@ -396,6 +397,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
       }
    }
 
+/*
    private class EntrainmentPauseResumeOnClick implements View.OnClickListener {
 
       @Override
@@ -459,6 +461,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
          }
       }
    }
+*/
 
    private class EntrainmentLoopOnClickListener implements View.OnClickListener {
 
@@ -765,8 +768,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
          switch (plantState.getEntrainmentState()) {
             case STOPPED:
                entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
-               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
-               entrainPauseResumeButton.setEnabled(false);
+//               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
+//               entrainPauseResumeButton.setEnabled(false);
                entrainmentSpinner.setEnabled(true);
 
                // Make sure any future time indicator gets reset here.
@@ -775,19 +778,19 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
             case RUNNING:
                entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
-               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
-               entrainPauseResumeButton.setEnabled(true);
+//               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
+//               entrainPauseResumeButton.setEnabled(true);
                entrainmentSpinner.setEnabled(false);
 
                break;
 
-            case PAUSED:
-               entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
-               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.RESUME);
-               entrainPauseResumeButton.setEnabled(true);
-               entrainmentSpinner.setEnabled(true);
-
-               break;
+//            case PAUSED:
+//               entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
+//               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.RESUME);
+//               entrainPauseResumeButton.setEnabled(true);
+//               entrainmentSpinner.setEnabled(true);
+//
+//               break;
          }
 
          // Convert from int to boolean
