@@ -238,6 +238,18 @@ public class BluetoothCommAdapter implements ICommAdapter {
          Log.d(TAG, "setState() " + oldState + " -> " + newState);
       }
 
+      ErrorHandler errorHandler = ErrorHandler.getInstance();
+      if (errorHandler == null) {
+         if (MyDebug.LOG) {
+            Log.d(TAG, "BluetoothCommAdapter.setState(): Old State - " + oldState + ", New State - " + newState);
+         }
+      } else {
+         errorHandler.logError(Level.INFO, "BluetoothCommAdapter.setState(): Old State - " + oldState + ", New State - " + newState, 0, 0);
+      }
+      if (MyDebug.LOG) {
+         Log.d(TAG, "PettPlantService.onCreate() - Entered");
+      }
+
       if (newState != oldState && listener != null) {
          listener.onConnectionState(newState);
       }
