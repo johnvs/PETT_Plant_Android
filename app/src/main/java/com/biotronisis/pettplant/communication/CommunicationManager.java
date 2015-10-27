@@ -126,7 +126,7 @@ public class CommunicationManager {
          ErrorHandler errorHandler = ErrorHandler.getInstance();
          if (errorHandler != null) {
             errorHandler.logError(Level.INFO, "CommunicationManager.connect():" +
-                  " executing commAdapter.activate().", 0, 0);
+                  " executing commAdapter.activate(" + communicationParams.getAddress() + ").", 0, 0);
          } else {
             if (MyDebug.LOG) {
                Log.d(TAG, "errorHandler is null.");
