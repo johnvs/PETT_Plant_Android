@@ -14,8 +14,8 @@ public class ColorMode {
       AROUND_THE_WORLD(4),
       RANDOM_POP(5),
       FCK_YEAH_COLORS(6),
-      PRESET_1(7),
-      PRESET_2(8);
+      UP_AND_DOWN(7),
+      FIFTY_FIFTY(8);
 
       private int id;
 
@@ -36,7 +36,7 @@ public class ColorMode {
       }
 
       public static boolean isValid (int id) {
-//         if (id >= RAINBOW_LOOP_ALL.getId() && id <= PRESET_2.getId()) { return true; }
+//         if (id >= RAINBOW_LOOP_ALL.getId() && id <= FIFTY_FIFTY.getId()) { return true; }
          if (id >= 0 && id < Mode.values().length) { return true; }
          else { return false; }
       }
