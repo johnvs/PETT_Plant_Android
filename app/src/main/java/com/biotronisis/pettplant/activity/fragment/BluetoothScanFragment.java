@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,8 +38,13 @@ public final class BluetoothScanFragment extends DialogFragment {
     private List<MyItem> items;
     private MyDeviceAdapter listAdapter;
     private MyBluetoothBroadcastReceiver receiver;
+   private Context parentContext;
     
     private OnBluetoothDeviceSelectedListener listener;
+
+   public void setContext(Context thisContext) {
+      parentContext = thisContext;
+   }
     
     public void setOnBluetoothDeviceSelectedListener(OnBluetoothDeviceSelectedListener listener) {
     	this.listener = listener;
@@ -51,7 +57,9 @@ public final class BluetoothScanFragment extends DialogFragment {
 
         this.inflator = inflater;
 
-        getDialog().setTitle(getString(R.string.select_device));
+//       v.setBackground(ContextCompat.getDrawable(parentContext, R.drawable.layout_background_spinner));
+
+       getDialog().setTitle(getString(R.string.select_device));
 
         items = new ArrayList<MyItem>();
         listAdapter = new MyDeviceAdapter();
@@ -60,6 +68,7 @@ public final class BluetoothScanFragment extends DialogFragment {
         ListView listView = (ListView) v.findViewById(R.id.listView);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(listAdapter);
+        listView.setBackground(ContextCompat.getDrawable(parentContext, R.drawable.layout_background_bluetooth));
 
         receiver = new MyBluetoothBroadcastReceiver();
 
