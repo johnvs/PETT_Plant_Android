@@ -1,6 +1,5 @@
 This is an Android app designed to control a PETT Plant via Bluetooth.
 
-
 /*********************************
 
   Pett Plant App Commands
@@ -48,7 +47,7 @@ This is an Android app designed to control a PETT Plant via Bluetooth.
                         Color Mode state,
                         Color Mode Speed
 
-    End of command      0x00   << Used internally to Plant controller.
+    End_of_command      0x00   << Used internally to Plant controller.
                                   Don't use for a message
 
 *********************************
