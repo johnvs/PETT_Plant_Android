@@ -23,7 +23,6 @@ import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.fragment.BluetoothScanFragment;
 import com.biotronisis.pettplant.activity.fragment.BluetoothScanFragment.OnBluetoothDeviceSelectedListener;
 import com.biotronisis.pettplant.communication.CommunicationErrorType;
-import com.biotronisis.pettplant.communication.CommunicationManager;
 import com.biotronisis.pettplant.communication.CommunicationManager.CommunicationManagerListener;
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.model.CommunicationParams;
@@ -39,7 +38,8 @@ public class SettingsActivity extends AbstractBaseActivity {
    private static final String TAG = "SettingsActivity";
 
    private TextView deviceNameTV;
-   private TextView communicationTypeTV;
+   private TextView connectionTypeTV;
+   private TextView connectionAddressTV;
    private TextView connectionStatusTV;
    private Button bluetoothScanButton;
    private Button usbScanButton;
@@ -80,9 +80,10 @@ public class SettingsActivity extends AbstractBaseActivity {
       usbScanButton =       (Button) findViewById(R.id.usbScanButton);
       usbScanButton.setVisibility(View.INVISIBLE);
 
-      communicationTypeTV = (TextView) findViewById(R.id.communicationType);
+      connectionTypeTV = (TextView) findViewById(R.id.connectionType);
       deviceNameTV =        (TextView) findViewById(R.id.deviceName);
       connectionStatusTV =  (TextView) findViewById(R.id.connectionStatus);
+      connectionAddressTV =   (TextView) findViewById(R.id.connectionAddress);
 
       communicationParams = new CommunicationParams(this);
       activityContext = this;
@@ -100,7 +101,7 @@ public class SettingsActivity extends AbstractBaseActivity {
             }
          }
       } else {
-         communicationTypeTV.setText(R.string.none);
+         connectionTypeTV.setText(R.string.none);
          deviceNameTV.setText(getString(R.string.none));
          connectionStatusTV.setText(getString(R.string.disconnected));
       }
@@ -215,7 +216,8 @@ public class SettingsActivity extends AbstractBaseActivity {
    }
 
    private void updateCommunicationDisplay() {
-      communicationTypeTV.setText(communicationParams.getCommunicationType().name());
+      connectionAddressTV.setText(communicationParams.getAddress());
+      connectionTypeTV.setText(communicationParams.getCommunicationType().name());
       deviceNameTV.setText(communicationParams.getName());
    }
 
@@ -308,6 +310,7 @@ public class SettingsActivity extends AbstractBaseActivity {
          }
 
          BluetoothScanFragment dialog = new BluetoothScanFragment();
+         dialog.setContext(activityContext);
          dialog.setOnBluetoothDeviceSelectedListener(new OnBluetoothDeviceSelectedListener() {
             @Override
             public void onBluetoothDeviceSelectedListener(BluetoothDevice device) {

@@ -20,8 +20,8 @@
     <string name="loop">Loop</string>
     <string-array name="entrainment_array">
         <item>Meditate</item>
-        <item>Sleep</item>
-        <item>Stay Awake</item>
+        <item>Meditate (Long)</item>
+        <item>Alertness</item>
     </string-array>
 
     <string name="color_mode">Color Mode</string>
@@ -68,6 +68,7 @@
     <string name="connection_type">Connection Type</string>
     <string name="pett_plant_name">PETT Plant Name</string>
     <string name="connection_status">Connection Status</string>
+    <string name="connection_address">Connection Address</string>
     <string name="none">None</string>
 
     <!-- Options Menu -->
