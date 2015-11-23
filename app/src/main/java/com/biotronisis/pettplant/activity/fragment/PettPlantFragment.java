@@ -243,6 +243,25 @@ public class PettPlantFragment extends AbstractBaseFragment {
          entrainmentSpinner.setSelection(pettPlantParams.getEntrainmentSequence().getValue());
 
          entrainRunStopButton.setText(pettPlantParams.getEntrainmentRunButton());
+         if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.RUN)) {
+            // Entrainment is off
+            entrainRunStopButton.setBackgroundResource(R.drawable.button_run_background);
+
+            // Enable color mode controls when entrainment is off
+            colorModeSpinner.setEnabled(true);
+            colorRunOffButton.setEnabled(true);
+            colorPauseResumeButton.setEnabled(true);
+            colorModeSeekbar.setEnabled(true);
+         } else {
+            // Entrainment is running
+            entrainRunStopButton.setBackgroundResource(R.drawable.button_stop_off_background);
+
+            // Disable color mode controls when entrainment is running
+            colorModeSpinner.setEnabled(false);
+            colorRunOffButton.setEnabled(false);
+            colorPauseResumeButton.setEnabled(false);
+            colorModeSeekbar.setEnabled(false);
+         }
 
 //         if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.RUN)) {
 //            entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
@@ -256,15 +275,34 @@ public class PettPlantFragment extends AbstractBaseFragment {
          loopCheckbox.setChecked(pettPlantParams.getEntrainmentLoopCheckbox().getValue() != 0);
 
          colorModeSpinner.setSelection(pettPlantParams.getColorMode().getValue());
+         updateEntrainmentButton();
 
          colorRunOffButton.setText(pettPlantParams.getColorModeRunButton());
 
          if (colorRunOffButton.getText().equals(ColorMode.RunOffButton.RUN)) {
+            // The Run/Off button is Run
+            colorRunOffButton.setBackgroundResource(R.drawable.button_run_background);
+
             colorPauseResumeButton.setText(pettPlantParams.getColorModePauseButton());
+            colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
             colorPauseResumeButton.setEnabled(false);
          } else {
+            // The Run/Off button is Off, Color Mode is running
+            colorRunOffButton.setBackgroundResource(R.drawable.button_stop_off_background);
+
             colorPauseResumeButton.setText(pettPlantParams.getColorModePauseButton());
-            colorPauseResumeButton.setEnabled(true);
+            if (colorPauseResumeButton.getText().equals(ColorMode.PauseResumeButton.PAUSE)) {
+               // Button is Pause
+               colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
+            } else {
+               // Button is Resume
+               colorPauseResumeButton.setBackgroundResource(R.drawable.button_resume_background);
+            }
+
+            // Enable the control if entrainment is off
+            if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.RUN)) {
+               colorPauseResumeButton.setEnabled(true);
+            }
          }
 
          int speed = pettPlantParams.getColorModeSpeed();
@@ -351,8 +389,18 @@ public class PettPlantFragment extends AbstractBaseFragment {
                                     Toast.LENGTH_LONG).show();
                               // Entrainment is now running, so change the Run/Stop button to Stop
                               entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
+                              entrainRunStopButton.setBackgroundResource(R.drawable.button_stop_off_background);
 //                              entrainPauseResumeButton.setEnabled(true);
                               entrainmentSpinner.setEnabled(false);
+
+                              // Todo - Check speed seekbar and limit to 25%
+                              //        Send new speed to plant if needed
+
+                              // Disable color mode controls when entrainment is running
+                              colorModeSpinner.setEnabled(false);
+                              colorRunOffButton.setEnabled(false);
+                              colorPauseResumeButton.setEnabled(false);
+                              colorModeSeekbar.setEnabled(false);
                            }
 
                            @Override
@@ -376,8 +424,15 @@ public class PettPlantFragment extends AbstractBaseFragment {
                               Toast.LENGTH_LONG).show();
                         // Entrainment is now stopped, so change the Run/Stop button to Run
                         entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
+                        entrainRunStopButton.setBackgroundResource(R.drawable.button_run_background);
 //                        entrainPauseResumeButton.setEnabled(false);
                         entrainmentSpinner.setEnabled(true);
+
+                        // Enable color mode controls when entrainment is off
+                        colorModeSpinner.setEnabled(true);
+                        colorRunOffButton.setEnabled(true);
+                        colorPauseResumeButton.setEnabled(true);
+                        colorModeSeekbar.setEnabled(true);
                      }
 
                      @Override
@@ -521,6 +576,27 @@ public class PettPlantFragment extends AbstractBaseFragment {
       }
    }
 
+   private void updateEntrainmentButton() {
+
+      switch (ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition())) {
+         // Enable or disable entrainment mode based on the selected color mode
+         case RAINBOW_LOOP_ALL:
+         case RAINBOW_LOOP_WHOLE:
+         case RAINBOW_LOOP_SPECTRUM:
+         case UP_AND_DOWN:
+            entrainRunStopButton.setEnabled(true);
+            break;
+
+         case SOUND_RESPONSIVE:
+         case AROUND_THE_WORLD:
+         case RANDOM_POP:
+         case FCK_YEAH_COLORS:
+         case FIFTY_FIFTY:
+            entrainRunStopButton.setEnabled(false);
+            break;
+      }
+   }
+
    private class ColorModeSpinnerOnItemSelected implements AdapterView.OnItemSelectedListener {
 
       @Override
@@ -550,6 +626,24 @@ public class PettPlantFragment extends AbstractBaseFragment {
                            public void onSuccess() {
 //                              Toast.makeText(getActivity(), getString(R.string.set_color_mode_success),
 //                                    Toast.LENGTH_LONG).show();
+                              updateEntrainmentButton();
+//                              switch (ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition())) {
+//                                 // Enable or disable entrainment mode based on the selected color mode
+//                                 case RAINBOW_LOOP_ALL:
+//                                 case RAINBOW_LOOP_WHOLE:
+//                                 case RAINBOW_LOOP_SPECTRUM:
+//                                 case UP_AND_DOWN:
+//                                    entrainRunStopButton.setEnabled(true);
+//                                    break;
+//
+//                                 case SOUND_RESPONSIVE:
+//                                 case AROUND_THE_WORLD:
+//                                 case RANDOM_POP:
+//                                 case FCK_YEAH_COLORS:
+//                                 case FIFTY_FIFTY:
+//                                    entrainRunStopButton.setEnabled(false);
+//                                    break;
+//                              }
                            }
 
                            @Override
@@ -772,6 +866,12 @@ public class PettPlantFragment extends AbstractBaseFragment {
 //               entrainPauseResumeButton.setEnabled(false);
                entrainmentSpinner.setEnabled(true);
 
+               // Enable color mode controls when entrainment is off
+               colorModeSpinner.setEnabled(true);
+               colorRunOffButton.setEnabled(true);
+               colorPauseResumeButton.setEnabled(true);
+               colorModeSeekbar.setEnabled(true);
+
                // Make sure any future time indicator gets reset here.
 
                break;
@@ -781,6 +881,12 @@ public class PettPlantFragment extends AbstractBaseFragment {
 //               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
 //               entrainPauseResumeButton.setEnabled(true);
                entrainmentSpinner.setEnabled(false);
+
+               // Disable color mode controls when entrainment is running
+               colorModeSpinner.setEnabled(false);
+               colorRunOffButton.setEnabled(false);
+               colorPauseResumeButton.setEnabled(false);
+               colorModeSeekbar.setEnabled(false);
 
                break;
 
@@ -798,6 +904,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
          lastColorModePos = plantState.getColorMode().getValue();
          colorModeSpinner.setSelection(lastColorModePos);
+         updateEntrainmentButton();
 
          switch (plantState.getColorModeState()) {
             case OFF:
@@ -815,7 +922,11 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
                colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
                colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
-               colorPauseResumeButton.setEnabled(true);
+
+               if (plantState.getEntrainmentState() == Entrainment.State.STOPPED) {
+                  colorPauseResumeButton.setEnabled(true);
+               }
+
                break;
 
             case PAUSED:

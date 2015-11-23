@@ -22,6 +22,7 @@
     android:id="@+id/sample_main_layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="@drawable/layout_background"
     android:orientation="horizontal">
 
     <RelativeLayout
@@ -46,6 +47,7 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
+            android:popupBackground="@drawable/layout_background_spinner"
             android:prompt="@string/select_entrainment_mode"
             android:layout_below="@+id/title_entrainment" />
 
@@ -60,11 +62,13 @@
             <Button
                 android:id="@+id/button_run_stop"
                 style="@style/AppButton"
+                android:background="@drawable/button_run_background"
                 android:text="@string/run"/>
 
             <Button
                 android:id="@+id/button_pause_resume"
                 style="@style/AppButton"
+                android:background="@drawable/button_pause_background"
                 android:text="@string/pause"/>
 
         </LinearLayout>
@@ -123,6 +127,7 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
+            android:popupBackground="@drawable/layout_background_spinner"
             android:layout_below="@+id/title_color_mode" />
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -135,11 +140,13 @@
             <Button
                 android:id="@+id/button_color_on_off"
                 style="@style/AppButton"
+                android:background="@drawable/button_run_background"
                 android:text="@string/on"/>
 
             <Button
                 android:id="@+id/button_color_pause_resume"
                 style="@style/AppButton"
+                android:background="@drawable/button_pause_background"
                 android:text="@string/pause"/>
 
         </LinearLayout>
