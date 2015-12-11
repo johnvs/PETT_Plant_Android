@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
     android:paddingLeft="10dp"
+    android:paddingRight="20dp"
     android:paddingTop="3dp"
     android:paddingBottom="3dp"
     android:ellipsize="end"
