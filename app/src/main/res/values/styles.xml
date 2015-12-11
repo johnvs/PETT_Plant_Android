@@ -3,7 +3,26 @@
     <!-- Base application theme. -->
     <style name="Theme.Base" parent="Theme.AppCompat.Light.DarkActionBar" />
 
-    <style name="AppTheme" parent="Theme.Base" />
+    <style name="AppTheme" parent="Theme.Base" >
+        <item name="android:popupMenuStyle">@style/MyOptionsMenu</item>
+        <item name="actionOverflowMenuStyle">@style/MyActionOverflow</item>
+    </style>
+
+    <!--<item name="android:panelFullBackground">#EE0000</item>-->
+    <!--<item name="android:panelColorBackground">#00EE00</item>-->
+    <!--<item name="android:panelBackground">#0000EE</item>-->
+    <!--<item name="android:panelBackground">@android:color/holo_green_light</item>-->
+    <!--<item name="android:actionBarWidgetTheme">@style/AppTheme</item>-->
+
+    <!--<style name ="MyPopupMenu" parent="android:Theme.Holo.Light">-->
+
+    <style name ="MyOptionsMenu" parent="Theme.AppCompat.Light">
+        <item name="android:popupBackground">@drawable/layout_background_fire_270</item>
+    </style>
+
+    <style name ="MyActionOverflow" parent="Widget.AppCompat.Light.PopupMenu.Overflow">
+        <item name="android:popupBackground">@drawable/layout_background_fire_270</item>
+    </style>
 
     <!-- Customize your theme here. -->
 
