@@ -11,9 +11,9 @@
     <color name="magenta">#FFFF00FF</color>
     <color name="red">#FFFF0000</color>
     <color name="orange">#FFCC5500</color>
-    <color name="transparent">#00000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="yellow">#FFFFFF00</color>
+    <color name="transparent">#00000000</color>
 
     <color name="indigo_500">#FF3f51b5</color>
     <color name="indigo_400">#FF5c6bc0</color>
