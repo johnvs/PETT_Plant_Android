@@ -22,7 +22,7 @@
     android:id="@+id/sample_main_layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/layout_background"
+    android:background="@drawable/layout_background_main"
     android:orientation="horizontal">
 
     <RelativeLayout
@@ -47,7 +47,7 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
-            android:popupBackground="@drawable/layout_background_spinner"
+            android:popupBackground="@drawable/layout_background_fire_225"
             android:prompt="@string/select_entrainment_mode"
             android:layout_below="@+id/title_entrainment" />
 
@@ -127,7 +127,7 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="20dp"
             android:layout_marginStart="20dp"
-            android:popupBackground="@drawable/layout_background_spinner"
+            android:popupBackground="@drawable/layout_background_fire_315"
             android:layout_below="@+id/title_color_mode" />
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
