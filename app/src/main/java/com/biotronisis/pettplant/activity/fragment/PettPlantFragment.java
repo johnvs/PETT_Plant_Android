@@ -350,11 +350,13 @@ public class PettPlantFragment extends AbstractBaseFragment {
          // The if is needed because the listener fires when the app starts
          if (position != lastEntrainmentPos) {
 
-            Toast entrainmentToast = Toast.makeText(getActivity(),
-                        parent.getItemAtPosition(position) + " selected, was " +
-                        parent.getItemAtPosition(lastEntrainmentPos),
-                  Toast.LENGTH_LONG);
-            entrainmentToast.show();
+            if (MyDebug.LOG) {
+               Toast entrainmentToast = Toast.makeText(getActivity(),
+                     parent.getItemAtPosition(position) + " selected, was " +
+                           parent.getItemAtPosition(lastEntrainmentPos),
+                     Toast.LENGTH_LONG);
+               entrainmentToast.show();
+            }
 
             lastEntrainmentPos = position;
          }
@@ -363,6 +365,34 @@ public class PettPlantFragment extends AbstractBaseFragment {
       @Override
       public void onNothingSelected(AdapterView<?> parent) {
 
+      }
+   }
+
+   private void SendSpeedCommand (final int speed) {
+      PettPlantService pettPlantService = PettPlantService.getInstance();
+      if (pettPlantService != null) {
+         // Make sure we are connected to a plant before trying to send it the command
+         if (pettPlantService.isConnected()) {
+
+            // Send command
+            pettPlantService.setSpeedColorMode((byte) speed,
+                  new PettPlantService.SetSpeedColorModeCallback() {
+                     @Override
+                     public void onSuccess() {
+                        colorModeSeekbar.setProgress(speed);
+                        colorModeSpeedTV.setText(Integer.toString(speed));
+                     }
+
+                     @Override
+                     public void onFailed(String reason) {
+                        ErrorHandler errorHandler = ErrorHandler.getInstance();
+                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                    "ColorModeOnSeekbarChange(): Can't set color mode speed- " + reason,
+                              R.string.set_speed_color_mode_failed_title,
+                              R.string.set_speed_color_mode_failed_message);
+                     }
+                  });
+         }
       }
    }
 
@@ -385,16 +415,24 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
                            @Override
                            public void onSuccess() {
-                              Toast.makeText(getActivity(), getString(R.string.run_entrainment_success),
-                                    Toast.LENGTH_LONG).show();
+
+                              if (MyDebug.LOG) {
+                                 Toast.makeText(getActivity(), getString(R.string.run_entrainment_success),
+                                       Toast.LENGTH_LONG).show();
+                              }
+
                               // Entrainment is now running, so change the Run/Stop button to Stop
                               entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
                               entrainRunStopButton.setBackgroundResource(R.drawable.button_stop_off_background);
 //                              entrainPauseResumeButton.setEnabled(true);
                               entrainmentSpinner.setEnabled(false);
 
-                              // Todo - Check speed seekbar and limit to 25%
-                              //        Send new speed to plant if needed
+                              //  Limit the color mode speed for entrainment
+                              int speed = colorModeSeekbar.getProgress();
+                              if (speed > ColorMode.Speed.MAX_ENTRAINTMENT_SPEED) {
+                                 SendSpeedCommand(ColorMode.Speed.MAX_ENTRAINTMENT_SPEED);
+//                                 colorModeSpeedTV.setText(Integer.toString(speed));
+                              }
 
                               // Disable color mode controls when entrainment is running
                               colorModeSpinner.setEnabled(false);
@@ -420,8 +458,12 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
                      @Override
                      public void onSuccess() {
-                        Toast.makeText(getActivity(), getString(R.string.stop_entrainment_success),
-                              Toast.LENGTH_LONG).show();
+
+                        if (MyDebug.LOG) {
+                           Toast.makeText(getActivity(), getString(R.string.stop_entrainment_success),
+                                 Toast.LENGTH_LONG).show();
+                        }
+
                         // Entrainment is now stopped, so change the Run/Stop button to Run
                         entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
                         entrainRunStopButton.setBackgroundResource(R.drawable.button_run_background);
@@ -535,8 +577,11 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
                      @Override
                      public void onSuccess() {
-                        Toast.makeText(getActivity(), getString(R.string.loop_on_entrainment_success),
-                              Toast.LENGTH_LONG).show();
+
+                        if (MyDebug.LOG) {
+                           Toast.makeText(getActivity(), getString(R.string.loop_on_entrainment_success),
+                                 Toast.LENGTH_LONG).show();
+                        }
                      }
 
                      @Override
@@ -544,20 +589,22 @@ public class PettPlantFragment extends AbstractBaseFragment {
                         ErrorHandler errorHandler = ErrorHandler.getInstance();
                         errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
                                     "EntrainmentLoopOnClick.onClick(): Can't loop on entrainment - " + reason,
-                              R.string.loop_on_entrainment_failed_title,
-                              R.string.loop_on_entrainment_failed_message);
+                                    R.string.loop_on_entrainment_failed_title,
+                                    R.string.loop_on_entrainment_failed_message);
                      }
                   });
 
-               } else {
+                  } else {
 
                   // Send the Loop Off command
                   pettPlantService.loopOffEntrainmentSequence(new PettPlantService.LoopOffEntrainmentCallback() {
 
                      @Override
                      public void onSuccess() {
-                        Toast.makeText(getActivity(), getString(R.string.loop_off_entrainment_success),
-                              Toast.LENGTH_LONG).show();
+                        if (MyDebug.LOG) {
+                           Toast.makeText(getActivity(), getString(R.string.loop_off_entrainment_success),
+                                 Toast.LENGTH_LONG).show();
+                        }
                      }
 
                      @Override
@@ -604,11 +651,12 @@ public class PettPlantFragment extends AbstractBaseFragment {
          // The if is needed because the listener fires when the app starts
          if (position != lastColorModePos) {
 
-            Toast colorModeToast = Toast.makeText(getActivity(),
-                  parent.getItemAtPosition(position) + " selected, was " +
-                        parent.getItemAtPosition(lastColorModePos),
-                  Toast.LENGTH_LONG);
-            colorModeToast.show();
+            if (MyDebug.LOG) {
+               Toast colorModeToast = Toast.makeText(getActivity(),
+                     parent.getItemAtPosition(position) + " selected, was " +
+                           parent.getItemAtPosition(lastColorModePos), Toast.LENGTH_LONG);
+               colorModeToast.show();
+            }
 
             lastColorModePos = position;
 
@@ -808,9 +856,9 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
          if (speed == 0) {
             speed = 1;
-            colorModeSeekbar.setProgress(speed);
          }
 
+         colorModeSeekbar.setProgress(speed);
          colorModeSpeedTV.setText(Integer.toString(speed));
 
          if (speed != lastColorModeSpeed) {
