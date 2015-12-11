@@ -2,7 +2,9 @@ package com.biotronisis.pettplant.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,6 +44,8 @@ public class HelpActivity extends AbstractBaseActivity {
 
       WebSettings webSettings = webView.getSettings();
       webSettings.setDefaultFontSize(18);
+      webView.setBackgroundColor(Color.TRANSPARENT);
+      webView.setBackground(ContextCompat.getDrawable(this, R.drawable.layout_background_help));
 
 //      activityName = getIntent().getExtras().getString(EXTRA_ACTIVITY_NAME);
       fragmentName = getIntent().getExtras().getString(EXTRA_FRAGMENT_NAME);
