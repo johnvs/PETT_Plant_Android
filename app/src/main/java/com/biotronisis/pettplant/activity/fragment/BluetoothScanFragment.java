@@ -12,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -30,14 +31,14 @@ public final class BluetoothScanFragment extends DialogFragment {
 
     // Return Intent extra
 //    public static String EXTRA_DEVICE_ADDRESS = "device_address";
-    
-    private LayoutInflater inflator;
 
-    // Member fields
-    private BluetoothAdapter bluetoothAdapter;
-    private List<MyItem> items;
-    private MyDeviceAdapter listAdapter;
-    private MyBluetoothBroadcastReceiver receiver;
+   private LayoutInflater inflator;
+
+   // Member fields
+   private BluetoothAdapter bluetoothAdapter;
+   private List<MyItem> items;
+   private MyDeviceAdapter listAdapter;
+   private MyBluetoothBroadcastReceiver receiver;
    private Context parentContext;
     
     private OnBluetoothDeviceSelectedListener listener;
@@ -53,19 +54,22 @@ public final class BluetoothScanFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_bluetooth_scan, container, false);
+        View view = inflater.inflate(R.layout.fragment_bluetooth_scan, container, false);
 
         this.inflator = inflater;
 
-//       v.setBackground(ContextCompat.getDrawable(parentContext, R.drawable.layout_background_spinner));
+//       view.setBackground(ContextCompat.getDrawable(parentContext, R.drawable.layout_background_spinner));
 
-       getDialog().setTitle(getString(R.string.select_device));
+//       getDialog().setTitle(getString(R.string.select_device));
+
+       // Hide the title.
+       getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
         items = new ArrayList<MyItem>();
         listAdapter = new MyDeviceAdapter();
 
         // Find and set up the ListView for paired devices
-        ListView listView = (ListView) v.findViewById(R.id.listView);
+        ListView listView = (ListView) view.findViewById(R.id.listView);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(listAdapter);
         listView.setBackground(ContextCompat.getDrawable(parentContext, R.drawable.layout_background_bluetooth));
@@ -75,7 +79,7 @@ public final class BluetoothScanFragment extends DialogFragment {
         // Get the local Bluetooth adapter
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        return v;
+        return view;
     }
     
     @Override
