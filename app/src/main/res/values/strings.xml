@@ -138,15 +138,14 @@
     <string name="PettPlantFragment"><![CDATA[<p><u>Entrainment Mode</u>: To start a brain wave
         entrainment cycle, select the desired sequence from the Entrainment Mode drop down list and
         tap the Run button to begin. Tap the Stop button to stop the current entrainment cycle and
-        return the cycle to the beginning. Tap the Pause button if you wish to pause the current
-        cycle and resume from that same point later.</p>
+        return the cycle to the beginning.</p>
         <p><u>Color Mode</u>: To select the color pattern that your PETT will display, select one
         from the Color Mode drop down list. Use the Speed slider to adjust the rate at which the
-        colors change. The Hold button will freeze the colors at any given point. Tap the Hold
+        colors change. The Pause button will freeze the colors at any given point. Tap the Resume
         button again to resume the animation.</p>
-        <p><u>Hint</u>: The brain wave entrainment mode will run with any color pattern you
-        select. For the best results in maximizing the stroboscopic effect, we recommend choosing
-        one of the first 3 Rainbow cycle presets that turn all of the LEDs on full bright, and
+        <p><u>Hint</u>: The brain wave entrainment mode will run with several of the available color
+        patterns. For the best results in maximizing the stroboscopic effect, we recommend choosing
+        one of the first 3 Rainbow cycle patterns that turn all of the LEDs on full bright, and
         placing your PETT in a fully darkened room.</p>
         <p>Enjoy!</p>]]></string>
 
