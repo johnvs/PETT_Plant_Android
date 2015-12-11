@@ -97,6 +97,7 @@ public class ColorMode {
    public static class Speed {
 
       public static final int SPEED_DEFAULT = 50;
+      public static final int MAX_ENTRAINTMENT_SPEED = 25;
 
       public static boolean isValid(int speed) {
          if (speed > 0 && speed <= 100) { return true;  }
