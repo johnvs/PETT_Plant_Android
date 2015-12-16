@@ -142,7 +142,7 @@ public class MainActivity extends AbstractBaseActivity {
       // on the Home/Up button, so long as you specify a parent activity in AndroidManifest.xml.
 
       switch (item.getItemId()) {
-         case R.id.settings: {
+         case R.id.action_settings: {
             // Launch the SettingsActivity
             illBeBack = true;
 
@@ -155,6 +155,12 @@ public class MainActivity extends AbstractBaseActivity {
          case R.id.action_help: {
             illBeBack = true;
             Intent intent = HelpActivity.createIntent(this, getActivityName(), fragmentName);
+            startActivity(intent);
+            return true;
+         }
+         case R.id.action_about: {
+            illBeBack = true;
+            Intent intent = AboutActivity.createIntent(this);
             startActivity(intent);
             return true;
          }

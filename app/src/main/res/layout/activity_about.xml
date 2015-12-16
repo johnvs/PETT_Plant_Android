@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/layout_background_settings"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:paddingTop="10dp">
+
+    <LinearLayout
+        android:id="@+id/about_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            style="@style/AboutTitle"
+            android:gravity="center"
+            android:text="@string/pett_led_sculpture_controller" />
+
+        <View
+            style="@style/AboutView" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/version_number"
+        android:layout_below="@+id/about_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/AboutTitle"
+            android:text="@string/version_number" />
+
+        <TextView
+            style="@style/AboutBody"
+            android:id="@+id/versionNumber"
+            android:text="@string/version_number" />
+
+        <View
+            style="@style/AboutView" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/contact_info"
+        android:layout_below="@+id/version_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/AboutTitle"
+            android:text="@string/contact_info" />
+
+        <TextView
+            style="@style/AboutBody"
+            android:text="@string/web" />
+
+        <TextView
+            style="@style/AboutBody"
+            android:text="@string/email" />
+
+        <View
+            style="@style/AboutView" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/copyright"
+        android:layout_below="@+id/contact_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            style="@style/AboutTitle"
+            android:text="@string/copyright" />
+
+    </LinearLayout>
+
+</RelativeLayout>
