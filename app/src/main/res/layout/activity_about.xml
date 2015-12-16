@@ -59,10 +59,12 @@
 
         <TextView
             style="@style/AboutBody"
+            android:autoLink="web"
             android:text="@string/web" />
 
         <TextView
             style="@style/AboutBody"
+            android:autoLink="email"
             android:text="@string/email" />
 
         <View

@@ -80,8 +80,8 @@
     <string name="copyright">Copyright &#169; 2015 john van strien</string>
     <string name="pett_led_sculpture_controller">PETT LED Sculpture Controller</string>
     <string name="contact_info">Contact Info</string>
-    <string name="web">Web: www.biotronisis.com</string>
-    <string name="email">Email: support@biotronisis.com</string>
+    <string name="web">Web: <a href="http://www.biotronesis.com/">http://www.biotronesis.com/</a></string>
+    <string name="email">Email: <a href="mailto:support@biotronesis.com?subject=PETT%20Controller" target="_top">support@biotronesis.com</a></string>
 
     <!-- Entrainment Fragment -->
     <string name="meditation_description">This is a description of the meditation entrainment
