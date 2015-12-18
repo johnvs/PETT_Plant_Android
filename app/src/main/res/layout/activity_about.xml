@@ -73,8 +73,28 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/copyright"
+        android:id="@+id/disclaimer"
         android:layout_below="@+id/contact_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/AboutTitle"
+            android:text="@string/disclaimer_title" />
+
+        <TextView
+            style="@style/AboutBody"
+            android:text="@string/disclaimer_body" />
+
+        <View
+            style="@style/AboutView" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/copyright"
+        android:layout_below="@+id/disclaimer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
