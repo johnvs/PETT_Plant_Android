@@ -44,6 +44,11 @@
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/settings" />
 
+        <activity
+            android:name=".activity.AboutActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/about" />
+
     </application>
 
 </manifest>
