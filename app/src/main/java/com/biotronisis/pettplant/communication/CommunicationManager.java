@@ -461,16 +461,16 @@ public class CommunicationManager {
     */
    public interface CommunicationManagerListener {
 
-      public void onDataRecieved();
+      void onDataRecieved();
 
-      public void onDataSent();
+      void onDataSent();
 
-      public void onConnecting();
+      void onConnecting();
 
-      public void onConnected();
+      void onConnected();
 
-      public void onDisconnected();
+      void onDisconnected();
 
-      public void onError(CommunicationErrorType type);
+      void onError(CommunicationErrorType type);
    }
 }

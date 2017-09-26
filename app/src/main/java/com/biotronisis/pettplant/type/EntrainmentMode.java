@@ -25,7 +25,7 @@ public enum EntrainmentMode {
 
    private int id;
 
-   private EntrainmentMode(int id) {
+   EntrainmentMode(int id) {
       this.id = id;
    }
 

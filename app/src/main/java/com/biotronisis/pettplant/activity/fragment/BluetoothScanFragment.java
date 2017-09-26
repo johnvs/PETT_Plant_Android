@@ -226,11 +226,11 @@ public final class BluetoothScanFragment extends DialogFragment {
                 getActivity().setProgressBarIndeterminateVisibility(false);
             }
         }
-    };
-    
+    }
+
     public interface OnBluetoothDeviceSelectedListener {
     	
-    	public void onBluetoothDeviceSelectedListener(BluetoothDevice device);
+    	void onBluetoothDeviceSelectedListener(BluetoothDevice device);
     }
 
 }

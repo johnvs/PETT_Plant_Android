@@ -10,7 +10,7 @@ public enum ConnectionState {
 
 	private int id;
 
-	private ConnectionState(int id) {
+	ConnectionState(int id) {
 		this.id = id;
 	}
 

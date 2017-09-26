@@ -1163,8 +1163,8 @@ public class PettPlantService extends Service {
 
    public interface PlantStateListener {
 
-      public void onPlantState(PlantState plantState);
+      void onPlantState(PlantState plantState);
 
-      public void onError(String reason);
+      void onError(String reason);
    }
 }

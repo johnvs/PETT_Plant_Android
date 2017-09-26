@@ -8,11 +8,11 @@ public interface ResponseCallback<R extends AbstractResponse> {
 	 * When a Comm has received a response. May be EmptyResponse.
 	 * NOTE: Called from a background looper. Impl should dispatch off the background looper.
 	 */
-	public void onResponse(R response);
+    void onResponse(R response);
 	
 	/**
 	 * When a Comm has failed.
 	 * NOTE: Called from a background looper. Impl should dispatch off the background looper.
 	 */
-	public void onFailed(CommunicationErrorType type);
+    void onFailed(CommunicationErrorType type);
 }

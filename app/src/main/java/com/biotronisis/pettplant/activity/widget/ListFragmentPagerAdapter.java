@@ -86,8 +86,8 @@ public class ListFragmentPagerAdapter extends FragmentPagerAdapter implements On
 	}
     
     public interface OnFragmentSelectedListener {
-		public void onFragmentSelected();
-		public void onFragmentUnselected();
+		void onFragmentSelected();
+		void onFragmentUnselected();
 	}
     
     public static class TabItem {

@@ -85,7 +85,7 @@ public abstract class AbstractBaseActivity extends AppCompatActivity implements 
 
    public interface MyOnClickListener {
 
-      public void onClick();
+      void onClick();
    }
 
 }
