@@ -19,7 +19,7 @@ public class ColorMode {
 
       private int id;
 
-      private Mode(int id) {
+      Mode(int id) {
          this.id = id;
       }
 
@@ -37,8 +37,7 @@ public class ColorMode {
 
       public static boolean isValid (int id) {
 //         if (id >= RAINBOW_LOOP_ALL.getId() && id <= FIFTY_FIFTY.getId()) { return true; }
-         if (id >= 0 && id < Mode.values().length) { return true; }
-         else { return false; }
+          return id >= 0 && id < Mode.values().length;
       }
 
       public static Mode getDefault() {
@@ -54,7 +53,7 @@ public class ColorMode {
 
       private int id;
 
-      private State(int id) {
+      State(int id) {
          this.id = id;
       }
 
@@ -67,8 +66,7 @@ public class ColorMode {
 
       public static boolean isValid (int id) {
 //         if (id >= OFF.getId() && id <= PAUSED.getId()) { return true; }
-         if (id >= 0 && id < State.values().length) { return true; }
-         else { return false; }
+          return id >= 0 && id < State.values().length;
       }
    }
 
@@ -100,8 +98,7 @@ public class ColorMode {
       public static final int MAX_ENTRAINTMENT_SPEED = 25;
 
       public static boolean isValid(int speed) {
-         if (speed > 0 && speed <= 100) { return true;  }
-         else                           { return false; }
+          return speed > 0 && speed <= 100;
       }
 
       public static int getDefault() {
