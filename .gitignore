@@ -1,5 +1,4 @@
-# Created by https://www.gitignore.io
-# https://www.gitignore.io/api/android,intellij,osx,java,gradle
+# Created by https://www.gitignore.io/api/android,intellij,osx,java,gradle
 
 ### Android ###
 # Built application files
@@ -16,10 +15,12 @@
 bin/
 gen/
 
-# Gradle files
+# Gradle directories
 .gradle/
+
+# Ignore build dirs at all levels
 build/
-/*/build/
+#/*/build/
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -32,7 +33,6 @@ proguard/
 
 ### Android Patch ###
 gen-external-apklibs
-
 
 ### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
@@ -73,6 +73,7 @@ gen-external-apklibs
 ## Plugin-specific files:
 
 # IntelliJ
+# Only ignore top level dir
 /out/
 
 # mpeltonen/sbt-idea plugin
@@ -129,13 +130,9 @@ Temporary Items
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-
-### Gradle ###
-.gradle
-build/
-
 # Ignore Gradle GUI config
 gradle-app.setting
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
+
