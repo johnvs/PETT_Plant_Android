@@ -13,7 +13,7 @@ public class Entrainment {
 
       private int id;
 
-      private Sequence(int id) {
+      Sequence(int id) {
          this.id = id;
       }
 
@@ -26,8 +26,7 @@ public class Entrainment {
 
       public static boolean isValid (int id) {
 //         if (id >= MEDITATE.getId() && id <= STAY_AWAKE.getId()) { return true;  }
-         if (id >= 0 && id < Sequence.values().length) { return true;  }
-         else { return false; }
+          return id >= 0 && id < Sequence.values().length;
       }
 
       public static Sequence getDefault() {
@@ -43,7 +42,7 @@ public class Entrainment {
 
       private int id;
 
-      private State(int id) {
+      State(int id) {
          this.id = id;
       }
 
@@ -56,8 +55,7 @@ public class Entrainment {
 
       public static boolean isValid (int id) {
 //         if (id >= STOPPED.getId() && id <= PAUSED.getId()) { return true; }
-         if (id >= 0 && id < State.values().length) { return true; }
-         else { return false; }
+          return id >= 0 && id < State.values().length;
       }
    }
 
@@ -90,7 +88,7 @@ public class Entrainment {
 
       private int id;
 
-      private LoopCheckbox(int id) {
+      LoopCheckbox(int id) {
          this.id = id;
       }
 
@@ -103,8 +101,7 @@ public class Entrainment {
 
       public static boolean isValid (int id) {
 //         if (id >= OFF.getId() && id <= ON.getId()) { return true; }
-         if (id >= 0 && id < LoopCheckbox.values().length) { return true; }
-         else { return false; }
+          return id >= 0 && id < LoopCheckbox.values().length;
       }
 
       public static LoopCheckbox getDefault() {

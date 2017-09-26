@@ -20,15 +20,12 @@ public class Plant {
    public static boolean isValidState(RequestStateResponse response) {
 
       // Verify that the data of each element of the plant's state is in the correct range
-      if (!Entrainment.Sequence.isValid(response.getEntrainSequence().getId()))  { return false; }
-      if (!Entrainment.State.isValid(response.getEntrainmentState().getId()))    { return false; }
-      if (!Entrainment.LoopCheckbox.isValid(response.getLoopCheckbox().getId())) { return false; }
-
-      if (!ColorMode.Mode.isValid(response.getColorMode().getId()))              { return false; }
-      if (!ColorMode.State.isValid(response.getColorModeState().getId()))        { return false; }
-      if (!ColorMode.Speed.isValid(response.getColorModeSpeed()))                { return false; }
-
-      return true;
+      return ( Entrainment.Sequence.isValid(response.getEntrainSequence().getId())  &&
+               Entrainment.State.isValid(response.getEntrainmentState().getId())    &&
+               Entrainment.LoopCheckbox.isValid(response.getLoopCheckbox().getId()) &&
+               ColorMode.Mode.isValid(response.getColorMode().getId())              &&
+               ColorMode.State.isValid(response.getColorModeState().getId())        &&
+               ColorMode.Speed.isValid(response.getColorModeSpeed()) );
    }
 
    public PlantState getState() {

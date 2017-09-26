@@ -563,8 +563,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
                   Log.w(TAG, "trying alt create");
                }
                try {
-                  Method m = device.getClass().getMethod("createRfcommSocket",
-                        new Class[]{int.class});
+                  Method m = device.getClass().getMethod("createRfcommSocket", int.class);
                   tmp = (BluetoothSocket) m.invoke(device, 1);
                   // Test
 //                      throw new Exception("test");
@@ -579,7 +578,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
          } else {
             try {
                Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord",
-                     new Class[]{UUID.class});
+                       UUID.class);
                tmp = (BluetoothSocket) m.invoke(device, SPP_UUID);
                // Test
 //                 throw new Exception("test");
@@ -588,8 +587,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
                   Log.w(TAG, "trying alternate socket create");
                }
                try {
-                  Method m = device.getClass().getMethod("createRfcommSocket",
-                        new Class[]{int.class});
+                  Method m = device.getClass().getMethod("createRfcommSocket", int.class);
                   tmp = (BluetoothSocket) m.invoke(device, 1);
                   // Test
 //                      throw new Exception("test");

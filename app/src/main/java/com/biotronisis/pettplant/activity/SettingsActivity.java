@@ -41,8 +41,6 @@ public class SettingsActivity extends AbstractBaseActivity {
    private TextView connectionTypeTV;
    private TextView connectionAddressTV;
    private TextView connectionStatusTV;
-   private Button bluetoothScanButton;
-   private Button usbScanButton;
 
    private CommunicationParams communicationParams;
 
@@ -65,7 +63,7 @@ public class SettingsActivity extends AbstractBaseActivity {
       return "settings";
    }
 
-   public static Intent createIntent(Context context, PlantState plantState) {
+   static Intent createIntent(Context context, PlantState plantState) {
       Intent intent = new Intent(context, SettingsActivity.class);
       intent.putExtra(EXTRA_PLANT_STATE, plantState);
       return intent;
@@ -76,8 +74,10 @@ public class SettingsActivity extends AbstractBaseActivity {
       super.onCreate(savedInstanceSate);
       setContentView(R.layout.activity_settings);
 
-      bluetoothScanButton = (Button) findViewById(R.id.bluetoothScanButton);
-      usbScanButton =       (Button) findViewById(R.id.usbScanButton);
+      Button bluetoothScanButton = (Button) findViewById(R.id.bluetoothScanButton);
+
+      // For future use
+      Button usbScanButton =       (Button) findViewById(R.id.usbScanButton);
       usbScanButton.setVisibility(View.INVISIBLE);
 
       connectionTypeTV = (TextView) findViewById(R.id.connectionType);
@@ -112,7 +112,9 @@ public class SettingsActivity extends AbstractBaseActivity {
       plantState = (PlantState) extras.get(EXTRA_PLANT_STATE);
 
       ActionBar actionBar = getSupportActionBar();
-      actionBar.setDisplayHomeAsUpEnabled(true);
+      if (actionBar != null) {
+         actionBar.setDisplayHomeAsUpEnabled(true);
+      }
 
    }
 

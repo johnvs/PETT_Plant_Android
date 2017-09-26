@@ -6,7 +6,7 @@ public enum CommunicationType {
 
 	private int id;
 
-	private CommunicationType(int id) {
+	CommunicationType(int id) {
 		this.id = id;
 	}
 
