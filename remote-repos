@@ -1,0 +1,8 @@
+# Check the current remote
+git remote -v
+
+# Switch to bitbucket
+git remote set-url origin git@bitbucket.org:john2525/pett_plant_android.git
+
+# Switch to github
+git remote set-url origin git@github.com:johnvs/PETT_Plant_Android.git
