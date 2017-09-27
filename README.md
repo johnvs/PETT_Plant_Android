@@ -15,20 +15,16 @@ One of the Color modes is Sound Responsive. Here is a [PETT Plant](https://vimeo
 The Plant is powered by the awesome [Teensy microcontroller](https://www.pjrc.com/teensy/), and is mentioned on their website [here](https://www.pjrc.com/pett-plant/).
 
 #### Main screen
-
-![Main Screen](https://github.com/johnvs/PETT_Plant_Android/PettPlant/blob/master/documentation/screen_shots/pett-plant-screen-main.png)
+![Main Screen](documentation/screen_shots/pett-plant-screen-main-sm.png)
 
 #### Color Modes
-
-![Color Modes](https://github.com/johnvs/PETT_Plant_Android/PettPlant/blob/master/documentation/screen_shots/pett-plant-screen-color-modes.png)
+![Color Modes](documentation/screen_shots/pett-plant-screen-color-modes-sm.png)
 
 #### Settings screen
-
-![Settings Screen](https://github.com/johnvs/PETT_Plant_Android/PettPlant/blob/master/documentation/screen_shots/pett-plant-screen-settings.png)
+![Settings Screen](documentation/screen_shots/pett-plant-screen-settings-sm.png)
 
 #### Bluetooth screen
-
-![Bluetooth Screen](https://github.com/johnvs/PETT_Plant_Android/PettPlant/blob/master/documentation/screen_shots/pett-plant-screen-bluetooth.png)
+![Bluetooth Screen](documentation/screen_shots/pett-plant-screen-bluetooth-sm.png)
 
 ## From the Settings/Help screen
 #### Entrainment Mode
