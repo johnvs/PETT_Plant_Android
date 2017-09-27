@@ -1,64 +1,44 @@
-This is an Android app designed to control a PETT Plant via Bluetooth.
+## PETT Plant Android App
+This is an Android app designed to control a [PETT Plant LED sculpture](http://biotronesis.com/store/) via Bluetooth.
 
-/*********************************
+With the app, you can:
 
-  Pett Plant App Commands
+* Connect to a Plant via Bluetooth
+* Select the Entrainment Mode
+* Start, Stop and Loop Entrainment sequences 
+* Select the Color Mode
+* Set the Color Mode speed
+* Start, Stop and Pause the Color Mode
 
- _Function_            _Command Number_
-  Entrainment Mode
-   Sequences
-    Meditation          0x01
-    Sleep               0x02
-    Stay Awake          0x03
+One of the Color modes is Sound Responsive. Here is a [PETT Plant](https://vimeo.com/129860490) in that mode, enjoying some Bobby McFerrin.
 
-    Run                 0x10, <sequence #>       0x90
-    Stop                0x11
-    Pause               0x12
-    Resume              0x13
-    Loop On             0x14
-    Loop Off            0x15
+The Plant is powered by the awesome [Teensy microcontroller](https://www.pjrc.com/teensy/), and is mentioned on their website [here](https://www.pjrc.com/pett-plant/).
 
-  Color Mode
-    Sound Responsive      0x20
-    Rainbow Loop All      0x21
-    Rainbow Loop Whole    0x22
-    Rainbow Loop Spectrum 0x23
-    Around The World      0x24
-    Random Pop            0x25
-    Fck Yeah Colors       0x26
-    Preset 4              0x27
-    Preset 5              0x28
+#### Main screen
 
-    New Speed           0x30, <new speed> (1 - 100)
-    Run                 0x31, <color mode>
-    Off                 0x32
-    Pause               0x33
-    Resume              0x34
-    Set Color Mode      0x35, <color mode>    Sent when color mode state = Running and
-                                              a new color mode is selected from the list
+![Main Screen](https://github.com/johnvs/PETT_Plant_Android/PettPlant/blob/master/documentation/screen_shots/pett-plant-screen-main.png)
 
-  General
-    Request Status      0x40                   0xC0
-      Returns           0xC0,
-                        Entrainment Sequence,
-                        Entrainment state (Stopped, Running or Paused),
-                        Entrainment Loop On/Off,
-                        Color Mode,
-                        Color Mode state,
-                        Color Mode Speed
+#### Color Modes
 
-    End_of_command      0x00   << Used internally to Plant controller.
-                                  Don't use for a message
+![Color Modes](https://github.com/johnvs/PETT_Plant_Android/PettPlant/blob/master/documentation/screen_shots/pett-plant-screen-color-modes.png)
 
-*********************************
+#### Settings screen
 
-  Pett Plant App Command Structure
+![Settings Screen](https://github.com/johnvs/PETT_Plant_Android/PettPlant/blob/master/documentation/screen_shots/pett-plant-screen-settings.png)
 
-  <NumBytes><CommandID><FirstDataByte> . . . <LastDataByte><Checksum>
+#### Bluetooth screen
 
-  1. Number of Bytes to Follow
-  2. Command ID
-  3. Any data bytes associated with command
-  4. Checksum, which equals the XOR of all previous bytes (in this case, bytes 1 - 3).
+![Bluetooth Screen](https://github.com/johnvs/PETT_Plant_Android/PettPlant/blob/master/documentation/screen_shots/pett-plant-screen-bluetooth.png)
 
-*********************************
+## From the Settings/Help screen
+#### Entrainment Mode
+To start a brain wave entrainment cycle, select the desired sequence from the Entrainment Mode drop down list and tap the Run button to begin. Tap the Stop button to stop the current entrainment cycle and return the cycle to the beginning.
+     
+#### Color Mode
+To select the color pattern that your PETT will display, select one from the Color Mode drop down list. Use the Speed slider to adjust the rate at which the colors change. The Pause button will freeze the colors at any given point. Tap the Resume button again to resume the animation.
+
+#### Hint
+The brain wave entrainment mode will run with several of the available color patterns. For the best results in maximizing the stroboscopic effect, we recommend choosing 
+one of the first 3 Rainbow cycle patterns that turn all of the LEDs on full bright, and placing your PETT in a fully darkened room.
+
+Enjoy!
