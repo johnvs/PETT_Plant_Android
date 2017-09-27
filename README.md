@@ -16,19 +16,19 @@ The Plant is powered by the awesome [Teensy microcontroller](https://www.pjrc.co
 
 #### Main screen
 
-![Main Screen](https://github.com/johnvs/PETT_Plant_Android/PettPlant/blob/master/documentation/screen_shots/pett-plant-screen-main.png)
+![Main Screen](https://github.com/johnvs/PETT_Plant_Android/blob/master/documentation/screen_shots/pett-plant-screen-main.png)
 
 #### Color Modes
 
-![Color Modes](https://github.com/johnvs/PETT_Plant_Android/PettPlant/blob/master/documentation/screen_shots/pett-plant-screen-color-modes.png)
+![Color Modes](https://github.com/johnvs/PETT_Plant_Android/blob/master/documentation/screen_shots/pett-plant-screen-color-modes.png)
 
 #### Settings screen
 
-![Settings Screen](https://github.com/johnvs/PETT_Plant_Android/PettPlant/blob/master/documentation/screen_shots/pett-plant-screen-settings.png)
+![Settings Screen](https://github.com/johnvs/PETT_Plant_Android/blob/master/documentation/screen_shots/pett-plant-screen-settings.png)
 
 #### Bluetooth screen
 
-![Bluetooth Screen](https://github.com/johnvs/PETT_Plant_Android/PettPlant/blob/master/documentation/screen_shots/pett-plant-screen-bluetooth.png)
+![Bluetooth Screen](https://github.com/johnvs/PETT_Plant_Android/blob/master/documentation/screen_shots/pett-plant-screen-bluetooth.png)
 
 ## From the Settings/Help screen
 #### Entrainment Mode
