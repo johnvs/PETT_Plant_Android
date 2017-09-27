@@ -16,7 +16,8 @@ The Plant is powered by the awesome [Teensy microcontroller](https://www.pjrc.co
 
 #### Main screen
 
-![Main Screen](https://github.com/johnvs/PETT_Plant_Android/blob/master/documentation/screen_shots/pett-plant-screen-main.png)
+<!-- ![Main Screen](https://github.com/johnvs/PETT_Plant_Android/blob/master/documentation/screen_shots/pett-plant-screen-main.png) -->
+<img style="width:50px; height:auto;" alt="Main Screen" src="documentation/screen_shots/pett-plant-screen-main.png"/>
 
 #### Color Modes
 
