@@ -11,7 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+//import android.widget.Toast;
 
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.fragment.PettPlantFragment;
@@ -24,7 +24,7 @@ import com.biotronisis.pettplant.plant.PettPlantService;
 //import com.biotronisis.pettplant.plant.processor.Plant;
 import com.biotronisis.pettplant.plant.processor.PlantState;
 
-import java.util.logging.Level;
+//import java.util.logging.Level;
 
 public class MainActivity extends AbstractBaseActivity {
 
@@ -33,7 +33,6 @@ public class MainActivity extends AbstractBaseActivity {
    private static String TAG = "MainActivity";
 
    private boolean illBeBack = false;
-   private PlantState plantState;
 
 //   private Context activityContext;
 
@@ -173,7 +172,7 @@ public class MainActivity extends AbstractBaseActivity {
    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
       if (requestCode == REQUEST_STATE) {
          if (resultCode == RESULT_OK) {
-            plantState = (PlantState) data.getSerializableExtra(EXTRA_PLANT_STATE);
+            PlantState plantState = (PlantState) data.getSerializableExtra(EXTRA_PLANT_STATE);
 
             PettPlantFragment pettPlantFragment = (PettPlantFragment) getSupportFragmentManager().
                   findFragmentById(R.id.pett_plant_fragment);
@@ -209,7 +208,7 @@ public class MainActivity extends AbstractBaseActivity {
    /**
     * Creates an Intent for this Activity.
     *
-    * @param callee
+    * @param callee the calling activity
     * @return Intent
     */
    public static Intent createIntent(Context callee) {
