@@ -1,13 +1,10 @@
 package com.biotronisis.pettplant.type;
 
-/**
- * Created by john on 6/16/15.
- */
-public enum EntrainmentMode {
+//public enum EntrainmentMode {
 
-   oldMEDITATE(0),
-   oldSLEEP(1),
-   oldSTAY_AWAKE(2);
+//   oldMEDITATE(0),
+//   oldSLEEP(1),
+//   oldSTAY_AWAKE(2);
 
    // Run/Stop button values
 //   public static final String RUN = "Run";
@@ -23,11 +20,11 @@ public enum EntrainmentMode {
 //
 //   public static final boolean LOOP_CHECKBOX_DEFAULT = false;
 
-   private int id;
+//   private int id;
 
-   EntrainmentMode(int id) {
-      this.id = id;
-   }
+//   EntrainmentMode(int id) {
+//      this.id = id;
+//   }
 
 //   public int getValue() {
 //      return id;
@@ -40,4 +37,4 @@ public enum EntrainmentMode {
 //   public static EntrainmentMode getEntrainmentMode(int id) {
 //      return EntrainmentMode.values()[id];
 //   }
-}
+//}
