@@ -4,9 +4,6 @@ import com.biotronisis.pettplant.communication.transfer.RequestStateResponse;
 import com.biotronisis.pettplant.model.ColorMode;
 import com.biotronisis.pettplant.model.Entrainment;
 
-/**
- * Created by john on 8/18/15.
- */
 public class Plant {
 
    private static final String TAG = "Plant_Class";
