@@ -21,7 +21,7 @@ public class MockCommAdapter implements ICommAdapter {
 	
 	private ConnectionState connectionState = ConnectionState.NONE;
 	
-	public MockCommAdapter(CommAdapterListener listener) {
+	MockCommAdapter(CommAdapterListener listener) {
 		this.listener = listener;
 		
 		HandlerThread commThread = new HandlerThread("mock-commThread");

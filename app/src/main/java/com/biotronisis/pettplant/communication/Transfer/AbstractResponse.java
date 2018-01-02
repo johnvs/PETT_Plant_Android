@@ -19,12 +19,10 @@ public abstract class AbstractResponse implements Serializable {
         return (msbInt << 8) + lsbInt;
 	}
 	
-	public int asInt(byte myByte) {
-		int myInt = myByte & (0x000000FF);
-		return myInt;
+	int asInt(byte myByte) {
+		return myByte & (0x000000FF);
 	}
 	
-
 	public boolean validateChecksum(byte[] bytes) {
 		boolean result = true;
 		

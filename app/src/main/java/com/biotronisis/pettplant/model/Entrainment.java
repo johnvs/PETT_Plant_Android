@@ -1,8 +1,5 @@
 package com.biotronisis.pettplant.model;
 
-/**
- * Created by john on 8/14/15.
- */
 public class Entrainment {
 
    public enum Sequence {
@@ -70,16 +67,16 @@ public class Entrainment {
       }
    }
 
-   public static class PauseResumeButton {
-
-      // Pause/Resume button values
-      public static final String PAUSE = "Pause";
-      public static final String RESUME = "Resume";
-
-      public static String getDefault() {
-         return PAUSE;
-      }
-   }
+//   public static class PauseResumeButton {
+//
+//      // Pause/Resume button values
+//      public static final String PAUSE = "Pause";
+//      public static final String RESUME = "Resume";
+//
+//      public static String getDefault() {
+//         return PAUSE;
+//      }
+//   }
 
    public enum LoopCheckbox {
 

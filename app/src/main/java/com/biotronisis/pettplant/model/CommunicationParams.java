@@ -18,11 +18,11 @@ public class CommunicationParams  {
 
 	private static final String TAG = "CommunicationParams";
 
-	public static final String COMM_NAME = "name";
-	public static final String COMMUNICATION_TYPE = "communicationType";
-   public static final String COMM_ADDRESS = "address";
-	public static final String NONE = "none";
-	public static final String MOCKING_JAY = "MockingJay";
+	private static final String COMM_NAME = "name";
+	private static final String COMMUNICATION_TYPE = "communicationType";
+    private static final String COMM_ADDRESS = "address";
+	private static final String NONE = "none";
+	private static final String MOCKING_JAY = "MockingJay";
 
 	private SharedPreferences appParams;
 

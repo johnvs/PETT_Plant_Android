@@ -46,7 +46,7 @@ public abstract class AbstractCommand<R extends AbstractResponse> implements Ser
 		return (byte)((number & 0x0000FF00) >> 8);
 	}
 
-   public byte computeChecksum(byte[] bytes) {
+	public byte computeChecksum(byte[] bytes) {
 
       StringBuilder bytesStrBldr = new StringBuilder();
       if (bytes.length > 0) {

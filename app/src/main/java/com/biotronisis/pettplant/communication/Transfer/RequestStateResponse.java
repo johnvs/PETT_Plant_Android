@@ -7,7 +7,7 @@ public class RequestStateResponse extends AbstractResponse {
    private static final long serialVersionUID = 1L;
 
    public static final Byte RESPONSE_ID = (byte) 0xC0;
-   public static final int MIN_RESPONSE_BYTES = 7;       // CommandID, 5 data bytes and checksum
+   private static final int MIN_RESPONSE_BYTES = 7;       // CommandID, 5 data bytes and checksum
 
    private Entrainment.Sequence entrainSequence;
    private Entrainment.State entrainmentState;
@@ -15,7 +15,6 @@ public class RequestStateResponse extends AbstractResponse {
    private ColorMode.Mode colorMode;
    private ColorMode.State colorModeState;
    private int colorModeSpeed;
-
 
    @Override
    public Byte getResponseId() {

@@ -5,9 +5,6 @@ import com.biotronisis.pettplant.model.Entrainment;
 
 import java.io.Serializable;
 
-/**
- * Created by john on 8/15/15.
- */
 public class PlantState implements Serializable {
    // Using Serializable to send objects from one activity to another
 
@@ -22,7 +19,7 @@ public class PlantState implements Serializable {
       return entrainSequence;
    }
 
-   public void setEntrainSequence(Entrainment.Sequence entrainSequence) {
+   void setEntrainSequence(Entrainment.Sequence entrainSequence) {
       this.entrainSequence = entrainSequence;
    }
 
@@ -30,7 +27,7 @@ public class PlantState implements Serializable {
       return entrainmentState;
    }
 
-   public void setEntrainmentState(Entrainment.State entrainmentState) {
+   void setEntrainmentState(Entrainment.State entrainmentState) {
       this.entrainmentState = entrainmentState;
    }
 
@@ -38,7 +35,7 @@ public class PlantState implements Serializable {
       return loopCheckbox;
    }
 
-   public void setLoopCheckbox(Entrainment.LoopCheckbox loopCheckbox) {
+   void setLoopCheckbox(Entrainment.LoopCheckbox loopCheckbox) {
       this.loopCheckbox = loopCheckbox;
    }
 
@@ -46,7 +43,7 @@ public class PlantState implements Serializable {
       return colorMode;
    }
 
-   public void setColorMode(ColorMode.Mode colorMode) {
+   void setColorMode(ColorMode.Mode colorMode) {
       this.colorMode = colorMode;
    }
 
@@ -54,7 +51,7 @@ public class PlantState implements Serializable {
       return colorModeState;
    }
 
-   public void setColorModeState(ColorMode.State colorModeState) {
+   void setColorModeState(ColorMode.State colorModeState) {
       this.colorModeState = colorModeState;
    }
 
@@ -62,7 +59,7 @@ public class PlantState implements Serializable {
       return colorModeSpeed;
    }
 
-   public void setColorModeSpeed(int colorModeSpeed) {
+   void setColorModeSpeed(int colorModeSpeed) {
       this.colorModeSpeed = colorModeSpeed;
    }
 
