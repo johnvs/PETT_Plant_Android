@@ -1,8 +1,5 @@
 package com.biotronisis.pettplant.model;
 
-/**
- * Created by john on 8/14/15.
- */
 public class ColorMode {
 
    public enum Mode {
