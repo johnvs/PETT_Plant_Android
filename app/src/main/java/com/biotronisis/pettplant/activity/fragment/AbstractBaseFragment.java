@@ -1,15 +1,10 @@
 package com.biotronisis.pettplant.activity.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.AbstractBaseActivity.MyOnClickListener;
@@ -31,16 +26,16 @@ public abstract class AbstractBaseFragment extends Fragment implements IntentPar
    public void persistData() {}
 
    @Override
-   public void onViewCreated(View view, Bundle savedInstanceState) {
+   public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
       super.onViewCreated(view, savedInstanceState);
       try {
          //Test
-         boolean test = false;
-         if (test) {
-            throw new Exception("test");
-         } else {
+//         boolean test = false;
+//         if (test) {
+//            throw new Exception("test");
+//         } else {
             setupView(view, savedInstanceState);
-         }
+//         }
       } catch (Exception e) {
          if (MyDebug.LOG) {
             Log.e(TAG, "setupView failed", e);
