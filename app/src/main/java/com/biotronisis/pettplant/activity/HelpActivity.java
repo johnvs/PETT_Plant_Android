@@ -5,25 +5,22 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+//import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import com.biotronisis.pettplant.R;
+import com.biotronisis.pettplant.debug.MyDebug;
 
 public class HelpActivity extends AbstractBaseActivity {
 
    private static final String TAG = "HelpActivity";
    public static final String EXTRA_ACTIVITY_NAME = "activityName";
    public static final String EXTRA_FRAGMENT_NAME = "fragmentName";
-
-//   private String activityName;
-   private String fragmentName;
-
-   //  @InjectView(R.id.webView)
-   private WebView webView;
 
    @Override
    public String getActivityName() {
@@ -40,36 +37,48 @@ public class HelpActivity extends AbstractBaseActivity {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_help);
 
-      webView = (WebView) findViewById(R.id.webView);
+      WebView webView = findViewById(R.id.webView);
 
       WebSettings webSettings = webView.getSettings();
       webSettings.setDefaultFontSize(18);
       webView.setBackgroundColor(Color.TRANSPARENT);
       webView.setBackground(ContextCompat.getDrawable(this, R.drawable.layout_background_help));
 
-//      activityName = getIntent().getExtras().getString(EXTRA_ACTIVITY_NAME);
-      fragmentName = getIntent().getExtras().getString(EXTRA_FRAGMENT_NAME);
+      try {
+         //noinspection ConstantConditions
+         String fragmentName = getIntent().getExtras().getString(EXTRA_FRAGMENT_NAME);
+//         String helpStr;
+//      int resID = 0;
 
-      String helpStr;
-      int resID = 0;
+//      if (fragmentName == null) {
+//         helpStr = getString(R.string.cant_find_help_text);
+////         resID = getResources().getIdentifier(activityName, "string", getPackageName());
+//      } else {
+         int resID = getResources().getIdentifier(fragmentName, "string", getPackageName());
+//      }
 
-      if (fragmentName == null) {
-         helpStr = getString(R.string.cant_find_help_text);
-//         resID = getResources().getIdentifier(activityName, "string", getPackageName());
-      } else {
-         resID = getResources().getIdentifier(fragmentName, "string", getPackageName());
+//      if (resID == 0) {
+//         helpStr = getString(R.string.cant_find_help_text);
+//      } else {
+//         String helpStr = getString(resID);
+//      }
+
+         webView.loadData(getString(resID), "text/html", "UTF8");
+      } catch (Exception e) {
+         if (MyDebug.LOG) {
+            Log.e(TAG, "getIntent().getExtras().getString() returned null in HelpActivity#onCreate", e);
+         }
       }
-
-      if (resID == 0) {
-         helpStr = getString(R.string.cant_find_help_text);
-      } else {
-         helpStr = getString(resID);
-      }
-
-      webView.loadData(helpStr, "text/html", "UTF8");
 
       ActionBar actionBar = getSupportActionBar();
-      actionBar.setDisplayHomeAsUpEnabled(true);
+      try {
+         //noinspection ConstantConditions
+         actionBar.setDisplayHomeAsUpEnabled(true);
+      } catch (Exception e) {
+         if (MyDebug.LOG) {
+            Log.e(TAG, "setDisplayHomeAsUpEnabled() returned null in HelpActivity#onCreate", e);
+         }
+      }
 
    }
 
@@ -96,7 +105,7 @@ public class HelpActivity extends AbstractBaseActivity {
    /**
     * Creates an Intent for this Activity.
     *
-    * @param callee
+    * @param callee the calling activity
     * @return Intent
     */
    public static Intent createIntent(Context callee, String activityName, String fragmentName) {
