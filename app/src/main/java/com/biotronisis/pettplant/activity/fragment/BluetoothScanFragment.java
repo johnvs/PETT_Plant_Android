@@ -6,7 +6,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -23,6 +25,7 @@ import com.biotronisis.pettplant.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public final class BluetoothScanFragment extends DialogFragment {
@@ -32,18 +35,18 @@ public final class BluetoothScanFragment extends DialogFragment {
     // Return Intent extra
 //    public static String EXTRA_DEVICE_ADDRESS = "device_address";
 
-   private LayoutInflater inflator;
+    private LayoutInflater inflator;
 
    // Member fields
-   private BluetoothAdapter bluetoothAdapter;
-   private List<MyItem> items;
-   private MyDeviceAdapter listAdapter;
-   private MyBluetoothBroadcastReceiver receiver;
-   private Context parentContext;
+    private BluetoothAdapter bluetoothAdapter;
+    private List<MyItem> items;
+    private MyDeviceAdapter listAdapter;
+    private MyBluetoothBroadcastReceiver receiver;
+    private Context parentContext;
     
     private OnBluetoothDeviceSelectedListener listener;
 
-   public void setContext(Context thisContext) {
+    public void setContext(Context thisContext) {
       parentContext = thisContext;
    }
     
@@ -52,8 +55,8 @@ public final class BluetoothScanFragment extends DialogFragment {
     }
     
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bluetooth_scan, container, false);
 
         this.inflator = inflater;
@@ -63,9 +66,9 @@ public final class BluetoothScanFragment extends DialogFragment {
 //       getDialog().setTitle(getString(R.string.select_device));
 
        // Hide the title.
-       getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
-        items = new ArrayList<MyItem>();
+        items = new ArrayList<>();
         listAdapter = new MyDeviceAdapter();
 
         // Find and set up the ListView for paired devices
@@ -144,7 +147,7 @@ public final class BluetoothScanFragment extends DialogFragment {
     private class MyItem {
     	private BluetoothDevice device;
     	
-    	public MyItem(BluetoothDevice device) {
+    	MyItem(BluetoothDevice device) {
     		this.device = device;
     	}
     	
@@ -179,13 +182,14 @@ public final class BluetoothScanFragment extends DialogFragment {
 			int colorId = bonded ? android.R.color.black : android.R.color.darker_gray;
 			int color = getResources().getColor(colorId);
 			
-			TextView text1 = (TextView) convertView.findViewById(android.R.id.text1);
+			TextView text1 = convertView.findViewById(android.R.id.text1);
 			text1.setText(item.device.getName());
 			text1.setTextColor(color);
 			
-			TextView text2 = (TextView) convertView.findViewById(android.R.id.text2);
-			text2.setText(item.device.getAddress() + " - " +
-               getString(bonded ? R.string.paired : R.string.not_paired));
+			TextView text2 = convertView.findViewById(android.R.id.text2);
+            Locale myLocale = Resources.getSystem().getConfiguration().locale;
+            String pairedStr = getString(bonded ? R.string.paired : R.string.not_paired);
+            text2.setText(String.format(myLocale, "%s - %s", item.device.getAddress(), pairedStr));
 			text2.setTextColor(color);
 			
 			return convertView;
