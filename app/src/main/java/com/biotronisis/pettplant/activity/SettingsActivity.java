@@ -30,9 +30,6 @@ import com.biotronisis.pettplant.plant.PettPlantService;
 import com.biotronisis.pettplant.plant.processor.PlantState;
 import com.biotronisis.pettplant.type.CommunicationType;
 
-/**
- * Created by john on 7/23/15.
- */
 public class SettingsActivity extends AbstractBaseActivity {
 
    private static final String TAG = "SettingsActivity";
@@ -72,18 +69,23 @@ public class SettingsActivity extends AbstractBaseActivity {
    @Override
    protected void onCreate(Bundle savedInstanceSate) {
       super.onCreate(savedInstanceSate);
+
+      if (MyDebug.LOG) {
+         Log.i(TAG, "------------ onCreate ------------");
+      }
+
       setContentView(R.layout.activity_settings);
 
-      Button bluetoothScanButton = (Button) findViewById(R.id.bluetoothScanButton);
+      Button bluetoothScanButton = findViewById(R.id.bluetoothScanButton);
 
       // For future use
-      Button usbScanButton =       (Button) findViewById(R.id.usbScanButton);
+      Button usbScanButton = findViewById(R.id.usbScanButton);
       usbScanButton.setVisibility(View.INVISIBLE);
 
-      connectionTypeTV = (TextView) findViewById(R.id.connectionType);
-      deviceNameTV =        (TextView) findViewById(R.id.deviceName);
-      connectionStatusTV =  (TextView) findViewById(R.id.connectionStatus);
-      connectionAddressTV =   (TextView) findViewById(R.id.connectionAddress);
+      connectionTypeTV =    findViewById(R.id.connectionType);
+      deviceNameTV =        findViewById(R.id.deviceName);
+      connectionStatusTV =  findViewById(R.id.connectionStatus);
+      connectionAddressTV = findViewById(R.id.connectionAddress);
 
       communicationParams = new CommunicationParams(this);
       activityContext = this;
@@ -109,7 +111,12 @@ public class SettingsActivity extends AbstractBaseActivity {
       bluetoothScanButton.setOnClickListener(new BluetoothScanClickListener());
 
       Bundle extras = getIntent().getExtras();
-      plantState = (PlantState) extras.get(EXTRA_PLANT_STATE);
+      try {
+         //noinspection ConstantConditions
+         plantState = (PlantState) extras.get(EXTRA_PLANT_STATE);
+      } catch (Exception e) {
+         Log.e(TAG, "Bundle#get() returned null in SettingsActivity#onCreate", e);
+      }
 
       ActionBar actionBar = getSupportActionBar();
       if (actionBar != null) {
@@ -121,6 +128,11 @@ public class SettingsActivity extends AbstractBaseActivity {
    @Override
    public void onResume() {
       super.onResume();
+
+      if (MyDebug.LOG) {
+         Log.i(TAG, "------------ onResume ------------");
+      }
+
       PettPlantService plantService = PettPlantService.getInstance();
       if (plantService != null) {
          plantService.addCommStatusListener(myCommunicationManagerListener);
@@ -140,14 +152,19 @@ public class SettingsActivity extends AbstractBaseActivity {
    private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
       public void onReceive(Context context, Intent intent) {
          String action = intent.getAction();
-         // When discovery finds a device
-         if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
+         try {
+            // When discovery finds a device
+            //noinspection ConstantConditions
+            if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
 
-            connectionStatusTV.setText(getString(R.string.disconnected));
-            PettPlantService plantService = PettPlantService.getInstance();
-            if (plantService != null) {
-               plantService.onConnectionLost();
+               connectionStatusTV.setText(getString(R.string.disconnected));
+               PettPlantService plantService = PettPlantService.getInstance();
+               if (plantService != null) {
+                  plantService.onConnectionLost();
+               }
             }
+         } catch (Exception e) {
+            Log.e(TAG, "String#equals() returned null in BroadcastReceiver#onReceive", e);
          }
       }
    };
@@ -155,6 +172,11 @@ public class SettingsActivity extends AbstractBaseActivity {
    @Override
    public void onPause() {
       super.onPause();
+
+      if (MyDebug.LOG) {
+         Log.i(TAG, "------------ onPause ------------");
+      }
+
       PettPlantService plantService = PettPlantService.getInstance();
       if (plantService != null) {
          plantService.removeCommStatusListener(myCommunicationManagerListener);
@@ -163,8 +185,20 @@ public class SettingsActivity extends AbstractBaseActivity {
 
       LocalBroadcastManager.getInstance(this).unregisterReceiver(pettPlantServiceEventReceiver);
 
+      unregisterReceiver(bluetoothReceiver);
 //      myUnregisterReceiver(mUsbReceiver);
 
+   }
+
+   @Override
+   protected void onDestroy() {
+      super.onDestroy();
+
+      if (MyDebug.LOG) {
+         Log.i(TAG, "------------ onDestroy ------------");
+      }
+
+//      unregisterReceiver(bluetoothReceiver);
    }
 
    @Override
