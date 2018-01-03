@@ -22,8 +22,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+//import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,6 +52,7 @@ import com.biotronisis.pettplant.plant.PettPlantService;
 import com.biotronisis.pettplant.plant.PettPlantService.PlantStateListener;
 import com.biotronisis.pettplant.model.ColorMode;
 
+import java.util.Locale;
 import java.util.logging.Level;
 
 /**
@@ -62,7 +66,6 @@ public class PettPlantFragment extends AbstractBaseFragment {
    private Spinner entrainmentSpinner;
    private CheckBox loopCheckbox;
    private Button entrainRunStopButton;
-   private Button entrainPauseResumeButton;
 
    // Color Mode Layout Views
    private Spinner colorModeSpinner;
@@ -85,7 +88,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
    private MyPlantStateListener myPlantStateListener = new MyPlantStateListener();
 
    @Override
-   public void onSaveInstanceState(Bundle savedInstanceState) {
+   public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
       // Save the fragment state
       savedInstanceState.putInt(STATE_ENTRAINMENT_MODE, lastEntrainmentPos);
       savedInstanceState.putInt(STATE_COLOR_MODE, lastColorModePos);
@@ -102,10 +105,9 @@ public class PettPlantFragment extends AbstractBaseFragment {
    }
 
    @Override
-   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                             @Nullable Bundle savedInstanceState) {
-      View theView = inflater.inflate(R.layout.fragment_pett_plant, container, false);
-      return theView;
+      return inflater.inflate(R.layout.fragment_pett_plant, container, false);
    }
 
    @Override
@@ -117,46 +119,56 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
    public void setupEntrainmentControls(View view) {
       // Setup the Entrainment controls
-      entrainmentSpinner = (Spinner) view.findViewById(R.id.spinner_entrainment);
-      ArrayAdapter<CharSequence> entrainmentAdapter = ArrayAdapter.createFromResource(getActivity(),
-            R.array.entrainment_array,
-            R.layout.cell_modes);
-      entrainmentSpinner.setAdapter(entrainmentAdapter);
+      entrainmentSpinner = view.findViewById(R.id.spinner_entrainment);
+      try {
+         //noinspection ConstantConditions
+         ArrayAdapter<CharSequence> entrainmentAdapter = ArrayAdapter.createFromResource(getActivity(),
+               R.array.entrainment_array,
+               R.layout.cell_modes);
+         entrainmentSpinner.setAdapter(entrainmentAdapter);
+      } catch (Exception e) {
+         Log.e(TAG, "getActivity() returned null in PettPlantFragment#setupEntrainmentControls", e);
+      }
 
 //    This is in onResume()
 //    entrainmentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
-      entrainRunStopButton = (Button) view.findViewById(R.id.button_run_stop);
+      entrainRunStopButton = view.findViewById(R.id.button_run_stop);
       entrainRunStopButton.setOnClickListener(new EntrainmentRunStopOnClick());
 
-      entrainPauseResumeButton = (Button) view.findViewById(R.id.button_pause_resume);
+      Button entrainPauseResumeButton = view.findViewById(R.id.button_pause_resume);
       entrainPauseResumeButton.setVisibility(View.INVISIBLE);
 //      entrainPauseResumeButton.setOnClickListener(new EntrainmentPauseResumeOnClick());
 
-      loopCheckbox = (CheckBox) view.findViewById(R.id.checkbox_loop);
+      loopCheckbox = view.findViewById(R.id.checkbox_loop);
       loopCheckbox.setOnClickListener(new EntrainmentLoopOnClickListener());
    }
 
    public void setupColorControls(View view) {
 
-      colorModeSpinner = (Spinner) view.findViewById(R.id.spinner_color_mode);
-      ArrayAdapter<CharSequence> colorModeAdapter = ArrayAdapter.createFromResource(getActivity(),
-            R.array.color_mode_array,
-            R.layout.cell_modes);
-      colorModeSpinner.setAdapter(colorModeAdapter);
+      colorModeSpinner = view.findViewById(R.id.spinner_color_mode);
+      try {
+         //noinspection ConstantConditions
+         ArrayAdapter<CharSequence> colorModeAdapter = ArrayAdapter.createFromResource(getActivity(),
+               R.array.color_mode_array,
+               R.layout.cell_modes);
+         colorModeSpinner.setAdapter(colorModeAdapter);
+      } catch (Exception e) {
+         Log.e(TAG, "getActivity() returned null in PettPlantFragment#setupColorControls", e);
+      }
 
 //    This is in onResume()
 //    colorModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
-      colorRunOffButton = (Button) view.findViewById(R.id.button_color_on_off);
+      colorRunOffButton = view.findViewById(R.id.button_color_on_off);
       colorRunOffButton.setOnClickListener(new ColorModeRunOffOnClick());
 
-      colorPauseResumeButton = (Button) view.findViewById(R.id.button_color_pause_resume);
+      colorPauseResumeButton = view.findViewById(R.id.button_color_pause_resume);
       colorPauseResumeButton.setOnClickListener(new ColorModePauseResumeOnClick());
 
-      colorModeSpeedTV = (TextView) view.findViewById(R.id.value_seekbar);
+      colorModeSpeedTV = view.findViewById(R.id.value_seekbar);
 
-      colorModeSeekbar = (SeekBar) view.findViewById(R.id.seekbar_speed);
+      colorModeSeekbar = view.findViewById(R.id.seekbar_speed);
 
 //    This is in onResume()
 //      colorModeSeekbar.setOnSeekBarChangeListener(new ColorModeOnSeekbarChange());
@@ -171,9 +183,14 @@ public class PettPlantFragment extends AbstractBaseFragment {
          plantService.removePlantStateListener(myPlantStateListener);
       }
 
-      plantService = null;
+//      plantService = null;
 
-      LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(pettPlantServiceEventReceiver);
+      try {
+         //noinspection ConstantConditions
+         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(pettPlantServiceEventReceiver);
+      } catch (Exception e) {
+         Log.e(TAG, "getActivity() returned null in PettPlantFragment#onPause", e);
+      }
 
       getActivity().unregisterReceiver(bluetoothReceiver);
 
@@ -189,9 +206,14 @@ public class PettPlantFragment extends AbstractBaseFragment {
          plantService.addPlantStateListener(myPlantStateListener);
       }
 
-      LocalBroadcastManager.getInstance(getActivity()).
-            registerReceiver(pettPlantServiceEventReceiver,
-                  new IntentFilter(PettPlantService.PETT_PLANT_SERVICE_EVENT));
+      try {
+         //noinspection ConstantConditions
+         LocalBroadcastManager.getInstance(getActivity()).
+               registerReceiver(pettPlantServiceEventReceiver,
+                     new IntentFilter(PettPlantService.PETT_PLANT_SERVICE_EVENT));
+      } catch (Exception e) {
+         Log.e(TAG, "getActivity() returned null in PettPlantFragment#onResume", e);
+      }
 
       // Register the Bluetooth BroadcastReceiver
       IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
@@ -216,15 +238,21 @@ public class PettPlantFragment extends AbstractBaseFragment {
       public void onReceive(Context context, Intent intent) {
          String action = intent.getAction();
          // When discovery finds a device
-         if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
+         try {
+            //noinspection ConstantConditions
+            if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
 
-            // Update actionbar
+               // Update actionbar
 
-//            connectionStatusTV.setText(getString(R.string.disconnected));
-            PettPlantService plantService = PettPlantService.getInstance();
-            if (plantService != null) {
-               plantService.onConnectionLost();
+   //            connectionStatusTV.setText(getString(R.string.disconnected));
+               PettPlantService plantService = PettPlantService.getInstance();
+               if (plantService != null) {
+                  plantService.onConnectionLost();
+               }
             }
+         } catch (Exception e) {
+            Log.e(TAG, "action.equals returned null in " +
+                  "PettPlantFragment#BroadcastReceiver#onReceive", e);
          }
       }
    };
@@ -232,11 +260,11 @@ public class PettPlantFragment extends AbstractBaseFragment {
    @Override
    public void populateData() {
 
-      if (plantState != null) {
+      if (plantState == null) {
 
 //         myPlantStateListener.onPlantState(plantState);
 
-      } else {
+//      } else {
 
          pettPlantParams = new PettPlantParams(getActivity());
 
@@ -307,7 +335,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
          int speed = pettPlantParams.getColorModeSpeed();
          colorModeSeekbar.setProgress(speed);
-         colorModeSpeedTV.setText(Integer.toString(speed));
+         Locale myLocale = Resources.getSystem().getConfiguration().locale;
+         colorModeSpeedTV.setText(String.format(myLocale, "%d", speed));
       }
 
       lastEntrainmentPos = entrainmentSpinner.getSelectedItemPosition();
@@ -380,7 +409,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
                      @Override
                      public void onSuccess() {
                         colorModeSeekbar.setProgress(speed);
-                        colorModeSpeedTV.setText(Integer.toString(speed));
+                        Locale myLocale = Resources.getSystem().getConfiguration().locale;
+                        colorModeSpeedTV.setText(String.format(myLocale, "%d", speed));
                      }
 
                      @Override
@@ -859,7 +889,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
          }
 
          colorModeSeekbar.setProgress(speed);
-         colorModeSpeedTV.setText(Integer.toString(speed));
+         Locale myLocale = Resources.getSystem().getConfiguration().locale;
+         colorModeSpeedTV.setText(String.format(myLocale, "%d", speed));
 
          if (speed != lastColorModeSpeed) {
             lastColorModeSpeed = speed;
@@ -989,7 +1020,9 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
          int speed = plantState.getColorModeSpeed();
          colorModeSeekbar.setProgress(speed);
-         colorModeSpeedTV.setText(Integer.toString(speed));
+         Locale myLocale = Resources.getSystem().getConfiguration().locale;
+//         colorModeSpeedTV.setText(Integer.toString(speed));
+         colorModeSpeedTV.setText(String.format(myLocale, "%d", speed));
       }
    }
 
