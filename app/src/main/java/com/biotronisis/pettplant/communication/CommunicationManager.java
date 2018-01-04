@@ -41,9 +41,6 @@ public class CommunicationManager {
    // handles sending and receiving bytes over some channel
    private ICommAdapter commAdapter;
 
-   // the callback used by the current commAdapter to notify this of responses
-   public CommAdapterListener commResponseListener = new MyCommAdapterListener();
-
    // a general purpose handler to ensure a Runnable is run on the background thread
    private Handler backgroundHandler;
 
@@ -74,10 +71,13 @@ public class CommunicationManager {
 
       this.uiHandler = new Handler(Looper.getMainLooper());
 
-      this.responseIdToWaitingCommands = new HashMap<Byte, AbstractCommand<?>>();
-      this.commandIdToWaitingCommands = new HashMap<Byte, AbstractCommand<?>>();
-      this.waitingCommandsToTimeouts = new HashMap<AbstractCommand<?>, TimeoutBackgroundRunnable>();
+      this.responseIdToWaitingCommands = new HashMap<>();
+      this.commandIdToWaitingCommands = new HashMap<>();
+      this.waitingCommandsToTimeouts = new HashMap<>();
 //      this.endCommandIdToStartCommandId = new HashMap<Byte, Byte>();
+
+      // the callback used by the current commAdapter to notify this of responses
+      CommAdapterListener commResponseListener = new MyCommAdapterListener();
 
       // Test
 //		switch (CommunicationType.TEST) {
@@ -357,7 +357,7 @@ public class CommunicationManager {
       private ResponseCallback callback;
       private AbstractResponse response;
 
-      public ResponseCallbackUiRunnable(ResponseCallback<?> callback, AbstractResponse response) {
+      ResponseCallbackUiRunnable(ResponseCallback<?> callback, AbstractResponse response) {
          this.callback = callback;
          this.response = response;
       }
@@ -376,7 +376,7 @@ public class CommunicationManager {
 
       private AbstractCommand<?> command;
 
-      public TimeoutBackgroundRunnable(AbstractCommand<?> command) {
+      TimeoutBackgroundRunnable(AbstractCommand<?> command) {
          this.command = command;
       }
 
@@ -414,7 +414,7 @@ public class CommunicationManager {
       @SuppressWarnings("rawtypes")
       private ResponseCallback callback;
 
-      public TimeoutCallbackUiRunnable(ResponseCallback<?> callback) {
+      TimeoutCallbackUiRunnable(ResponseCallback<?> callback) {
          this.callback = callback;
       }
 

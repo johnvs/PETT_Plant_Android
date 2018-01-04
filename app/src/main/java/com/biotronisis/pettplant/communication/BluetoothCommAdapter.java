@@ -50,7 +50,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
    private Handler backgroundHandler;
 
 
-   public BluetoothCommAdapter(CommAdapterListener listener, PettPlantService pettPlantService) {
+   BluetoothCommAdapter(CommAdapterListener listener, PettPlantService pettPlantService) {
       bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
       connectionState = ConnectionState.NONE;
       this.listener = listener;
@@ -261,7 +261,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
     * @param device The BluetoothDevice to connect
     * @param secure Socket Security type - Secure (true) , Insecure (false)
     */
-   public synchronized void connect(BluetoothDevice device, boolean secure) {
+   private synchronized void connect(BluetoothDevice device, boolean secure) {
       if (MyDebug.LOG) {
          Log.d(TAG, "connecting to: " + device);
       }
@@ -292,8 +292,8 @@ public class BluetoothCommAdapter implements ICommAdapter {
     * @param socket The BluetoothSocket on which the connection was made
     * @param device The BluetoothDevice that has been connected
     */
-   public synchronized void connected(BluetoothSocket socket, BluetoothDevice device,
-                                      final String socketType) {
+   private synchronized void connected(BluetoothSocket socket, BluetoothDevice device,
+                                       final String socketType) {
       if (MyDebug.LOG) {
          Log.d(TAG, "connected, Socket Type:" + socketType);
       }
@@ -421,7 +421,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
          // Now that the adapter is disabled, enable it
          if (bluetoothAdapter.enable()) {
             waitingForBTState = true;
-            startTime = currentTime = System.currentTimeMillis();
+            startTime = System.currentTimeMillis();
 
             while (waitingForBTState) {
                currentTime = System.currentTimeMillis();
@@ -546,7 +546,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
       private String mSocketType;
       private boolean cancelled = false;
 
-      public ConnectThread(BluetoothDevice device, boolean secure) {
+      ConnectThread(BluetoothDevice device, boolean secure) {
          mmDevice = device;
          BluetoothSocket tmp = null;
          mSocketType = secure ? "Secure" : "Insecure";
@@ -685,7 +685,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
          }
       }
 
-      public void cancel() {
+      void cancel() {
          cancelled = true;
          try {
             mmSocket.close();
@@ -711,7 +711,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
       private final OutputStream mmOutStream;
       private boolean cancelled = false;
 
-      public ConnectedThread(BluetoothSocket socket, String socketType) {
+      ConnectedThread(BluetoothSocket socket, String socketType) {
          if (MyDebug.LOG) {
             Log.d(TAG, "create ConnectedThread: " + socketType);
          }
@@ -821,7 +821,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
        *
        * @param buffer The bytes to write
        */
-      public void write(byte[] buffer) {
+      void write(byte[] buffer) {
          try {
             mmOutStream.write(buffer);
          } catch (IOException e) {
@@ -834,7 +834,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
          }
       }
 
-      public void cancel() {
+      void cancel() {
          cancelled = true;
          try {
             mmSocket.close();
