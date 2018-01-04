@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+//import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.IBinder;
@@ -24,13 +25,13 @@ import com.biotronisis.pettplant.communication.transfer.EmptyResponse;
 import com.biotronisis.pettplant.communication.transfer.LoopOffEntrainmentCommand;
 import com.biotronisis.pettplant.communication.transfer.LoopOnEntrainmentCommand;
 import com.biotronisis.pettplant.communication.transfer.OffColorModeCommand;
-import com.biotronisis.pettplant.communication.transfer.PauseEntrainmentCommand;
+//import com.biotronisis.pettplant.communication.transfer.PauseEntrainmentCommand;
 import com.biotronisis.pettplant.communication.transfer.PauseColorModeCommand;
 import com.biotronisis.pettplant.communication.transfer.RequestStateCommand;
 import com.biotronisis.pettplant.communication.transfer.RequestStateResponse;
 import com.biotronisis.pettplant.communication.transfer.ResponseCallback;
 import com.biotronisis.pettplant.communication.transfer.ResumeColorModeCommand;
-import com.biotronisis.pettplant.communication.transfer.ResumeEntrainmentCommand;
+//import com.biotronisis.pettplant.communication.transfer.ResumeEntrainmentCommand;
 import com.biotronisis.pettplant.communication.transfer.RunColorModeCommand;
 import com.biotronisis.pettplant.communication.transfer.RunEntrainmentCommand;
 import com.biotronisis.pettplant.communication.transfer.RunEntrainmentResponse;
@@ -51,9 +52,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
-/**
- * Created by john on 7/10/15.
- */
 public class PettPlantService extends Service {
 
    private static final String TAG = "PettPlantService";
@@ -70,21 +68,18 @@ public class PettPlantService extends Service {
 
    // Registry of listeners that want to be notified for the status of communications
    // *access synchronized on statusListeners*
-   public Set<CommunicationManagerListener> statusListeners =
-         new LinkedHashSet<CommunicationManagerListener>();
+   public final Set<CommunicationManagerListener> statusListeners = new LinkedHashSet<>();
 
    // registry of listeners that want to be notified for the status of communications
    // *access synchronized on plantStateListeners*
-   public Set<PlantStateListener> plantStateListeners =
-         new LinkedHashSet<PlantStateListener>();
+   public final Set<PlantStateListener> plantStateListeners = new LinkedHashSet<>();
 
    private CommunicationManager communicationManager;
 
    private Handler uiHandler;
 
    public static Intent createIntent(Context callee) {
-      Intent intent = new Intent(callee, PettPlantService.class);
-      return intent;
+      return new Intent(callee, PettPlantService.class);
    }
 
    @Override
@@ -222,7 +217,7 @@ public class PettPlantService extends Service {
       return null;
    }
 
-   private Notification createNotification(String message, boolean ongoing) {
+   private Notification createNotification(String message, boolean ongoing) throws NullPointerException {
       if (MyDebug.LOG) {
          Log.d(TAG, "Create Notification with message: " + message);
       }
@@ -234,7 +229,7 @@ public class PettPlantService extends Service {
       BitmapDrawable icon = (BitmapDrawable) ContextCompat.getDrawable(this, R.drawable.ic_launcher);
       // depricated method getResources().getDrawable(R.drawable.ic_launcher);
 
-
+      @SuppressWarnings("ConstantConditions")
       Notification notification = new NotificationCompat.Builder(this)
             .setContentTitle(getString(R.string.pett_plant))
             .setContentText(message).setContentIntent(contentIntent)
@@ -243,6 +238,7 @@ public class PettPlantService extends Service {
             .setOngoing(ongoing)
             .setTicker(message)
             .build();
+
       return notification;
    }
 
@@ -256,10 +252,11 @@ public class PettPlantService extends Service {
       if (communicationManager != null) {
          commAdapter = communicationManager.getCurrentCommAdapter();
       }
-      if (commAdapter == null) {
-         return false;
-      }
-      return commAdapter.getConnectionState() == ConnectionState.ESTABLISHED;
+//      if (commAdapter == null) {
+//         return false;
+//      }
+//      return commAdapter.getConnectionState() == ConnectionState.ESTABLISHED;
+      return (commAdapter != null) && (commAdapter.getConnectionState() == ConnectionState.ESTABLISHED);
    }
 
    public void onCommConnecting() {
@@ -545,45 +542,45 @@ public class PettPlantService extends Service {
       }
    }
 
-   public void pauseEntrainmentSequence(PauseEntrainmentCallback callback) {
-      try {
-         PauseEntrainmentCommand command = new PauseEntrainmentCommand();
-         command.setResponseCallback(new PauseEntrainmentResponseCallback(callback));
+//   public void pauseEntrainmentSequence(PauseEntrainmentCallback callback) {
+//      try {
+//         PauseEntrainmentCommand command = new PauseEntrainmentCommand();
+//         command.setResponseCallback(new PauseEntrainmentResponseCallback(callback));
+//
+//         // Test
+//         boolean test = false;
+//         if (test) {
+//            throw new Exception("test");
+//         }
+//
+//         communicationManager.sendCommand(command);
+//      } catch (Exception ex) {
+//         if (MyDebug.LOG) {
+//            Log.e(TAG, "failed to send pause entrainment sequence command", ex);
+//         }
+//         callback.onFailed(ex.toString());
+//      }
+//   }
 
-         // Test
-         boolean test = false;
-         if (test) {
-            throw new Exception("test");
-         }
-
-         communicationManager.sendCommand(command);
-      } catch (Exception ex) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send pause entrainment sequence command", ex);
-         }
-         callback.onFailed(ex.toString());
-      }
-   }
-
-   public void resumeEntrainmentSequence(ResumeEntrainmentCallback callback) {
-      try {
-         ResumeEntrainmentCommand command = new ResumeEntrainmentCommand();
-         command.setResponseCallback(new ResumeEntrainmentResponseCallback(callback));
-
-         // Test
-         boolean test = false;
-         if (test) {
-            throw new Exception("test");
-         }
-
-         communicationManager.sendCommand(command);
-      } catch (Exception ex) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send resume entrainment sequence command", ex);
-         }
-         callback.onFailed(ex.toString());
-      }
-   }
+//   public void resumeEntrainmentSequence(ResumeEntrainmentCallback callback) {
+//      try {
+//         ResumeEntrainmentCommand command = new ResumeEntrainmentCommand();
+//         command.setResponseCallback(new ResumeEntrainmentResponseCallback(callback));
+//
+//         // Test
+//         boolean test = false;
+//         if (test) {
+//            throw new Exception("test");
+//         }
+//
+//         communicationManager.sendCommand(command);
+//      } catch (Exception ex) {
+//         if (MyDebug.LOG) {
+//            Log.e(TAG, "failed to send resume entrainment sequence command", ex);
+//         }
+//         callback.onFailed(ex.toString());
+//      }
+//   }
 
    public void loopOnEntrainmentSequence(LoopOnEntrainmentCallback callback) {
       try {
@@ -755,7 +752,7 @@ public class PettPlantService extends Service {
 
       private RunEntrainmentCallback callback;
 
-      public RunEntrainmentResponseCallback(RunEntrainmentCallback callback) {
+      RunEntrainmentResponseCallback(RunEntrainmentCallback callback) {
          this.callback = callback;
       }
 
@@ -780,7 +777,7 @@ public class PettPlantService extends Service {
 
       private StopEntrainmentCallback callback;
 
-      public StopEntrainmentResponseCallback(StopEntrainmentCallback callback) {
+      StopEntrainmentResponseCallback(StopEntrainmentCallback callback) {
          this.callback = callback;
       }
 
@@ -801,61 +798,61 @@ public class PettPlantService extends Service {
       }
    }
 
-   private class PauseEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
+//   private class PauseEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
+//
+//      private PauseEntrainmentCallback callback;
+//
+//      PauseEntrainmentResponseCallback(PauseEntrainmentCallback callback) {
+//         this.callback = callback;
+//      }
+//
+//      public void onResponse(EmptyResponse response) {
+//         uiHandler.post(new Runnable() {
+//            public void run() {
+//               callback.onSuccess();
+//            }
+//         });
+//      }
+//
+//      public void onFailed(final CommunicationErrorType type) {
+//         uiHandler.post(new Runnable() {
+//            public void run() {
+//               callback.onFailed(toUserMessage(type));
+//            }
+//         });
+//      }
+//   }
 
-      private PauseEntrainmentCallback callback;
-
-      public PauseEntrainmentResponseCallback(PauseEntrainmentCallback callback) {
-         this.callback = callback;
-      }
-
-      public void onResponse(EmptyResponse response) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onSuccess();
-            }
-         });
-      }
-
-      public void onFailed(final CommunicationErrorType type) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onFailed(toUserMessage(type));
-            }
-         });
-      }
-   }
-
-   private class ResumeEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
-
-      private ResumeEntrainmentCallback callback;
-
-      public ResumeEntrainmentResponseCallback(ResumeEntrainmentCallback callback) {
-         this.callback = callback;
-      }
-
-      public void onResponse(EmptyResponse response) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onSuccess();
-            }
-         });
-      }
-
-      public void onFailed(final CommunicationErrorType type) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onFailed(toUserMessage(type));
-            }
-         });
-      }
-   }
+//   private class ResumeEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
+//
+//      private ResumeEntrainmentCallback callback;
+//
+//      ResumeEntrainmentResponseCallback(ResumeEntrainmentCallback callback) {
+//         this.callback = callback;
+//      }
+//
+//      public void onResponse(EmptyResponse response) {
+//         uiHandler.post(new Runnable() {
+//            public void run() {
+//               callback.onSuccess();
+//            }
+//         });
+//      }
+//
+//      public void onFailed(final CommunicationErrorType type) {
+//         uiHandler.post(new Runnable() {
+//            public void run() {
+//               callback.onFailed(toUserMessage(type));
+//            }
+//         });
+//      }
+//   }
 
    private class LoopOnEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
 
       private LoopOnEntrainmentCallback callback;
 
-      public LoopOnEntrainmentResponseCallback(LoopOnEntrainmentCallback callback) {
+      LoopOnEntrainmentResponseCallback(LoopOnEntrainmentCallback callback) {
          this.callback = callback;
       }
 
@@ -880,7 +877,7 @@ public class PettPlantService extends Service {
 
       private LoopOffEntrainmentCallback callback;
 
-      public LoopOffEntrainmentResponseCallback(LoopOffEntrainmentCallback callback) {
+      LoopOffEntrainmentResponseCallback(LoopOffEntrainmentCallback callback) {
          this.callback = callback;
       }
 
@@ -905,7 +902,7 @@ public class PettPlantService extends Service {
 
       private SetColorModeCallback callback;
 
-      public SetColorModeResponseCallback(SetColorModeCallback callback) {
+      SetColorModeResponseCallback(SetColorModeCallback callback) {
          this.callback = callback;
       }
 
@@ -930,7 +927,7 @@ public class PettPlantService extends Service {
 
       private RunColorModeCallback callback;
 
-      public RunColorModeResponseCallback(RunColorModeCallback callback) {
+      RunColorModeResponseCallback(RunColorModeCallback callback) {
          this.callback = callback;
       }
 
@@ -955,7 +952,7 @@ public class PettPlantService extends Service {
 
       private OffColorModeCallback callback;
 
-      public OffColorModeResponseCallback(OffColorModeCallback callback) {
+      OffColorModeResponseCallback(OffColorModeCallback callback) {
          this.callback = callback;
       }
 
@@ -980,7 +977,7 @@ public class PettPlantService extends Service {
 
       private PauseColorModeCallback callback;
 
-      public PauseColorModeResponseCallback(PauseColorModeCallback callback) {
+      PauseColorModeResponseCallback(PauseColorModeCallback callback) {
          this.callback = callback;
       }
 
@@ -1005,7 +1002,7 @@ public class PettPlantService extends Service {
 
       private ResumeColorModeCallback callback;
 
-      public ResumeColorModeResponseCallback(ResumeColorModeCallback callback) {
+      ResumeColorModeResponseCallback(ResumeColorModeCallback callback) {
          this.callback = callback;
       }
 
@@ -1030,7 +1027,7 @@ public class PettPlantService extends Service {
 
       private SetSpeedColorModeCallback callback;
 
-      public SetSpeedColorModeResponseCallback(SetSpeedColorModeCallback callback) {
+      SetSpeedColorModeResponseCallback(SetSpeedColorModeCallback callback) {
          this.callback = callback;
       }
 
@@ -1051,27 +1048,27 @@ public class PettPlantService extends Service {
       }
    }
 
-   private  class RequestStateResponseCallback implements ResponseCallback<RequestStateResponse> {
-
-      private RequestStateResponseCallback callback;
-      private PlantStateListener listener;
-
-      public RequestStateResponseCallback(RequestStateResponseCallback callback,
-                                          PlantStateListener listener) {
-         this.callback = callback;
-         this.listener = listener;
-      }
-
-      @Override
-      public void onResponse(RequestStateResponse response) {
-
-      }
-
-      @Override
-      public void onFailed(CommunicationErrorType type) {
-
-      }
-   }
+//   private  class RequestStateResponseCallback implements ResponseCallback<RequestStateResponse> {
+//
+//      private RequestStateResponseCallback callback;
+//      private PlantStateListener listener;
+//
+//      public RequestStateResponseCallback(RequestStateResponseCallback callback,
+//                                          PlantStateListener listener) {
+//         this.callback = callback;
+//         this.listener = listener;
+//      }
+//
+//      @Override
+//      public void onResponse(RequestStateResponse response) {
+//
+//      }
+//
+//      @Override
+//      public void onFailed(CommunicationErrorType type) {
+//
+//      }
+//   }
 
 
    //
@@ -1091,19 +1088,19 @@ public class PettPlantService extends Service {
       void onFailed(String reason);
    }
 
-   public interface PauseEntrainmentCallback {
+//   public interface PauseEntrainmentCallback {
+//
+//      void onSuccess();
+//
+//      void onFailed(String reason);
+//   }
 
-      void onSuccess();
-
-      void onFailed(String reason);
-   }
-
-   public interface ResumeEntrainmentCallback {
-
-      void onSuccess();
-
-      void onFailed(String reason);
-   }
+//   public interface ResumeEntrainmentCallback {
+//
+//      void onSuccess();
+//
+//      void onFailed(String reason);
+//   }
 
    public interface LoopOnEntrainmentCallback {
 
