@@ -20,5 +20,5 @@ android {
 
 dependencies {
     implementation "com.android.support:appcompat-v7:$support_version"
-    implementation 'com.mcxiaoke.viewpagerindicator:library:2.4.1@aar'
+//    implementation 'com.mcxiaoke.viewpagerindicator:library:2.4.1@aar'
 }
