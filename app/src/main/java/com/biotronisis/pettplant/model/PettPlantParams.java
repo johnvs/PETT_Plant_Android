@@ -15,21 +15,21 @@ public class PettPlantParams {
 
 	private static final String TAG = "PettPlantParams";
 
-	public static final String ENTRAINMENT_SEQUENCE = "entrainmentSequence";
-	public static final String ENTRAINMENT_RUN_BUTTON = "entrainmentRunButton";
-	public static final String ENTRAINMENT_PAUSE_BUTTON = "entrainmentPauseButton";
-	public static final String ENTRAINMENT_LOOP_CHECKBOX = "entrainmentLoopCheckbox";
+	private static final String ENTRAINMENT_SEQUENCE = "entrainmentSequence";
+	private static final String ENTRAINMENT_RUN_BUTTON = "entrainmentRunButton";
+//	private static final String ENTRAINMENT_PAUSE_BUTTON = "entrainmentPauseButton";
+	private static final String ENTRAINMENT_LOOP_CHECKBOX = "entrainmentLoopCheckbox";
 
-	public static final String COLOR_MODE = "colorMode";
-	public static final String COLOR_MODE_SPEED = "colorModeSpeed";
-	public static final String COLOR_MODE_RUN_BUTTON = "colorModeRunButton";
-	public static final String COLOR_MODE_PAUSE_BUTTON = "colorModePauseButton";
+	private static final String COLOR_MODE = "colorMode";
+	private static final String COLOR_MODE_SPEED = "colorModeSpeed";
+	private static final String COLOR_MODE_RUN_BUTTON = "colorModeRunButton";
+	private static final String COLOR_MODE_PAUSE_BUTTON = "colorModePauseButton";
 
-   private SharedPreferences appParams;
+    private SharedPreferences appParams;
 
 	private Entrainment.Sequence entrainmentSequence;
 	private String entrainmentRunButton;
-	private String entrainmentPauseButton;
+//	private String entrainmentPauseButton;
 	private Entrainment.LoopCheckbox entrainmentLoopCheckbox;
 
 	private ColorMode.Mode colorMode;
@@ -54,12 +54,12 @@ public class PettPlantParams {
 			entrainmentRunButton = Entrainment.RunStopButton.getDefault();
 		}
 
-		str = appParams.getString(ENTRAINMENT_PAUSE_BUTTON, Entrainment.PauseResumeButton.getDefault());
-		if (str.equals(Entrainment.PauseResumeButton.PAUSE) || str.equals(Entrainment.PauseResumeButton.RESUME)) {
-			entrainmentPauseButton = str;
-		} else {
-			entrainmentPauseButton = Entrainment.PauseResumeButton.getDefault();
-		}
+//		str = appParams.getString(ENTRAINMENT_PAUSE_BUTTON, Entrainment.PauseResumeButton.getDefault());
+//		if (str.equals(Entrainment.PauseResumeButton.PAUSE) || str.equals(Entrainment.PauseResumeButton.RESUME)) {
+//			entrainmentPauseButton = str;
+//		} else {
+//			entrainmentPauseButton = Entrainment.PauseResumeButton.getDefault();
+//		}
 
 		int checkbox = appParams.getInt(ENTRAINMENT_LOOP_CHECKBOX,
 				Entrainment.LoopCheckbox.OFF.getValue());
@@ -106,12 +106,12 @@ public class PettPlantParams {
 
       SharedPreferences.Editor editor = appParams.edit();
 
-		editor.putInt(ENTRAINMENT_SEQUENCE, entrainmentSequence.getValue());
-		editor.putString(ENTRAINMENT_RUN_BUTTON, entrainmentRunButton);
-		editor.putString(ENTRAINMENT_PAUSE_BUTTON, entrainmentPauseButton);
-		editor.putInt(ENTRAINMENT_LOOP_CHECKBOX, entrainmentLoopCheckbox.getValue());
+      editor.putInt(ENTRAINMENT_SEQUENCE, entrainmentSequence.getValue());
+      editor.putString(ENTRAINMENT_RUN_BUTTON, entrainmentRunButton);
+//	  editor.putString(ENTRAINMENT_PAUSE_BUTTON, entrainmentPauseButton);
+	  editor.putInt(ENTRAINMENT_LOOP_CHECKBOX, entrainmentLoopCheckbox.getValue());
 
-		editor.putInt(COLOR_MODE, colorMode.getValue());
+	  editor.putInt(COLOR_MODE, colorMode.getValue());
       editor.putInt(COLOR_MODE_SPEED, colorModeSpeed);
       editor.putString(COLOR_MODE_RUN_BUTTON, colorModeRunButton);
       editor.putString(COLOR_MODE_PAUSE_BUTTON, colorModePauseButton);
@@ -119,11 +119,11 @@ public class PettPlantParams {
       // Commit the edits!
       boolean success = editor.commit();
       if (!success) {
-			if (MyDebug.LOG) {
-				Log.e(TAG, "failed to save pettPlantparams");
-			}
-			ErrorHandler errorHandler = ErrorHandler.getInstance();
-         errorHandler.logError(Level.WARNING, "PettPlantParams.saveData(): " +
+      	if (MyDebug.LOG) {
+      		Log.e(TAG, "failed to save pettPlantparams");
+      	}
+		ErrorHandler errorHandler = ErrorHandler.getInstance();
+        errorHandler.logError(Level.WARNING, "PettPlantParams.saveData(): " +
                      "Can't update pettPlantParams - ",
                R.string.pett_plant_params_persist_error_title,
                R.string.pett_plant_params_persist_error_message);
@@ -184,13 +184,13 @@ public class PettPlantParams {
 		this.entrainmentRunButton = entrainmentRunButton;
 	}
 
-	public String getEntrainmentPauseButton() {
-		return entrainmentPauseButton;
-	}
+//	public String getEntrainmentPauseButton() {
+//		return entrainmentPauseButton;
+//	}
 
-	public void setEntrainmentPauseButton(String entrainmentPauseButton) {
-		this.entrainmentPauseButton = entrainmentPauseButton;
-	}
+//	public void setEntrainmentPauseButton(String entrainmentPauseButton) {
+//		this.entrainmentPauseButton = entrainmentPauseButton;
+//	}
 
 	@Override
 	public String toString() {
@@ -202,8 +202,9 @@ public class PettPlantParams {
 				", entrainmentSequence='" + entrainmentSequence + '\'' +
 				", entrainmentLoopCheckbox='" + entrainmentLoopCheckbox + '\'' +
 				", entrainmentRunButton='" + entrainmentRunButton + '\'' +
-				", entrainmentPauseButton='" + entrainmentPauseButton + '\'' +
 				'}';
 	}
+//              Removed from toString above
+//				", entrainmentPauseButton='" + entrainmentPauseButton + '\'' +
 
 }
