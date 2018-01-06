@@ -218,7 +218,7 @@ public class ErrorHandler {
                         if (wasServiceStopped) {
                             // We just stopped the service. Listen for the broadcast of it's ultimate demise.
                             LocalBroadcastManager.getInstance(appContext).registerReceiver(pettPlantEventReceiver,
-                                  new IntentFilter(PettPlantService.PETT_PLANT_SERVICE_EVENT));
+                                  new IntentFilter(PettPlantService.SERVICE_EVENT));
                         } else {
                             // The service was already stopped somewhere else, so do here what we would
                             // be doing in the receiver
@@ -244,14 +244,14 @@ public class ErrorHandler {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            String message = intent.getStringExtra("message");
+            String message = intent.getStringExtra(PettPlantService.EXTRA_EVENT_MESSAGE);
 
             if (MyDebug.LOG) {
                 Log.d("receiver", "Got message: " + message);
             }
 
-            if (message.equals(PettPlantService.PETT_PLANT_SERVICE_CREATED)) {
-            } else if  (message.equals(PettPlantService.PETT_PLANT_SERVICE_DESTROYED)) {
+            if (message.equals(PettPlantService.SERVICE_CREATED)) {
+            } else if  (message.equals(PettPlantService.SERVICE_DESTROYED)) {
                 
                 // The pett plant service has stopped, after a fatal exception, so close the log file and
                 // throw a RTE to kill the app.

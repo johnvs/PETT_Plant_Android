@@ -210,7 +210,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
          //noinspection ConstantConditions
          LocalBroadcastManager.getInstance(getActivity()).
                registerReceiver(pettPlantServiceEventReceiver,
-                     new IntentFilter(PettPlantService.PETT_PLANT_SERVICE_EVENT));
+                     new IntentFilter(PettPlantService.SERVICE_EVENT));
       } catch (Exception e) {
          Log.e(TAG, "getActivity() returned null in PettPlantFragment#onResume", e);
       }
@@ -1115,17 +1115,17 @@ public class PettPlantFragment extends AbstractBaseFragment {
    private BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
-         String message = intent.getStringExtra("message");
+         String message = intent.getStringExtra(PettPlantService.EXTRA_EVENT_MESSAGE);
          if (MyDebug.LOG) {
             Log.d("receiver", "Got message: " + message);
          }
 
-         if (message.equals(PettPlantService.PETT_PLANT_SERVICE_CREATED)) {
+         if (message.equals(PettPlantService.SERVICE_CREATED)) {
             PettPlantService pettPlantService = PettPlantService.getInstance();
             if (pettPlantService != null) {
                pettPlantService.addPlantStateListener(myPlantStateListener);
             }
-//         } else if (message.equals(PettPlantService.PETT_PLANT_SERVICE_DESTROYED)) {
+//         } else if (message.equals(PettPlantService.SERVICE_DESTROYED)) {
 //            // Save the new comm params
 //            boolean success = communicationParams.saveData();
 //            final Intent startIntent = PettPlantService.createIntent(activityContext);
