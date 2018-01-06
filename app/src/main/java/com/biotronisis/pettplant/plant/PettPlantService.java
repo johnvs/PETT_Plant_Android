@@ -58,9 +58,10 @@ public class PettPlantService extends Service {
 
    private static final int NOTIFICATION_ID = 0xAA00001;
 
-   public static final String PETT_PLANT_SERVICE_EVENT = "pett plant service event";
-   public static final String PETT_PLANT_SERVICE_CREATED = "pett plant service created";
-   public static final String PETT_PLANT_SERVICE_DESTROYED = "pett plant service destroyed";
+   public static final String EXTRA_EVENT_MESSAGE = "message";
+   public static final String SERVICE_EVENT = "pett plant service event";
+   public static final String SERVICE_CREATED = "pett plant service created";
+   public static final String SERVICE_DESTROYED = "pett plant service destroyed";
 
    private static PettPlantService instance;
 
@@ -116,8 +117,8 @@ public class PettPlantService extends Service {
 //      usbFilter.setPriority(500);
 //      this.registerReceiver(mUsbReceiver, usbFilter);
 
-      Intent intent = new Intent(PETT_PLANT_SERVICE_EVENT);
-      intent.putExtra("message", PETT_PLANT_SERVICE_CREATED);
+      Intent intent = new Intent(SERVICE_EVENT);
+      intent.putExtra(EXTRA_EVENT_MESSAGE, SERVICE_CREATED);
       LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
    }
 
@@ -149,8 +150,8 @@ public class PettPlantService extends Service {
 //      unregisterReceiver(mUsbReceiver);
 
       // Let others know that the service is being destroyed
-      Intent intent = new Intent(PETT_PLANT_SERVICE_EVENT);
-      intent.putExtra("message", PETT_PLANT_SERVICE_DESTROYED);
+      Intent intent = new Intent(SERVICE_EVENT);
+      intent.putExtra(EXTRA_EVENT_MESSAGE, SERVICE_DESTROYED);
       LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
    }
 
