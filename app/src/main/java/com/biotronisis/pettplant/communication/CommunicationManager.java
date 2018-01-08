@@ -65,7 +65,7 @@ public class CommunicationManager {
       this.pettPlantService = pettPlantService;
       this.communicationParams = communicationParams;
 
-      HandlerThread backgroundThread = new HandlerThread("meter-service");
+      HandlerThread backgroundThread = new HandlerThread("pett-plant-service");
       backgroundThread.start();
       this.backgroundHandler = new Handler(backgroundThread.getLooper());
 
