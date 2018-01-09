@@ -11,7 +11,6 @@ import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-//import android.widget.Toast;
 
 import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.activity.fragment.PettPlantFragment;
@@ -21,20 +20,13 @@ import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.model.CommunicationParams;
 import com.biotronisis.pettplant.plant.PettPlantService;
-//import com.biotronisis.pettplant.plant.processor.Plant;
 import com.biotronisis.pettplant.plant.processor.PlantState;
 
-//import java.util.logging.Level;
-
 public class MainActivity extends AbstractBaseActivity {
-
-   // This was added on the develop branch.
 
    private static String TAG = "MainActivity";
 
    private boolean illBeBack = false;
-
-//   private Context activityContext;
 
    private MyCommunicationManagerListener myCommunicationManagerListener =
          new MyCommunicationManagerListener();
@@ -56,27 +48,10 @@ public class MainActivity extends AbstractBaseActivity {
 
       // Create a new Error Handler object in case the application was stopped
       // but not destroyed, in which case, MyApplication.onCreate will not be executed.
-      ErrorHandler.getInstance(this.getApplicationContext());
+      ErrorHandler.getInstance(getApplicationContext());
 
-      // During a configuration change (i.e. device rotation), the service is not stopped,
-      // so check if the service is running before starting it.
-      PettPlantService pettPlantService = PettPlantService.getInstance();
-      if (pettPlantService == null) {
-         Intent intent = PettPlantService.createIntent(this);
-         startService(intent);
-//         Toast.makeText(this, "onCreate: Starting Service", Toast.LENGTH_LONG).show();
-
-         if (MyDebug.LOG) {
-            Log.d(TAG, "MainActivity:onCreate - Started PettPlantService.");
-         }
-//      } else {
-//         Toast.makeText(this, "onCreate: Service Already Running", Toast.LENGTH_LONG).show();
-
-//         ErrorHandler errorHandler = ErrorHandler.getInstance();
-//         errorHandler.logError(Level.WARNING, "MainActivity.onCreate()$" +
-//                     " failed with the error - " + type,
-//               R.string.plant_not_responding_title,
-//               R.string.plant_not_responding_message);
+      if (MyDebug.LOG) {
+         Log.d(TAG, "---------- onCreate ----------");
       }
 
       if (savedInstanceState == null) {
@@ -86,37 +61,44 @@ public class MainActivity extends AbstractBaseActivity {
          transaction.commit();
       }
 
-//      activityContext = this;  // Needed later for inner classes.
    }
 
    @Override
    public void onResume() {
       super.onResume();
 
+      if (MyDebug.LOG) {
+         Log.d(TAG, "---------- onResume ---------- ");
+      }
       illBeBack = false;
 
+      // During a configuration change (i.e. device rotation), the service is not stopped,
+      // so check if the service is running before starting it.
       PettPlantService pettPlantService = PettPlantService.getInstance();
-      if (pettPlantService != null) {
+      if (pettPlantService == null) {
 
-         updateActionBar();
-         pettPlantService.addCommStatusListener(myCommunicationManagerListener);
-
-
-      } else {
          Intent intent = PettPlantService.createIntent(this);
          startService(intent);
+
          if (MyDebug.LOG) {
-            Log.d(TAG, "MainActivity:onResume - Started PettPlantService.");
+            Log.d(TAG, "---------- Started PettPlantService ---------- ");
          }
+
+      } else {
+         updateActionBar();
+         pettPlantService.addCommStatusListener(myCommunicationManagerListener);
       }
 
       LocalBroadcastManager.getInstance(this).
             registerReceiver(pettPlantServiceEventReceiver,
-                  new IntentFilter(PettPlantService.PETT_PLANT_SERVICE_EVENT));
+                  new IntentFilter(PettPlantService.SERVICE_EVENT));
    }
 
    @Override
    public void onPause() {
+      if (MyDebug.LOG) {
+         Log.d(TAG, "---------- onPause ---------- ");
+      }
       super.onPause();
       PettPlantService pettPlantService = PettPlantService.getInstance();
       if (pettPlantService != null) {
@@ -195,16 +177,6 @@ public class MainActivity extends AbstractBaseActivity {
 
    }
 
-   @Override
-   public void onDestroy() {
-      super.onDestroy();
-
-//      if (!isChangingConfigurations()) {
-//         Intent intent = PettPlantService.createIntent(this);
-//         stopService(intent);
-//      }
-   }
-
    /**
     * Creates an Intent for this Activity.
     *
@@ -213,7 +185,7 @@ public class MainActivity extends AbstractBaseActivity {
     */
    public static Intent createIntent(Context callee) {
       if (MyDebug.LOG) {
-         Log.d("MainActivity", "creating main activity");
+         Log.d("MainActivity", "creating main activity intent");
       }
       return new Intent(callee, MainActivity.class);
    }
@@ -275,31 +247,24 @@ public class MainActivity extends AbstractBaseActivity {
    private BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
-         String message = intent.getStringExtra("message");
+         String message = intent.getStringExtra(PettPlantService.EXTRA_EVENT_MESSAGE);
          if (MyDebug.LOG) {
             Log.d("Service receiver", "Got message: " + message);
          }
 
-         if (message.equals(PettPlantService.PETT_PLANT_SERVICE_CREATED)) {
+         if (message.equals(PettPlantService.SERVICE_CREATED)) {
             PettPlantService pettPlantService = PettPlantService.getInstance();
             if (pettPlantService != null) {
                pettPlantService.addCommStatusListener(myCommunicationManagerListener);
                updateActionBar();
                if (MyDebug.LOG) {
-                  Log.d("Service receiver", "MainActivity:ServiceReceiver:onReceive() - Got PP service.");
+                  Log.d(TAG, "PettPlantServiceBroadcastReceiver$onReceive() - Got service.");
                }
             } else {
                if (MyDebug.LOG) {
-                  Log.d("Service receiver", "MainActivity:ServiceReceiver:onReceive() - PP service is Null.");
+                  Log.d(TAG, "PettPlantServiceBroadcastReceiver$onReceive() - service is null.");
                }
             }
-
-//         } else if (message.equals(PettPlantService.PETT_PLANT_SERVICE_DESTROYED)) {
-//            // Save the new comm params
-//            CommunicationParams communicationParams = new CommunicationParams(activityContext);
-//            boolean success = communicationParams.saveData();
-//            final Intent startIntent = PettPlantService.createIntent(activityContext);
-//            startService(startIntent);
          }
       }
    };
