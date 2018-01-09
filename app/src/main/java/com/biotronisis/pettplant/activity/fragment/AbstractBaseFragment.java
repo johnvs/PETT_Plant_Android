@@ -59,7 +59,7 @@ public abstract class AbstractBaseFragment extends Fragment implements IntentPar
    @Override
    public void onResume() {
       if (MyDebug.LOG) {
-         Log.d(TAG, this.getClass().getSimpleName() + ".onResume");
+         Log.d(this.getClass().getSimpleName(), "---------- onResume ----------");
       }
       super.onResume();
 
@@ -86,7 +86,7 @@ public abstract class AbstractBaseFragment extends Fragment implements IntentPar
    @Override
    public void onPause() {
       if (MyDebug.LOG) {
-         Log.d(TAG, "onPause");
+         Log.d(this.getClass().getSimpleName(), "---------- onPause ----------");
       }
       try {
          //Test

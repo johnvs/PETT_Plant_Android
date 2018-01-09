@@ -101,7 +101,7 @@ public class PettPlantService extends Service {
          errorHandler.logError(Level.INFO, "PettPlantService.onCreate().", 0, 0);
       }
       if (MyDebug.LOG) {
-         Log.d(TAG, "PettPlantService.onCreate() - Entered");
+         Log.i(TAG, "------------ onCreate ------------");
       }
 
       uiHandler = new Handler(getMainLooper());
@@ -125,6 +125,10 @@ public class PettPlantService extends Service {
    @Override
    public void onDestroy() {
       super.onDestroy();
+
+      if (MyDebug.LOG) {
+         Log.i(TAG, "------------ onDestroy ------------");
+      }
 
       if (communicationManager != null) {
          communicationManager.disconnect();
