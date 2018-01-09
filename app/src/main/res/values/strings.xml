@@ -41,7 +41,7 @@
     </string-array>
 
     <!--  Bluetooth connection messages  -->
-    <string name="not_connected">You are not connected to a Plant</string>
+    <string name="not_connected_to_plant">You are not connected to a Plant</string>
     <string name="bt_not_enabled_leaving">Bluetooth was not enabled. Try again.</string>
     <string name="title_connecting">connecting...</string>
     <string name="title_connected_to">Connected to <xliff:g id="device_name">%1$s</xliff:g></string>
@@ -200,6 +200,7 @@ USE AT YOUR OWN RISK! </string>
     <string name="reconnecting_to_device">Reconnecting to your Pett Plant.</string>
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
+    <string name="not_connected">Not Connected</string>
     <string name="attempting_to_reconnect">Attempting to reconnect</string>
 
     <!-- Service -->
