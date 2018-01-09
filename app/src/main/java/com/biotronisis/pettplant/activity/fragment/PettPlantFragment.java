@@ -51,12 +51,13 @@ import com.biotronisis.pettplant.plant.processor.PlantState;
 import com.biotronisis.pettplant.plant.PettPlantService;
 import com.biotronisis.pettplant.plant.PettPlantService.PlantStateListener;
 import com.biotronisis.pettplant.model.ColorMode;
+import com.biotronisis.pettplant.util.Time;
 
 import java.util.Locale;
 import java.util.logging.Level;
 
 /**
- * This fragment contains the controls for controlling the PETT Plant
+ * This fragment contains the PETT Plant controls
  */
 public class PettPlantFragment extends AbstractBaseFragment {
 
@@ -242,8 +243,10 @@ public class PettPlantFragment extends AbstractBaseFragment {
             //noinspection ConstantConditions
             if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
 
-               // Update actionbar
-
+               String currentTime = Time.getCurrentTime();
+               if (MyDebug.LOG) {
+                  Log.d(TAG, "------------ BTReceiver$ACTION_ACL_DISCONNECTED ------------" + currentTime);
+               }
    //            connectionStatusTV.setText(getString(R.string.disconnected));
                PettPlantService plantService = PettPlantService.getInstance();
                if (plantService != null) {
@@ -934,15 +937,12 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
          this.plantState = pState;
 
-//         entrainmentSpinner.setSelection(plantState.getEntrainSequence().getValue());
          lastEntrainmentPos = plantState.getEntrainSequence().getValue();
          entrainmentSpinner.setSelection(lastEntrainmentPos);
 
          switch (plantState.getEntrainmentState()) {
             case STOPPED:
                entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
-//               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
-//               entrainPauseResumeButton.setEnabled(false);
                entrainmentSpinner.setEnabled(true);
 
                // Enable color mode controls when entrainment is off
@@ -957,8 +957,6 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
             case RUNNING:
                entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
-//               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
-//               entrainPauseResumeButton.setEnabled(true);
                entrainmentSpinner.setEnabled(false);
 
                // Disable color mode controls when entrainment is running
@@ -968,14 +966,6 @@ public class PettPlantFragment extends AbstractBaseFragment {
                colorModeSeekbar.setEnabled(false);
 
                break;
-
-//            case PAUSED:
-//               entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
-//               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.RESUME);
-//               entrainPauseResumeButton.setEnabled(true);
-//               entrainmentSpinner.setEnabled(true);
-//
-//               break;
          }
 
          // Convert from int to boolean
@@ -1034,73 +1024,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
             Log.d(TAG, "processor state changed. state=" + pState);
          }
 
-//         int entrainSeq = plantState.getEntrainSequence().getValue();
-//         if (entrainSeq >= 0 && entrainSeq < Entrainment.Sequence.values().length) {
-//            entrainmentSpinner.setSelection(entrainSeq);
-//         }
-
          // All state data was validated prior to this call
          updateState(pState);
-
-//         entrainmentSpinner.setSelection(plantState.getEntrainSequence().getValue());
-//
-//         switch (plantState.getEntrainmentState()) {
-//            case STOPPED:
-//               entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
-//               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
-//               entrainPauseResumeButton.setEnabled(false);
-//
-//               // Make sure any future time indicator gets reset here.
-//
-//               break;
-//
-//            case RUNNING:
-//               entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
-//               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
-//               entrainPauseResumeButton.setEnabled(true);
-//
-//               break;
-//
-//            case PAUSED:
-//               entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
-//               entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.RESUME);
-//               entrainPauseResumeButton.setEnabled(true);
-//
-//               break;
-//         }
-//
-//         // Convert from int to boolean
-//         loopCheckbox.setChecked(plantState.getLoopCheckbox().getValue() != 0);
-//
-////         int colorMode = plantState.getColorMode().getValue();
-////         if (colorMode >= 0 && colorMode < ColorMode.Mode.values().length) {
-////            colorModeSpinner.setSelection(colorMode);
-////         }
-//
-//         colorModeSpinner.setSelection(plantState.getColorMode().getValue());
-//
-//         switch (plantState.getColorModeState()) {
-//            case OFF:
-//               colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
-//               colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
-//               colorPauseResumeButton.setEnabled(false);
-//               break;
-//
-//            case RUNNING:
-//               colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
-//               colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
-//               colorPauseResumeButton.setEnabled(true);
-//               break;
-//
-//            case PAUSED:
-//               colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
-//               colorPauseResumeButton.setText(ColorMode.PauseResumeButton.RESUME);
-//               colorPauseResumeButton.setEnabled(true);
-//               break;
-//         }
-//
-//         colorModeSeekbar.setProgress(plantState.getColorModeSpeed());
-
       }
 
       @Override
@@ -1125,11 +1050,6 @@ public class PettPlantFragment extends AbstractBaseFragment {
             if (pettPlantService != null) {
                pettPlantService.addPlantStateListener(myPlantStateListener);
             }
-//         } else if (message.equals(PettPlantService.SERVICE_DESTROYED)) {
-//            // Save the new comm params
-//            boolean success = communicationParams.saveData();
-//            final Intent startIntent = PettPlantService.createIntent(activityContext);
-//            startService(startIntent);
          }
       }
    };
