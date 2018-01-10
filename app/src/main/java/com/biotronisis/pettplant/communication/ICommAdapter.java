@@ -3,22 +3,22 @@ package com.biotronisis.pettplant.communication;
 
 public interface ICommAdapter {
 
-   void activate(String address);
+    void activate(String address);
 
-   void deactivate();
+    void deactivate();
 
-   void connLost();
+    void connLost();
 
-   boolean isReConnectingToDevice(String address);
+    boolean isReConnectingToDevice(String address);
 
-   ConnectionState getConnectionState();
+    ConnectionState getConnectionState();
 
-   void sendBytes(byte[] command);
+    void sendBytes(byte[] command);
 
-   interface CommAdapterListener {
+    interface CommAdapterListener {
 
-      void onConnectionState(ConnectionState connectionState);
+        void onConnectionState(ConnectionState connectionState);
 
-      void onReceiveBytes(byte[] response);
-   }
+        void onReceiveBytes(byte[] response);
+    }
 }
