@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.biotronisis.pettplant.R;
+import com.biotronisis.pettplant.debug.MyDebug;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,18 +32,15 @@ import java.util.Set;
 
 public final class BluetoothScanFragment extends DialogFragment {
 	
-//    private static final String TAG = "BluetoothScanFragment";
-
-    // Return Intent extra
-//    public static String EXTRA_DEVICE_ADDRESS = "device_address";
+    private static final String TAG = "BluetoothScanFragment";
 
     private LayoutInflater inflator;
 
-   // Member fields
+    // Member fields
     private BluetoothAdapter bluetoothAdapter;
     private List<MyItem> items;
     private MyDeviceAdapter listAdapter;
-    private MyBluetoothBroadcastReceiver receiver;
+    private MyBluetoothBroadcastReceiver bluetoothReceiver;
     private Context parentContext;
     
     private OnBluetoothDeviceSelectedListener listener;
@@ -57,27 +56,28 @@ public final class BluetoothScanFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        if (MyDebug.LOG) {
+            Log.i(TAG, "------------ onCreateView ------------");
+        }
+
         View view = inflater.inflate(R.layout.fragment_bluetooth_scan, container, false);
 
         this.inflator = inflater;
 
-//       view.setBackground(ContextCompat.getDrawable(parentContext, R.drawable.layout_background_spinner));
-
-//       getDialog().setTitle(getString(R.string.select_device));
-
-       // Hide the title.
+        // Hide the title.
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
         items = new ArrayList<>();
         listAdapter = new MyDeviceAdapter();
 
         // Find and set up the ListView for paired devices
-        ListView listView = (ListView) view.findViewById(R.id.listView);
+        ListView listView = view.findViewById(R.id.listView);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(listAdapter);
         listView.setBackground(ContextCompat.getDrawable(parentContext, R.drawable.layout_background_bluetooth));
 
-        receiver = new MyBluetoothBroadcastReceiver();
+        bluetoothReceiver = new MyBluetoothBroadcastReceiver();
 
         // Get the local Bluetooth adapter
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -89,16 +89,17 @@ public final class BluetoothScanFragment extends DialogFragment {
     public void onResume() {
         super.onResume();
 
+        if (MyDebug.LOG) {
+            Log.i(TAG, "------------ onResume ------------");
+        }
+
         items.clear();
         listAdapter.notifyDataSetChanged();
 
-        // Register for broadcasts when a device is discovered
+        // Register for Bluetooth device found and discovery finished events
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        getActivity().registerReceiver(receiver, filter);
-
-        // Register for broadcasts when discovery has finished
-        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        getActivity().registerReceiver(receiver, filter);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        getActivity().registerReceiver(bluetoothReceiver, filter);
 
         // Get a set of currently paired devices
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
@@ -124,7 +125,7 @@ public final class BluetoothScanFragment extends DialogFragment {
         }
 
         // Unregister broadcast listeners
-        getActivity().unregisterReceiver(receiver);
+        getActivity().unregisterReceiver(bluetoothReceiver);
     }
 
     /**
