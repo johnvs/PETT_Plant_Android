@@ -4,6 +4,7 @@ import com.biotronisis.pettplant.R;
 import com.biotronisis.pettplant.debug.MyDebug;
 import com.biotronisis.pettplant.file.ErrorHandler;
 import com.biotronisis.pettplant.plant.PettPlantService;
+import com.biotronisis.pettplant.util.Time;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -182,6 +183,8 @@ public class BluetoothCommAdapter implements ICommAdapter {
          Log.d(TAG, "bluetooth comm adapter deactivate");
       }
 
+      unregisterBluetoothRcvr(bluetoothReceiver);
+
       if (connectThread != null) {
          connectThread.cancel();
          connectThread = null;
@@ -213,7 +216,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
       }
       // Perform the write unsynchronized
 
-      //String msg = "ULTRAGRAV_TEST";
+      //String msg = "PETT_PLANT_TEST";
       //r.write(msg.getBytes());
 
       r.write(command);
@@ -245,9 +248,6 @@ public class BluetoothCommAdapter implements ICommAdapter {
          }
       } else {
          errorHandler.logError(Level.INFO, "BluetoothCommAdapter.setState(): Old State - " + oldState + ", New State - " + newState, 0, 0);
-      }
-      if (MyDebug.LOG) {
-         Log.d(TAG, "PettPlantService.onCreate() - Entered");
       }
 
       if (newState != oldState && listener != null) {
@@ -328,12 +328,12 @@ public class BluetoothCommAdapter implements ICommAdapter {
    private void connectionFailed() {
       // Send a failure message back to the Activity
       if (MyDebug.LOG) {
-         Log.w(TAG, "connection failed");
+         Log.w(TAG, "-------- connection failed");
       }
       setState(ConnectionState.FAILED);
 
       // Attempt to reconnect with the same BT device
-      reConnect();
+//      reConnect();
    }
 
    public void connLost() {
@@ -346,7 +346,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
    private void connectionLost() {
       // Send a failure message back to the Activity
       if (MyDebug.LOG) {
-         Log.w(TAG, "connection lost");
+         Log.w(TAG, "-------- connection lost");
       }
       setState(ConnectionState.NONE);
 
@@ -366,12 +366,9 @@ public class BluetoothCommAdapter implements ICommAdapter {
 
       bluetoothReceiver = new MyBluetoothBroadcastReceiver();
 
-      // Register for broadcasts when a device is discovered
+      // Register for Bluetooth device found and discovery finished events
       IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-      pettPlantService.registerReceiver(bluetoothReceiver, filter);
-
-      // Register for broadcasts when discovery has finished
-      filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+      filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
       pettPlantService.registerReceiver(bluetoothReceiver, filter);
 
       connectedThread = null;
@@ -468,6 +465,16 @@ public class BluetoothCommAdapter implements ICommAdapter {
       bluetoothAdapter.startDiscovery();
    }
 
+   private void unregisterBluetoothRcvr(BluetoothCommAdapter.MyBluetoothBroadcastReceiver rcvr) {
+      try {
+         pettPlantService.unregisterReceiver(rcvr);
+      } catch (Exception e) {
+         if (MyDebug.LOG) {
+            Log.i(TAG, "Trying to unregister a BroadcastReceiver that is not registered");
+         }
+      }
+   }
+
    // The BroadcastReceiver that listens for discovered devices and
    // tries to connect if the most recent BT device is found
    private class MyBluetoothBroadcastReceiver extends BroadcastReceiver {
@@ -476,7 +483,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
          String action = intent.getAction();
 
          // When discovery finds a device
-         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+         if (action.equals(BluetoothDevice.ACTION_FOUND)) {
             // Get the BluetoothDevice object from the Intent
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             // If it's the device we were most recently connected to, reconnect with it
@@ -488,18 +495,17 @@ public class BluetoothCommAdapter implements ICommAdapter {
                activate(currentDeviceAddress);
             }
             // When discovery is finished, if we have not yet reconnected, continue trying
-         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+         } else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
             if (MyDebug.LOG) {
                Log.i(TAG, "Discovery Finished.");
             }
             if (isActivating) {
-               // Unregister broadcast listener
-               pettPlantService.unregisterReceiver(bluetoothReceiver);
+               unregisterBluetoothRcvr(bluetoothReceiver);
                isReConnecting = false;
             } else if (isReConnecting) {
                doDiscovery();
             }
-         } else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+         } else if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
             synchronized (waitingForBTState) {
                if (MyDebug.LOG) {
                   Log.i(TAG, "Bluetooth Adapter State has changed. isEnabling: " + isEnabling + ", " +
@@ -837,6 +843,11 @@ public class BluetoothCommAdapter implements ICommAdapter {
       void cancel() {
          cancelled = true;
          try {
+            String currentTime = Time.getCurrentTime();
+            if (MyDebug.LOG) {
+               Log.d(TAG, "------------ connected thread : cancel() ------------" + currentTime);
+            }
+
             mmSocket.close();
          } catch (IOException e) {
             if (MyDebug.LOG) {
@@ -850,4 +861,5 @@ public class BluetoothCommAdapter implements ICommAdapter {
          }
       }
    }
+
 }
