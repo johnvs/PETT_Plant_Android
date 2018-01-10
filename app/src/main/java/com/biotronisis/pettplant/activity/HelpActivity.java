@@ -18,35 +18,35 @@ import com.biotronisis.pettplant.debug.MyDebug;
 
 public class HelpActivity extends AbstractBaseActivity {
 
-   private static final String TAG = "HelpActivity";
-   public static final String EXTRA_ACTIVITY_NAME = "activityName";
-   public static final String EXTRA_FRAGMENT_NAME = "fragmentName";
+    private static final String TAG = "HelpActivity";
+    public static final String EXTRA_ACTIVITY_NAME = "activityName";
+    public static final String EXTRA_FRAGMENT_NAME = "fragmentName";
 
-   @Override
-   public String getActivityName() {
-      return TAG;
-   }
+    @Override
+    public String getActivityName() {
+        return TAG;
+    }
 
-   @Override
-   public String getHelpKey() {
-      return null;         // no help
-   }
+    @Override
+    public String getHelpKey() {
+        return null;         // no help
+    }
 
-   @Override
-   public void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      setContentView(R.layout.activity_help);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_help);
 
-      WebView webView = findViewById(R.id.webView);
+        WebView webView = findViewById(R.id.webView);
 
-      WebSettings webSettings = webView.getSettings();
-      webSettings.setDefaultFontSize(18);
-      webView.setBackgroundColor(Color.TRANSPARENT);
-      webView.setBackground(ContextCompat.getDrawable(this, R.drawable.layout_background_help));
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setDefaultFontSize(18);
+        webView.setBackgroundColor(Color.TRANSPARENT);
+        webView.setBackground(ContextCompat.getDrawable(this, R.drawable.layout_background_help));
 
-      try {
-         //noinspection ConstantConditions
-         String fragmentName = getIntent().getExtras().getString(EXTRA_FRAGMENT_NAME);
+        try {
+            //noinspection ConstantConditions
+            String fragmentName = getIntent().getExtras().getString(EXTRA_FRAGMENT_NAME);
 //         String helpStr;
 //      int resID = 0;
 
@@ -54,7 +54,7 @@ public class HelpActivity extends AbstractBaseActivity {
 //         helpStr = getString(R.string.cant_find_help_text);
 ////         resID = getResources().getIdentifier(activityName, "string", getPackageName());
 //      } else {
-         int resID = getResources().getIdentifier(fragmentName, "string", getPackageName());
+            int resID = getResources().getIdentifier(fragmentName, "string", getPackageName());
 //      }
 
 //      if (resID == 0) {
@@ -63,56 +63,56 @@ public class HelpActivity extends AbstractBaseActivity {
 //         String helpStr = getString(resID);
 //      }
 
-         webView.loadData(getString(resID), "text/html", "UTF8");
-      } catch (Exception e) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "getIntent().getExtras().getString() returned null in HelpActivity#onCreate", e);
-         }
-      }
+            webView.loadData(getString(resID), "text/html", "UTF8");
+        } catch (Exception e) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "getIntent().getExtras().getString() returned null in HelpActivity#onCreate", e);
+            }
+        }
 
-      ActionBar actionBar = getSupportActionBar();
-      try {
-         //noinspection ConstantConditions
-         actionBar.setDisplayHomeAsUpEnabled(true);
-      } catch (Exception e) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "setDisplayHomeAsUpEnabled() returned null in HelpActivity#onCreate", e);
-         }
-      }
+        ActionBar actionBar = getSupportActionBar();
+        try {
+            //noinspection ConstantConditions
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        } catch (Exception e) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "setDisplayHomeAsUpEnabled() returned null in HelpActivity#onCreate", e);
+            }
+        }
 
-   }
+    }
 
-   @Override
-   public boolean onCreateOptionsMenu(Menu menu) {
-      // Inflate the menu; this adds items to the action bar.
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar.
 //      getMenuInflater().inflate(R.menu.menu_main, menu);
-      super.onCreateOptionsMenu(menu);
+        super.onCreateOptionsMenu(menu);
 
-      return true;
-   }
+        return true;
+    }
 
-   @Override
-   public boolean onOptionsItemSelected(MenuItem item) {
-      switch (item.getItemId()) {
-         case android.R.id.home:
-            this.finish();
-            return true;
-         default:
-            return super.onOptionsItemSelected(item);
-      }
-   }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
-   /**
-    * Creates an Intent for this Activity.
-    *
-    * @param callee the calling activity
-    * @return Intent
-    */
-   public static Intent createIntent(Context callee, String activityName, String fragmentName) {
+    /**
+     * Creates an Intent for this Activity.
+     *
+     * @param callee the calling activity
+     * @return Intent
+     */
 //   public static Intent createIntent(Context callee, String fragmentName) {
-      Intent intent = new Intent(callee, HelpActivity.class);
-      intent.putExtra(EXTRA_ACTIVITY_NAME, activityName);
-      intent.putExtra(EXTRA_FRAGMENT_NAME, fragmentName);
-      return intent;
-   }
+    public static Intent createIntent(Context callee, String activityName, String fragmentName) {
+        Intent intent = new Intent(callee, HelpActivity.class);
+        intent.putExtra(EXTRA_ACTIVITY_NAME, activityName);
+        intent.putExtra(EXTRA_FRAGMENT_NAME, fragmentName);
+        return intent;
+    }
 }

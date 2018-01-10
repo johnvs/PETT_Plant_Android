@@ -16,97 +16,99 @@ import java.util.logging.Level;
 
 public abstract class AbstractBaseFragment extends Fragment implements IntentParams {
 
-   private static final String TAG = "AbstractBaseFragment";
+    private static final String TAG = "AbstractBaseFragment";
 //    protected boolean dummyLLHasFocus;
 
-   public abstract void setupView(View view, Bundle savedInstanceState);
+    public abstract void setupView(View view, Bundle savedInstanceState);
 
-   public void populateData() {}
+    public void populateData() {
+    }
 
-   public void persistData() {}
+    public void persistData() {
+    }
 
-   @Override
-   public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-      super.onViewCreated(view, savedInstanceState);
-      try {
-         //Test
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        try {
+            //Test
 //         boolean test = false;
 //         if (test) {
 //            throw new Exception("test");
 //         } else {
             setupView(view, savedInstanceState);
 //         }
-      } catch (Exception e) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "setupView failed", e);
-         }
-         ErrorHandler errorHandler = ErrorHandler.getInstance();
-         errorHandler.logError(Level.WARNING, this.getClass().getSimpleName() + ".onViewCreated(): " +
-                     "setupView failed - " + e,
-               "Alert - Setup View Error",
-               "There was an error setting up the view for " + this.getClass().getSimpleName(),
-               okOnClickListener);
-      }
-   }
+        } catch (Exception e) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "setupView failed", e);
+            }
+            ErrorHandler errorHandler = ErrorHandler.getInstance();
+            errorHandler.logError(Level.WARNING, this.getClass().getSimpleName() + ".onViewCreated(): " +
+                        "setupView failed - " + e,
+                  "Alert - Setup View Error",
+                  "There was an error setting up the view for " + this.getClass().getSimpleName(),
+                  okOnClickListener);
+        }
+    }
 
-   MyOnClickListener okOnClickListener = new MyOnClickListener() {
-      @Override
-      public void onClick() {
-         getActivity().finish();
-      }
-   };
+    MyOnClickListener okOnClickListener = new MyOnClickListener() {
+        @Override
+        public void onClick() {
+            getActivity().finish();
+        }
+    };
 
-   @Override
-   public void onResume() {
-      if (MyDebug.LOG) {
-         Log.d(this.getClass().getSimpleName(), "---------- onResume ----------");
-      }
-      super.onResume();
+    @Override
+    public void onResume() {
+        if (MyDebug.LOG) {
+            Log.d(this.getClass().getSimpleName(), "---------- onResume ----------");
+        }
+        super.onResume();
 
-      try {
-         //Test
+        try {
+            //Test
 //            if (true) {
-         populateData();
+            populateData();
 //            } else {
 //                throw new Exception("test");
 //            }
-      } catch (Exception e) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "populateData failed", e);
-         }
-         ErrorHandler errorHandler = ErrorHandler.getInstance();
-         errorHandler.logError(Level.WARNING, this.getClass().getSimpleName() + ".onResume(): " +
-                     "populateData failed - " + e,
-               getString(R.string.activity_fatal_setup_title),
-               getString(R.string.activity_fatal_setup_message) + this.getClass().getSimpleName(),
-               okOnClickListener);
-      }
-   }
+        } catch (Exception e) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "populateData failed", e);
+            }
+            ErrorHandler errorHandler = ErrorHandler.getInstance();
+            errorHandler.logError(Level.WARNING, this.getClass().getSimpleName() + ".onResume(): " +
+                        "populateData failed - " + e,
+                  getString(R.string.activity_fatal_setup_title),
+                  getString(R.string.activity_fatal_setup_message) + this.getClass().getSimpleName(),
+                  okOnClickListener);
+        }
+    }
 
-   @Override
-   public void onPause() {
-      if (MyDebug.LOG) {
-         Log.d(this.getClass().getSimpleName(), "---------- onPause ----------");
-      }
-      try {
-         //Test
+    @Override
+    public void onPause() {
+        if (MyDebug.LOG) {
+            Log.d(this.getClass().getSimpleName(), "---------- onPause ----------");
+        }
+        try {
+            //Test
 //            if (true) {
-         persistData();
+            persistData();
 //            } else {
 //                throw new Exception("test");
 //            }
-      } catch (Exception e) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "persistData failed", e);
-         }
-         ErrorHandler errorHandler = ErrorHandler.getInstance();
-         errorHandler.logError(Level.WARNING, this.getClass().getSimpleName() + ".onPause(): " +
-                     "persistData failed - " + e,
-               getString(R.string.activity_fatal_persist_title),
-               getString(R.string.activity_fatal_persist_message) + this.getClass().getSimpleName(),
-               okOnClickListener);
-      }
-      super.onPause();
-   }
+        } catch (Exception e) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "persistData failed", e);
+            }
+            ErrorHandler errorHandler = ErrorHandler.getInstance();
+            errorHandler.logError(Level.WARNING, this.getClass().getSimpleName() + ".onPause(): " +
+                        "persistData failed - " + e,
+                  getString(R.string.activity_fatal_persist_title),
+                  getString(R.string.activity_fatal_persist_message) + this.getClass().getSimpleName(),
+                  okOnClickListener);
+        }
+        super.onPause();
+    }
 
 }

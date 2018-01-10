@@ -33,166 +33,166 @@ import com.biotronisis.pettplant.util.Time;
 
 public class SettingsActivity extends AbstractBaseActivity {
 
-   private static final String TAG = "SettingsActivity";
+    private static final String TAG = "SettingsActivity";
 
-   private TextView deviceNameTV;
-   private TextView connectionTypeTV;
-   private TextView connectionAddressTV;
-   private TextView connectionStatusTV;
+    private TextView deviceNameTV;
+    private TextView connectionTypeTV;
+    private TextView connectionAddressTV;
+    private TextView connectionStatusTV;
 
-   private CommunicationParams communicationParams;
+    private CommunicationParams communicationParams;
 
-   private Context activityContext;
+    private Context activityContext;
 
-   private MyCommunicationManagerListener myCommunicationManagerListener =
-         new MyCommunicationManagerListener();
+    private MyCommunicationManagerListener myCommunicationManagerListener =
+          new MyCommunicationManagerListener();
 
-   private PlantState plantState = null;
+    private PlantState plantState = null;
 
-   private MyPlantStateListener myPlantStateListener = new MyPlantStateListener(this);
+    private MyPlantStateListener myPlantStateListener = new MyPlantStateListener(this);
 
-   @Override
-   public String getActivityName() {
-      return TAG;
-   }
+    @Override
+    public String getActivityName() {
+        return TAG;
+    }
 
-   @Override
-   public String getHelpKey() {
-      return "settings";
-   }
+    @Override
+    public String getHelpKey() {
+        return "settings";
+    }
 
-   static Intent createIntent(Context context, PlantState plantState) {
-      Intent intent = new Intent(context, SettingsActivity.class);
-      intent.putExtra(EXTRA_PLANT_STATE, plantState);
-      return intent;
-   }
+    static Intent createIntent(Context context, PlantState plantState) {
+        Intent intent = new Intent(context, SettingsActivity.class);
+        intent.putExtra(EXTRA_PLANT_STATE, plantState);
+        return intent;
+    }
 
-   @Override
-   protected void onCreate(Bundle savedInstanceSate) {
-      super.onCreate(savedInstanceSate);
+    @Override
+    protected void onCreate(Bundle savedInstanceSate) {
+        super.onCreate(savedInstanceSate);
 
-      if (MyDebug.LOG) {
-         Log.i(TAG, "------------ onCreate ------------");
-      }
+        if (MyDebug.LOG) {
+            Log.i(TAG, "------------ onCreate ------------");
+        }
 
-      setContentView(R.layout.activity_settings);
+        setContentView(R.layout.activity_settings);
 
-      Button bluetoothScanButton = findViewById(R.id.bluetoothScanButton);
+        Button bluetoothScanButton = findViewById(R.id.bluetoothScanButton);
 
-      // For future use
-      Button usbScanButton = findViewById(R.id.usbScanButton);
-      usbScanButton.setVisibility(View.INVISIBLE);
+        // For future use
+        Button usbScanButton = findViewById(R.id.usbScanButton);
+        usbScanButton.setVisibility(View.INVISIBLE);
 
-      connectionTypeTV =    findViewById(R.id.connectionType);
-      deviceNameTV =        findViewById(R.id.deviceName);
-      connectionStatusTV =  findViewById(R.id.connectionStatus);
-      connectionAddressTV = findViewById(R.id.connectionAddress);
+        connectionTypeTV = findViewById(R.id.connectionType);
+        deviceNameTV = findViewById(R.id.deviceName);
+        connectionStatusTV = findViewById(R.id.connectionStatus);
+        connectionAddressTV = findViewById(R.id.connectionAddress);
 
-      communicationParams = new CommunicationParams(this);
-      activityContext = this;
+        communicationParams = new CommunicationParams(this);
+        activityContext = this;
 
-      PettPlantService pettPlantService = PettPlantService.getInstance();
-      if (pettPlantService != null) {
-         updateCommunicationDisplay();
-         if (pettPlantService.isConnected()) {
-            connectionStatusTV.setText(getString(R.string.connected));
-         } else {
-            if (pettPlantService.isReConnectingToBtDevice(communicationParams.getAddress())) {
-               connectionStatusTV.setText(getString(R.string.attempting_to_reconnect));
+        PettPlantService pettPlantService = PettPlantService.getInstance();
+        if (pettPlantService != null) {
+            updateCommunicationDisplay();
+            if (pettPlantService.isConnected()) {
+                connectionStatusTV.setText(getString(R.string.connected));
             } else {
-               connectionStatusTV.setText(getString(R.string.not_connected));
+                if (pettPlantService.isReConnectingToBtDevice(communicationParams.getAddress())) {
+                    connectionStatusTV.setText(getString(R.string.attempting_to_reconnect));
+                } else {
+                    connectionStatusTV.setText(getString(R.string.not_connected));
+                }
             }
-         }
-      } else {
-         connectionTypeTV.setText(R.string.none);
-         deviceNameTV.setText(getString(R.string.none));
-         connectionStatusTV.setText(getString(R.string.not_connected));
-      }
+        } else {
+            connectionTypeTV.setText(R.string.none);
+            deviceNameTV.setText(getString(R.string.none));
+            connectionStatusTV.setText(getString(R.string.not_connected));
+        }
 
-      bluetoothScanButton.setOnClickListener(new BluetoothScanClickListener());
+        bluetoothScanButton.setOnClickListener(new BluetoothScanClickListener());
 
-      Bundle extras = getIntent().getExtras();
-      try {
-         //noinspection ConstantConditions
-         plantState = (PlantState) extras.get(EXTRA_PLANT_STATE);
-      } catch (Exception e) {
-         Log.e(TAG, "Bundle#get() returned null in SettingsActivity#onCreate", e);
-      }
+        Bundle extras = getIntent().getExtras();
+        try {
+            //noinspection ConstantConditions
+            plantState = (PlantState) extras.get(EXTRA_PLANT_STATE);
+        } catch (Exception e) {
+            Log.e(TAG, "Bundle#get() returned null in SettingsActivity#onCreate", e);
+        }
 
-      ActionBar actionBar = getSupportActionBar();
-      if (actionBar != null) {
-         actionBar.setDisplayHomeAsUpEnabled(true);
-      }
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
-   }
+    }
 
-   @Override
-   public void onResume() {
-      super.onResume();
+    @Override
+    public void onResume() {
+        super.onResume();
 
-      String currentTime = Time.getCurrentTime();  //getCurrentTime();
-      if (MyDebug.LOG) {
-         Log.d(TAG, "------------ onResume ------------" + currentTime);
-      }
+        String currentTime = Time.getCurrentTime();  //getCurrentTime();
+        if (MyDebug.LOG) {
+            Log.d(TAG, "------------ onResume ------------" + currentTime);
+        }
 
-      PettPlantService plantService = PettPlantService.getInstance();
-      if (plantService != null) {
-         plantService.addCommStatusListener(myCommunicationManagerListener);
-         plantService.addPlantStateListener(myPlantStateListener);
-      }
+        PettPlantService plantService = PettPlantService.getInstance();
+        if (plantService != null) {
+            plantService.addCommStatusListener(myCommunicationManagerListener);
+            plantService.addPlantStateListener(myPlantStateListener);
+        }
 
-      LocalBroadcastManager.getInstance(this).
-            registerReceiver(pettPlantServiceEventReceiver,
-                             new IntentFilter(PettPlantService.SERVICE_EVENT));
+        LocalBroadcastManager.getInstance(this).
+              registerReceiver(pettPlantServiceEventReceiver,
+                    new IntentFilter(PettPlantService.SERVICE_EVENT));
 
-      registerBluetoothRcvr();
+        registerBluetoothRcvr();
 
-   }
+    }
 
     private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
-      public void onReceive(Context context, Intent intent) {
-         String action = intent.getAction();
-         try {
-            // When discovery finds a device
-            //noinspection ConstantConditions
-            if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
-               String currentTime = Time.getCurrentTime();
-               if (MyDebug.LOG) {
-                  Log.d(TAG, "------------ BluetoothRcvr$ACTION_ACL_DISCONNECTED ------------" + currentTime);
-               }
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            try {
+                // When discovery finds a device
+                //noinspection ConstantConditions
+                if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
+                    String currentTime = Time.getCurrentTime();
+                    if (MyDebug.LOG) {
+                        Log.d(TAG, "------------ BluetoothRcvr$ACTION_ACL_DISCONNECTED ------------" + currentTime);
+                    }
 
-               BluetoothDevice btDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-               String disconnectedDeviceAddr = btDevice.getAddress();
+                    BluetoothDevice btDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    String disconnectedDeviceAddr = btDevice.getAddress();
 
-               if (disconnectedDeviceAddr.equals(communicationParams.getAddress())) {
-                  connectionStatusTV.setText(getString(R.string.disconnected));
-                  PettPlantService pettPlantService = PettPlantService.getInstance();
-                  if (pettPlantService != null) {
-                     pettPlantService.onConnectionLost();
-                  }
-               }
+                    if (disconnectedDeviceAddr.equals(communicationParams.getAddress())) {
+                        connectionStatusTV.setText(getString(R.string.disconnected));
+                        PettPlantService pettPlantService = PettPlantService.getInstance();
+                        if (pettPlantService != null) {
+                            pettPlantService.onConnectionLost();
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "String#equals() returned null in BroadcastReceiver#onReceive", e);
             }
-         } catch (Exception e) {
-            Log.e(TAG, "String#equals() returned null in BroadcastReceiver#onReceive", e);
-         }
-      }
-   };
+        }
+    };
 
     private void registerBluetoothRcvr() {
-       String currentTime = Time.getCurrentTime();
-       if (MyDebug.LOG) {
-          Log.d(TAG, "------------ registerBluetoothRcvr ------------" + currentTime);
-       }
+        String currentTime = Time.getCurrentTime();
+        if (MyDebug.LOG) {
+            Log.d(TAG, "------------ registerBluetoothRcvr ------------" + currentTime);
+        }
 
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
         registerReceiver(bluetoothReceiver, filter);
     }
 
     private void unregisterBluetoothRcvr() {
-       String currentTime = Time.getCurrentTime();
-       if (MyDebug.LOG) {
-          Log.d(TAG, "------------ unregisterBluetoothRcvr ------------" + currentTime);
-       }
+        String currentTime = Time.getCurrentTime();
+        if (MyDebug.LOG) {
+            Log.d(TAG, "------------ unregisterBluetoothRcvr ------------" + currentTime);
+        }
 
         try {
             unregisterReceiver(bluetoothReceiver);
@@ -204,56 +204,56 @@ public class SettingsActivity extends AbstractBaseActivity {
         }
     }
 
-   @Override
-   public void onPause() {
-      super.onPause();
+    @Override
+    public void onPause() {
+        super.onPause();
 
-      String currentTime = Time.getCurrentTime();
-      if (MyDebug.LOG) {
-         Log.d(TAG, "------------ onPause ------------" + currentTime);
-      }
+        String currentTime = Time.getCurrentTime();
+        if (MyDebug.LOG) {
+            Log.d(TAG, "------------ onPause ------------" + currentTime);
+        }
 
-      PettPlantService plantService = PettPlantService.getInstance();
-      if (plantService != null) {
-         plantService.removeCommStatusListener(myCommunicationManagerListener);
-         plantService.removePlantStateListener(myPlantStateListener);
-      }
+        PettPlantService plantService = PettPlantService.getInstance();
+        if (plantService != null) {
+            plantService.removeCommStatusListener(myCommunicationManagerListener);
+            plantService.removePlantStateListener(myPlantStateListener);
+        }
 
-      LocalBroadcastManager.getInstance(this).unregisterReceiver(pettPlantServiceEventReceiver);
-      unregisterBluetoothRcvr();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(pettPlantServiceEventReceiver);
+        unregisterBluetoothRcvr();
 
-   }
+    }
 
-   @Override
-   protected void onDestroy() {
-      super.onDestroy();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
-      if (MyDebug.LOG) {
-         Log.i(TAG, "------------ onDestroy ------------");
-      }
+        if (MyDebug.LOG) {
+            Log.i(TAG, "------------ onDestroy ------------");
+        }
 
 //      unregisterReceiver(bluetoothReceiver);
-   }
+    }
 
-   @Override
-   public boolean onCreateOptionsMenu(Menu menu) {
-      // Inflate the menu; this adds items to the action bar.
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar.
 //      getMenuInflater().inflate(R.menu.menu_main, menu);
-      super.onCreateOptionsMenu(menu);
+        super.onCreateOptionsMenu(menu);
 
-      return true;
-   }
+        return true;
+    }
 
-   @Override
-   public boolean onOptionsItemSelected(MenuItem item) {
-      switch (item.getItemId()) {
-         case android.R.id.home:
-            onBackPressed();
-            return true;
-         default:
-            return super.onOptionsItemSelected(item);
-      }
-   }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
 
 //   private void myRegisterReceiver(BroadcastReceiver receiver, IntentFilter filter) {
@@ -277,170 +277,173 @@ public class SettingsActivity extends AbstractBaseActivity {
 //      }
 //   }
 
-   @Override
-   public void onBackPressed() {
-      Intent intent = new Intent();
-      intent.putExtra(EXTRA_PLANT_STATE, plantState);
-      setResult(RESULT_OK, intent);
-      super.onBackPressed();
-   }
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_PLANT_STATE, plantState);
+        setResult(RESULT_OK, intent);
+        super.onBackPressed();
+    }
 
-   private void updateCommunicationDisplay() {
-      connectionAddressTV.setText(communicationParams.getAddress());
-      connectionTypeTV.setText(communicationParams.getCommunicationType().name());
-      deviceNameTV.setText(communicationParams.getName());
-   }
+    private void updateCommunicationDisplay() {
+        connectionAddressTV.setText(communicationParams.getAddress());
+        connectionTypeTV.setText(communicationParams.getCommunicationType().name());
+        deviceNameTV.setText(communicationParams.getName());
+    }
 
-   private class MyCommunicationManagerListener implements CommunicationManagerListener {
+    private class MyCommunicationManagerListener implements CommunicationManagerListener {
 
-      @Override
-      public void onDataRecieved() {}
+        @Override
+        public void onDataRecieved() {
+        }
 
-      @Override
-      public void onDataSent() {}
+        @Override
+        public void onDataSent() {
+        }
 
-      @Override
-      public void onConnecting() {}
+        @Override
+        public void onConnecting() {
+        }
 
-      @Override
-      public void onConnected() {
-         updateCommunicationDisplay();
-         connectionStatusTV.setText(getString(R.string.connected));
-      }
-
-      @Override
-      public void onDisconnected() {
-         PettPlantService pettPlantService = PettPlantService.getInstance();
-         if (pettPlantService != null && pettPlantService.isReConnectingToBtDevice(communicationParams.getAddress())) {
-            connectionStatusTV.setText(getString(R.string.attempting_to_reconnect));
-         } else {
+        @Override
+        public void onConnected() {
             updateCommunicationDisplay();
-            connectionStatusTV.setText(getString(R.string.disconnected));
-         }
-      }
+            connectionStatusTV.setText(getString(R.string.connected));
+        }
 
-      @Override
-      public void onError(CommunicationErrorType type) {
-         if (MyDebug.LOG) {
-            Log.d(TAG, "Connection Manager - Error");
-         }
-      }
-   }
-
-   private BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
-      @Override
-      public void onReceive(Context context, Intent intent) {
-         String message = intent.getStringExtra(PettPlantService.EXTRA_EVENT_MESSAGE);
-         if (MyDebug.LOG) {
-            Log.d(TAG, "------- PettPlantService receiver got message: " + message);
-         }
-
-         if (message.equals(PettPlantService.SERVICE_CREATED)) {
+        @Override
+        public void onDisconnected() {
             PettPlantService pettPlantService = PettPlantService.getInstance();
-            if (pettPlantService != null) {
-               pettPlantService.addCommStatusListener(myCommunicationManagerListener);
-               pettPlantService.addPlantStateListener(myPlantStateListener);
+            if (pettPlantService != null && pettPlantService.isReConnectingToBtDevice(communicationParams.getAddress())) {
+                connectionStatusTV.setText(getString(R.string.attempting_to_reconnect));
+            } else {
+                updateCommunicationDisplay();
+                connectionStatusTV.setText(getString(R.string.disconnected));
+            }
+        }
 
-               String currentTime = Time.getCurrentTime();
-               if (MyDebug.LOG) {
-                  Log.d(TAG, "------------ BroadcastReceiver$SERVICE_CREATED ------------" + currentTime);
-               }
-               registerBluetoothRcvr();
+        @Override
+        public void onError(CommunicationErrorType type) {
+            if (MyDebug.LOG) {
+                Log.d(TAG, "Connection Manager - Error");
+            }
+        }
+    }
+
+    private BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra(PettPlantService.EXTRA_EVENT_MESSAGE);
+            if (MyDebug.LOG) {
+                Log.d(TAG, "------- PettPlantService receiver got message: " + message);
             }
 
-         } else if (message.equals(PettPlantService.SERVICE_DESTROYED)) {
-            // Save the new comm params
-            boolean success = communicationParams.saveData();
-            final Intent startIntent = PettPlantService.createIntent(activityContext);
-            startService(startIntent);
-         }
-      }
-   };
+            if (message.equals(PettPlantService.SERVICE_CREATED)) {
+                PettPlantService pettPlantService = PettPlantService.getInstance();
+                if (pettPlantService != null) {
+                    pettPlantService.addCommStatusListener(myCommunicationManagerListener);
+                    pettPlantService.addPlantStateListener(myPlantStateListener);
 
-   private class BluetoothScanClickListener implements View.OnClickListener {
-      public void onClick(View v) {
+                    String currentTime = Time.getCurrentTime();
+                    if (MyDebug.LOG) {
+                        Log.d(TAG, "------------ BroadcastReceiver$SERVICE_CREATED ------------" + currentTime);
+                    }
+                    registerBluetoothRcvr();
+                }
 
-         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-         if (bluetoothAdapter == null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(activityContext);
-            builder.setTitle(R.string.no_bluetooth_support_title);
-            builder.setMessage(R.string.no_bluetooth_support_message);
-            builder.setCancelable(false);
-            builder.setPositiveButton(R.string.ok, null);
-            builder.show();
-            return;
-         } else {
-            if (!bluetoothAdapter.isEnabled()) {
-               AlertDialog.Builder builder = new AlertDialog.Builder(activityContext);
-               builder.setTitle(R.string.enable_bluetooth_title);
-               builder.setMessage(R.string.enable_bluetooth_message);
-               builder.setCancelable(false);
-               builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                  public void onClick(DialogInterface dialog, int which) {
-                     startActivity(new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS));
-                  }
-               });
-               builder.show();
-               return;
+            } else if (message.equals(PettPlantService.SERVICE_DESTROYED)) {
+                // Save the new comm params
+                boolean success = communicationParams.saveData();
+                final Intent startIntent = PettPlantService.createIntent(activityContext);
+                startService(startIntent);
             }
-         }
+        }
+    };
 
-         BluetoothScanFragment dialog = new BluetoothScanFragment();
-         dialog.setContext(activityContext);
-         dialog.setOnBluetoothDeviceSelectedListener(new OnBluetoothDeviceSelectedListener() {
-            @Override
-            public void onBluetoothDeviceSelectedListener(BluetoothDevice device) {
+    private class BluetoothScanClickListener implements View.OnClickListener {
+        public void onClick(View v) {
 
-               // Check to see if we are trying to reconnect to a BT device
-               PettPlantService pettPlantService = PettPlantService.getInstance();
-               if (pettPlantService != null && pettPlantService.isReConnectingToBtDevice(device.getAddress())) {
-                  // Display toast letting user know we are trying to reconnect to this device
-                  Toast.makeText(activityContext, getString(R.string.reconnecting_to_device), Toast.LENGTH_LONG).show();
-
-               } else if (!device.getAddress().equals(communicationParams.getAddress())) {
-                  // Only do this if the item selected is not the current device
-                  String currentTime = Time.getCurrentTime();
-                  if (MyDebug.LOG) {
-                     Log.d(TAG, "------------ onBluetoothDeviceSelectedListener ------------" + currentTime);
-                  }
-                   unregisterBluetoothRcvr();
-
-                  final Intent intent = PettPlantService.createIntent(activityContext);
-                  stopService(intent);
-                  if (MyDebug.LOG) {
-                     Log.i(TAG, "------------ stopService ------------");
-                  }
-
-                  communicationParams.setCommunicationType(CommunicationType.BLUETOOTH);
-                  communicationParams.setName(device.getName());
-                  communicationParams.setAddress(device.getAddress());
-               }
-
+            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (bluetoothAdapter == null) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(activityContext);
+                builder.setTitle(R.string.no_bluetooth_support_title);
+                builder.setMessage(R.string.no_bluetooth_support_message);
+                builder.setCancelable(false);
+                builder.setPositiveButton(R.string.ok, null);
+                builder.show();
+                return;
+            } else {
+                if (!bluetoothAdapter.isEnabled()) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(activityContext);
+                    builder.setTitle(R.string.enable_bluetooth_title);
+                    builder.setMessage(R.string.enable_bluetooth_message);
+                    builder.setCancelable(false);
+                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            startActivity(new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS));
+                        }
+                    });
+                    builder.show();
+                    return;
+                }
             }
-         });
-         dialog.show(getSupportFragmentManager().beginTransaction(), "dialog");
-      }
-   }
 
-   private class MyPlantStateListener implements PettPlantService.PlantStateListener {
+            BluetoothScanFragment dialog = new BluetoothScanFragment();
+            dialog.setContext(activityContext);
+            dialog.setOnBluetoothDeviceSelectedListener(new OnBluetoothDeviceSelectedListener() {
+                @Override
+                public void onBluetoothDeviceSelectedListener(BluetoothDevice device) {
 
-      private SettingsActivity outerClass;
+                    // Check to see if we are trying to reconnect to a BT device
+                    PettPlantService pettPlantService = PettPlantService.getInstance();
+                    if (pettPlantService != null && pettPlantService.isReConnectingToBtDevice(device.getAddress())) {
+                        // Display toast letting user know we are trying to reconnect to this device
+                        Toast.makeText(activityContext, getString(R.string.reconnecting_to_device), Toast.LENGTH_LONG).show();
 
-      MyPlantStateListener(SettingsActivity oClass) {
-         outerClass = oClass;
-      }
+                    } else if (!device.getAddress().equals(communicationParams.getAddress())) {
+                        // Only do this if the item selected is not the current device
+                        String currentTime = Time.getCurrentTime();
+                        if (MyDebug.LOG) {
+                            Log.d(TAG, "------------ onBluetoothDeviceSelectedListener ------------" + currentTime);
+                        }
+                        unregisterBluetoothRcvr();
 
-      @Override
-      public void onPlantState(PlantState plantState) {
-         outerClass.plantState = plantState;
-      }
+                        final Intent intent = PettPlantService.createIntent(activityContext);
+                        stopService(intent);
+                        if (MyDebug.LOG) {
+                            Log.i(TAG, "------------ stopService ------------");
+                        }
 
-      @Override
-      public void onError(String reason) {
-         Toast.makeText(activityContext, reason, Toast.LENGTH_LONG).show();
-         if (MyDebug.LOG) {
-            Log.d(TAG, "processor state failed. " + reason);
-         }
-      }
-   }
+                        communicationParams.setCommunicationType(CommunicationType.BLUETOOTH);
+                        communicationParams.setName(device.getName());
+                        communicationParams.setAddress(device.getAddress());
+                    }
+
+                }
+            });
+            dialog.show(getSupportFragmentManager().beginTransaction(), "dialog");
+        }
+    }
+
+    private class MyPlantStateListener implements PettPlantService.PlantStateListener {
+
+        private SettingsActivity outerClass;
+
+        MyPlantStateListener(SettingsActivity oClass) {
+            outerClass = oClass;
+        }
+
+        @Override
+        public void onPlantState(PlantState plantState) {
+            outerClass.plantState = plantState;
+        }
+
+        @Override
+        public void onError(String reason) {
+            Toast.makeText(activityContext, reason, Toast.LENGTH_LONG).show();
+            if (MyDebug.LOG) {
+                Log.d(TAG, "processor state failed. " + reason);
+            }
+        }
+    }
 }

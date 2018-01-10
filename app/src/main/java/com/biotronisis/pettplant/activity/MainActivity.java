@@ -24,249 +24,252 @@ import com.biotronisis.pettplant.plant.processor.PlantState;
 
 public class MainActivity extends AbstractBaseActivity {
 
-   private static String TAG = "MainActivity";
+    private static String TAG = "MainActivity";
 
-   private boolean illBeBack = false;
+    private boolean illBeBack = false;
 
-   private MyCommunicationManagerListener myCommunicationManagerListener =
-         new MyCommunicationManagerListener();
+    private MyCommunicationManagerListener myCommunicationManagerListener =
+          new MyCommunicationManagerListener();
 
-   @Override
-   public String getActivityName() {
-      return TAG;
-   }
+    @Override
+    public String getActivityName() {
+        return TAG;
+    }
 
-   @Override
-   public String getHelpKey() {
-      return "main";
-   }
+    @Override
+    public String getHelpKey() {
+        return "main";
+    }
 
-   @Override
-   protected void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      setContentView(R.layout.activity_main);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-      // Create a new Error Handler object in case the application was stopped
-      // but not destroyed, in which case, MyApplication.onCreate will not be executed.
-      ErrorHandler.getInstance(getApplicationContext());
+        // Create a new Error Handler object in case the application was stopped
+        // but not destroyed, in which case, MyApplication.onCreate will not be executed.
+        ErrorHandler.getInstance(getApplicationContext());
 
-      if (MyDebug.LOG) {
-         Log.d(TAG, "---------- onCreate ----------");
-      }
+        if (MyDebug.LOG) {
+            Log.d(TAG, "---------- onCreate ----------");
+        }
 
-      if (savedInstanceState == null) {
-         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-         PettPlantFragment fragment = new PettPlantFragment();
-         transaction.replace(R.id.pett_plant_fragment, fragment);
-         transaction.commit();
-      }
+        if (savedInstanceState == null) {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            PettPlantFragment fragment = new PettPlantFragment();
+            transaction.replace(R.id.pett_plant_fragment, fragment);
+            transaction.commit();
+        }
 
-   }
+    }
 
-   @Override
-   public void onResume() {
-      super.onResume();
+    @Override
+    public void onResume() {
+        super.onResume();
 
-      if (MyDebug.LOG) {
-         Log.d(TAG, "---------- onResume ---------- ");
-      }
-      illBeBack = false;
+        if (MyDebug.LOG) {
+            Log.d(TAG, "---------- onResume ---------- ");
+        }
+        illBeBack = false;
 
-      // During a configuration change (i.e. device rotation), the service is not stopped,
-      // so check if the service is running before starting it.
-      PettPlantService pettPlantService = PettPlantService.getInstance();
-      if (pettPlantService == null) {
+        // During a configuration change (i.e. device rotation), the service is not stopped,
+        // so check if the service is running before starting it.
+        PettPlantService pettPlantService = PettPlantService.getInstance();
+        if (pettPlantService == null) {
 
-         Intent intent = PettPlantService.createIntent(this);
-         startService(intent);
+            Intent intent = PettPlantService.createIntent(this);
+            startService(intent);
 
-         if (MyDebug.LOG) {
-            Log.d(TAG, "---------- Started PettPlantService ---------- ");
-         }
+            if (MyDebug.LOG) {
+                Log.d(TAG, "---------- Started PettPlantService ---------- ");
+            }
 
-      } else {
-         updateActionBar();
-         pettPlantService.addCommStatusListener(myCommunicationManagerListener);
-      }
+        } else {
+            updateActionBar();
+            pettPlantService.addCommStatusListener(myCommunicationManagerListener);
+        }
 
-      LocalBroadcastManager.getInstance(this).
-            registerReceiver(pettPlantServiceEventReceiver,
-                  new IntentFilter(PettPlantService.SERVICE_EVENT));
-   }
+        LocalBroadcastManager.getInstance(this).
+              registerReceiver(pettPlantServiceEventReceiver,
+                    new IntentFilter(PettPlantService.SERVICE_EVENT));
+    }
 
-   @Override
-   public void onPause() {
-      if (MyDebug.LOG) {
-         Log.d(TAG, "---------- onPause ---------- ");
-      }
-      super.onPause();
-      PettPlantService pettPlantService = PettPlantService.getInstance();
-      if (pettPlantService != null) {
-         pettPlantService.removeCommStatusListener(myCommunicationManagerListener);
-      }
+    @Override
+    public void onPause() {
+        if (MyDebug.LOG) {
+            Log.d(TAG, "---------- onPause ---------- ");
+        }
+        super.onPause();
+        PettPlantService pettPlantService = PettPlantService.getInstance();
+        if (pettPlantService != null) {
+            pettPlantService.removeCommStatusListener(myCommunicationManagerListener);
+        }
 
-      LocalBroadcastManager.getInstance(this).unregisterReceiver(pettPlantServiceEventReceiver);
-   }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(pettPlantServiceEventReceiver);
+    }
 
-   @Override
-   public boolean onCreateOptionsMenu(Menu menu) {
-      // Inflate the menu; this adds items to the action bar.
-      getMenuInflater().inflate(R.menu.menu_main, menu);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
 //      super.onCreateOptionsMenu(menu);
 
-      return true;
-   }
+        return true;
+    }
 
-   @Override
-   public boolean onOptionsItemSelected(MenuItem item) {
-      // Handle options menu item clicks here. The action bar will automatically handle clicks
-      // on the Home/Up button, so long as you specify a parent activity in AndroidManifest.xml.
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle options menu item clicks here. The action bar will automatically handle clicks
+        // on the Home/Up button, so long as you specify a parent activity in AndroidManifest.xml.
 
-      switch (item.getItemId()) {
-         case R.id.action_settings: {
-            // Launch the SettingsActivity
-            illBeBack = true;
+        switch (item.getItemId()) {
+            case R.id.action_settings: {
+                // Launch the SettingsActivity
+                illBeBack = true;
 
-            // If its null on return, we know we didn't get any new plantState in Settings
-            PlantState plantState = null;
-            Intent intent = SettingsActivity.createIntent(this, plantState);
-            startActivityForResult(intent, REQUEST_STATE);
-            return true;
-         }
-         case R.id.action_help: {
-            illBeBack = true;
-            Intent intent = HelpActivity.createIntent(this, getActivityName(), fragmentName);
-            startActivity(intent);
-            return true;
-         }
-         case R.id.action_about: {
-            illBeBack = true;
-            Intent intent = AboutActivity.createIntent(this);
-            startActivity(intent);
-            return true;
-         }
-      }
-
-      return super.onOptionsItemSelected(item);
-   }
-
-   @Override
-   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-      if (requestCode == REQUEST_STATE) {
-         if (resultCode == RESULT_OK) {
-            PlantState plantState = (PlantState) data.getSerializableExtra(EXTRA_PLANT_STATE);
-
-            PettPlantFragment pettPlantFragment = (PettPlantFragment) getSupportFragmentManager().
-                  findFragmentById(R.id.pett_plant_fragment);
-            if (plantState != null) {
-               pettPlantFragment.updateState(plantState);
+                // If its null on return, we know we didn't get any new plantState in Settings
+                PlantState plantState = null;
+                Intent intent = SettingsActivity.createIntent(this, plantState);
+                startActivityForResult(intent, REQUEST_STATE);
+                return true;
             }
-         }
-      }
-   }
+            case R.id.action_help: {
+                illBeBack = true;
+                Intent intent = HelpActivity.createIntent(this, getActivityName(), fragmentName);
+                startActivity(intent);
+                return true;
+            }
+            case R.id.action_about: {
+                illBeBack = true;
+                Intent intent = AboutActivity.createIntent(this);
+                startActivity(intent);
+                return true;
+            }
+        }
 
-   @Override
-   public void onStop() {
-      super.onStop();
+        return super.onOptionsItemSelected(item);
+    }
 
-      // Don't stop the service if we are only rotating the device
-      if (!isChangingConfigurations() && !illBeBack) {
-         Intent intent = PettPlantService.createIntent(this);
-         stopService(intent);
-      }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_STATE) {
+            if (resultCode == RESULT_OK) {
+                PlantState plantState = (PlantState) data.getSerializableExtra(EXTRA_PLANT_STATE);
 
-   }
+                PettPlantFragment pettPlantFragment = (PettPlantFragment) getSupportFragmentManager().
+                      findFragmentById(R.id.pett_plant_fragment);
+                if (plantState != null) {
+                    pettPlantFragment.updateState(plantState);
+                }
+            }
+        }
+    }
 
-   /**
-    * Creates an Intent for this Activity.
-    *
-    * @param callee the calling activity
-    * @return Intent
-    */
-   public static Intent createIntent(Context callee) {
-      if (MyDebug.LOG) {
-         Log.d("MainActivity", "creating main activity intent");
-      }
-      return new Intent(callee, MainActivity.class);
-   }
+    @Override
+    public void onStop() {
+        super.onStop();
 
-   private class MyCommunicationManagerListener implements CommunicationManager.CommunicationManagerListener {
+        // Don't stop the service if we are only rotating the device
+        if (!isChangingConfigurations() && !illBeBack) {
+            Intent intent = PettPlantService.createIntent(this);
+            stopService(intent);
+        }
 
-      @Override
-      public void onDataRecieved() {}
+    }
 
-      @Override
-      public void onDataSent() {}
+    /**
+     * Creates an Intent for this Activity.
+     *
+     * @param callee the calling activity
+     * @return Intent
+     */
+    public static Intent createIntent(Context callee) {
+        if (MyDebug.LOG) {
+            Log.d("MainActivity", "creating main activity intent");
+        }
+        return new Intent(callee, MainActivity.class);
+    }
 
-      @Override
-      public void onConnecting() {}
+    private class MyCommunicationManagerListener implements CommunicationManager.CommunicationManagerListener {
 
-      @Override
-      public void onConnected() {
-         updateActionBar();
-      }
+        @Override
+        public void onDataRecieved() {
+        }
 
-      @Override
-      public void onDisconnected() {
-         updateActionBar();
-      }
+        @Override
+        public void onDataSent() {
+        }
 
-      @Override
-      public void onError(CommunicationErrorType type) {
-         if (MyDebug.LOG) {
-            Log.d(TAG, "Connection Manager - Error");
-         }
-      }
-   }
+        @Override
+        public void onConnecting() {
+        }
 
-   /**
-    * Updates the status (sub title) on the action bar.
-    */
-   private void updateActionBar() {
+        @Override
+        public void onConnected() {
+            updateActionBar();
+        }
 
-      CommunicationParams communicationParams = new CommunicationParams(this);
+        @Override
+        public void onDisconnected() {
+            updateActionBar();
+        }
 
-      final ActionBar actionBar = getSupportActionBar();
-      if (actionBar == null) {
-         return;
-      }
+        @Override
+        public void onError(CommunicationErrorType type) {
+            if (MyDebug.LOG) {
+                Log.d(TAG, "Connection Manager - Error");
+            }
+        }
+    }
 
-      PettPlantService pettPlantService = PettPlantService.getInstance();
-      if (pettPlantService != null) {
-         String message;
-         if (pettPlantService.isConnected()) {
-            message = getString(R.string.title_connected_to, communicationParams.getName());
-         } else {
-            message = getString(R.string.title_not_connected);
-         }
-         actionBar.setSubtitle(message);
-      }
+    /**
+     * Updates the status (sub title) on the action bar.
+     */
+    private void updateActionBar() {
 
-   }
+        CommunicationParams communicationParams = new CommunicationParams(this);
 
-   private BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
-      @Override
-      public void onReceive(Context context, Intent intent) {
-         String message = intent.getStringExtra(PettPlantService.EXTRA_EVENT_MESSAGE);
-         if (MyDebug.LOG) {
-            Log.d("Service receiver", "Got message: " + message);
-         }
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null) {
+            return;
+        }
 
-         if (message.equals(PettPlantService.SERVICE_CREATED)) {
-            PettPlantService pettPlantService = PettPlantService.getInstance();
-            if (pettPlantService != null) {
-               pettPlantService.addCommStatusListener(myCommunicationManagerListener);
-               updateActionBar();
-               if (MyDebug.LOG) {
-                  Log.d(TAG, "PettPlantServiceBroadcastReceiver$onReceive() - Got service.");
-               }
+        PettPlantService pettPlantService = PettPlantService.getInstance();
+        if (pettPlantService != null) {
+            String message;
+            if (pettPlantService.isConnected()) {
+                message = getString(R.string.title_connected_to, communicationParams.getName());
             } else {
-               if (MyDebug.LOG) {
-                  Log.d(TAG, "PettPlantServiceBroadcastReceiver$onReceive() - service is null.");
-               }
+                message = getString(R.string.title_not_connected);
             }
-         }
-      }
-   };
+            actionBar.setSubtitle(message);
+        }
+
+    }
+
+    private BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra(PettPlantService.EXTRA_EVENT_MESSAGE);
+            if (MyDebug.LOG) {
+                Log.d("Service receiver", "Got message: " + message);
+            }
+
+            if (message.equals(PettPlantService.SERVICE_CREATED)) {
+                PettPlantService pettPlantService = PettPlantService.getInstance();
+                if (pettPlantService != null) {
+                    pettPlantService.addCommStatusListener(myCommunicationManagerListener);
+                    updateActionBar();
+                    if (MyDebug.LOG) {
+                        Log.d(TAG, "PettPlantServiceBroadcastReceiver$onReceive() - Got service.");
+                    }
+                } else {
+                    if (MyDebug.LOG) {
+                        Log.d(TAG, "PettPlantServiceBroadcastReceiver$onReceive() - service is null.");
+                    }
+                }
+            }
+        }
+    };
 
 }

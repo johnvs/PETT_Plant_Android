@@ -61,238 +61,238 @@ import java.util.logging.Level;
  */
 public class PettPlantFragment extends AbstractBaseFragment {
 
-   private static final String TAG = "PettPlantFragment";
+    private static final String TAG = "PettPlantFragment";
 
-   // Entrainment Layout Views
-   private Spinner entrainmentSpinner;
-   private CheckBox loopCheckbox;
-   private Button entrainRunStopButton;
+    // Entrainment Layout Views
+    private Spinner entrainmentSpinner;
+    private CheckBox loopCheckbox;
+    private Button entrainRunStopButton;
 
-   // Color Mode Layout Views
-   private Spinner colorModeSpinner;
-   private Button colorRunOffButton;
-   private Button colorPauseResumeButton;
-   private SeekBar colorModeSeekbar;
-   private TextView colorModeSpeedTV;
+    // Color Mode Layout Views
+    private Spinner colorModeSpinner;
+    private Button colorRunOffButton;
+    private Button colorPauseResumeButton;
+    private SeekBar colorModeSeekbar;
+    private TextView colorModeSpeedTV;
 
-   private PettPlantParams pettPlantParams;
-   private PlantState plantState;
+    private PettPlantParams pettPlantParams;
+    private PlantState plantState;
 
-   private int lastEntrainmentPos;
-   private int lastColorModePos;
-   private int lastColorModeSpeed;
+    private int lastEntrainmentPos;
+    private int lastColorModePos;
+    private int lastColorModeSpeed;
 
-   static final String STATE_ENTRAINMENT_MODE = "entrainmentMode";
-   static final String STATE_COLOR_MODE = "colorMode";
-   static final String STATE_COLOR_MODE_SPEED = "colorModeSpeed";
+    static final String STATE_ENTRAINMENT_MODE = "entrainmentMode";
+    static final String STATE_COLOR_MODE = "colorMode";
+    static final String STATE_COLOR_MODE_SPEED = "colorModeSpeed";
 
-   private MyPlantStateListener myPlantStateListener = new MyPlantStateListener();
+    private MyPlantStateListener myPlantStateListener = new MyPlantStateListener();
 
-   @Override
-   public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
-      // Save the fragment state
-      savedInstanceState.putInt(STATE_ENTRAINMENT_MODE, lastEntrainmentPos);
-      savedInstanceState.putInt(STATE_COLOR_MODE, lastColorModePos);
-      savedInstanceState.putInt(STATE_COLOR_MODE_SPEED, lastColorModeSpeed);
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+        // Save the fragment state
+        savedInstanceState.putInt(STATE_ENTRAINMENT_MODE, lastEntrainmentPos);
+        savedInstanceState.putInt(STATE_COLOR_MODE, lastColorModePos);
+        savedInstanceState.putInt(STATE_COLOR_MODE_SPEED, lastColorModeSpeed);
 
-      // Always call the superclass so it can save the view hierarchy state
-      super.onSaveInstanceState(savedInstanceState);
-   }
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
 
-   @Override
-   public void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-   }
+    }
 
-   @Override
-   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                            @Nullable Bundle savedInstanceState) {
-      return inflater.inflate(R.layout.fragment_pett_plant, container, false);
-   }
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_pett_plant, container, false);
+    }
 
-   @Override
-   public void setupView(View view, Bundle savedInstanceState) {
+    @Override
+    public void setupView(View view, Bundle savedInstanceState) {
 
-      setupEntrainmentControls(view);
-      setupColorControls(view);
-   }
+        setupEntrainmentControls(view);
+        setupColorControls(view);
+    }
 
-   public void setupEntrainmentControls(View view) {
-      // Setup the Entrainment controls
-      entrainmentSpinner = view.findViewById(R.id.spinner_entrainment);
-      try {
-         //noinspection ConstantConditions
-         ArrayAdapter<CharSequence> entrainmentAdapter = ArrayAdapter.createFromResource(getActivity(),
-               R.array.entrainment_array,
-               R.layout.cell_modes);
-         entrainmentSpinner.setAdapter(entrainmentAdapter);
-      } catch (Exception e) {
-         Log.e(TAG, "getActivity() returned null in PettPlantFragment#setupEntrainmentControls", e);
-      }
+    public void setupEntrainmentControls(View view) {
+        // Setup the Entrainment controls
+        entrainmentSpinner = view.findViewById(R.id.spinner_entrainment);
+        try {
+            //noinspection ConstantConditions
+            ArrayAdapter<CharSequence> entrainmentAdapter = ArrayAdapter.createFromResource(getActivity(),
+                  R.array.entrainment_array,
+                  R.layout.cell_modes);
+            entrainmentSpinner.setAdapter(entrainmentAdapter);
+        } catch (Exception e) {
+            Log.e(TAG, "getActivity() returned null in PettPlantFragment#setupEntrainmentControls", e);
+        }
 
 //    This is in onResume()
 //    entrainmentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
-      entrainRunStopButton = view.findViewById(R.id.button_run_stop);
-      entrainRunStopButton.setOnClickListener(new EntrainmentRunStopOnClick());
+        entrainRunStopButton = view.findViewById(R.id.button_run_stop);
+        entrainRunStopButton.setOnClickListener(new EntrainmentRunStopOnClick());
 
-      Button entrainPauseResumeButton = view.findViewById(R.id.button_pause_resume);
-      entrainPauseResumeButton.setVisibility(View.INVISIBLE);
+        Button entrainPauseResumeButton = view.findViewById(R.id.button_pause_resume);
+        entrainPauseResumeButton.setVisibility(View.INVISIBLE);
 //      entrainPauseResumeButton.setOnClickListener(new EntrainmentPauseResumeOnClick());
 
-      loopCheckbox = view.findViewById(R.id.checkbox_loop);
-      loopCheckbox.setOnClickListener(new EntrainmentLoopOnClickListener());
-   }
+        loopCheckbox = view.findViewById(R.id.checkbox_loop);
+        loopCheckbox.setOnClickListener(new EntrainmentLoopOnClickListener());
+    }
 
-   public void setupColorControls(View view) {
+    public void setupColorControls(View view) {
 
-      colorModeSpinner = view.findViewById(R.id.spinner_color_mode);
-      try {
-         //noinspection ConstantConditions
-         ArrayAdapter<CharSequence> colorModeAdapter = ArrayAdapter.createFromResource(getActivity(),
-               R.array.color_mode_array,
-               R.layout.cell_modes);
-         colorModeSpinner.setAdapter(colorModeAdapter);
-      } catch (Exception e) {
-         Log.e(TAG, "getActivity() returned null in PettPlantFragment#setupColorControls", e);
-      }
+        colorModeSpinner = view.findViewById(R.id.spinner_color_mode);
+        try {
+            //noinspection ConstantConditions
+            ArrayAdapter<CharSequence> colorModeAdapter = ArrayAdapter.createFromResource(getActivity(),
+                  R.array.color_mode_array,
+                  R.layout.cell_modes);
+            colorModeSpinner.setAdapter(colorModeAdapter);
+        } catch (Exception e) {
+            Log.e(TAG, "getActivity() returned null in PettPlantFragment#setupColorControls", e);
+        }
 
 //    This is in onResume()
 //    colorModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
-      colorRunOffButton = view.findViewById(R.id.button_color_on_off);
-      colorRunOffButton.setOnClickListener(new ColorModeRunOffOnClick());
+        colorRunOffButton = view.findViewById(R.id.button_color_on_off);
+        colorRunOffButton.setOnClickListener(new ColorModeRunOffOnClick());
 
-      colorPauseResumeButton = view.findViewById(R.id.button_color_pause_resume);
-      colorPauseResumeButton.setOnClickListener(new ColorModePauseResumeOnClick());
+        colorPauseResumeButton = view.findViewById(R.id.button_color_pause_resume);
+        colorPauseResumeButton.setOnClickListener(new ColorModePauseResumeOnClick());
 
-      colorModeSpeedTV = view.findViewById(R.id.value_seekbar);
+        colorModeSpeedTV = view.findViewById(R.id.value_seekbar);
 
-      colorModeSeekbar = view.findViewById(R.id.seekbar_speed);
+        colorModeSeekbar = view.findViewById(R.id.seekbar_speed);
 
 //    This is in onResume()
 //      colorModeSeekbar.setOnSeekBarChangeListener(new ColorModeOnSeekbarChange());
 
-   }
+    }
 
-   @Override
-   public void onPause() {
+    @Override
+    public void onPause() {
 
-      PettPlantService plantService = PettPlantService.getInstance();
-      if (plantService != null) {
-         plantService.removePlantStateListener(myPlantStateListener);
-      }
+        PettPlantService plantService = PettPlantService.getInstance();
+        if (plantService != null) {
+            plantService.removePlantStateListener(myPlantStateListener);
+        }
 
 //      plantService = null;
 
-      try {
-         //noinspection ConstantConditions
-         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(pettPlantServiceEventReceiver);
-      } catch (Exception e) {
-         Log.e(TAG, "getActivity() returned null in PettPlantFragment#onPause", e);
-      }
+        try {
+            //noinspection ConstantConditions
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(pettPlantServiceEventReceiver);
+        } catch (Exception e) {
+            Log.e(TAG, "getActivity() returned null in PettPlantFragment#onPause", e);
+        }
 
-      getActivity().unregisterReceiver(bluetoothReceiver);
+        getActivity().unregisterReceiver(bluetoothReceiver);
 
-      super.onPause();
-   }
+        super.onPause();
+    }
 
-   @Override
-   public void onResume() {
-      super.onResume();
+    @Override
+    public void onResume() {
+        super.onResume();
 
-      PettPlantService plantService = PettPlantService.getInstance();
-      if (plantService != null) {
-         plantService.addPlantStateListener(myPlantStateListener);
-      }
+        PettPlantService plantService = PettPlantService.getInstance();
+        if (plantService != null) {
+            plantService.addPlantStateListener(myPlantStateListener);
+        }
 
-      try {
-         //noinspection ConstantConditions
-         LocalBroadcastManager.getInstance(getActivity()).
-               registerReceiver(pettPlantServiceEventReceiver,
-                     new IntentFilter(PettPlantService.SERVICE_EVENT));
-      } catch (Exception e) {
-         Log.e(TAG, "getActivity() returned null in PettPlantFragment#onResume", e);
-      }
+        try {
+            //noinspection ConstantConditions
+            LocalBroadcastManager.getInstance(getActivity()).
+                  registerReceiver(pettPlantServiceEventReceiver,
+                        new IntentFilter(PettPlantService.SERVICE_EVENT));
+        } catch (Exception e) {
+            Log.e(TAG, "getActivity() returned null in PettPlantFragment#onResume", e);
+        }
 
-      // Register the Bluetooth BroadcastReceiver
-      IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-      getActivity().registerReceiver(bluetoothReceiver, filter); // Don't forget to unregister during onDestroy
+        // Register the Bluetooth BroadcastReceiver
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        getActivity().registerReceiver(bluetoothReceiver, filter); // Don't forget to unregister during onDestroy
 
-      AbstractBaseActivity.fragmentName = this.getClass().getSimpleName();
+        AbstractBaseActivity.fragmentName = this.getClass().getSimpleName();
 
-      // These are here (and not in setupView) because they execute as soon as they are created
-      // and their data needs to be populated first.
-      entrainmentSpinner.setOnItemSelectedListener(new EntrainmentSpinnerOnItemSelected());
-      colorModeSpinner.setOnItemSelectedListener(new ColorModeSpinnerOnItemSelected());
-      colorModeSeekbar.setOnSeekBarChangeListener(new ColorModeOnSeekbarChange());
-   }
+        // These are here (and not in setupView) because they execute as soon as they are created
+        // and their data needs to be populated first.
+        entrainmentSpinner.setOnItemSelectedListener(new EntrainmentSpinnerOnItemSelected());
+        colorModeSpinner.setOnItemSelectedListener(new ColorModeSpinnerOnItemSelected());
+        colorModeSeekbar.setOnSeekBarChangeListener(new ColorModeOnSeekbarChange());
+    }
 
 //   @Override
 //   public void onDestroy() {
 //      super.onDestroy();
 //   }
 
-   // Create a BroadcastReceiver for a bluetooth disconnection
-   private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
-      public void onReceive(Context context, Intent intent) {
-         String action = intent.getAction();
-         // When discovery finds a device
-         try {
-            //noinspection ConstantConditions
-            if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
+    // Create a BroadcastReceiver for a bluetooth disconnection
+    private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            // When discovery finds a device
+            try {
+                //noinspection ConstantConditions
+                if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
 
-               String currentTime = Time.getCurrentTime();
-               if (MyDebug.LOG) {
-                  Log.d(TAG, "------------ BTReceiver$ACTION_ACL_DISCONNECTED ------------" + currentTime);
-               }
-   //            connectionStatusTV.setText(getString(R.string.disconnected));
-               PettPlantService plantService = PettPlantService.getInstance();
-               if (plantService != null) {
-                  plantService.onConnectionLost();
-               }
+                    String currentTime = Time.getCurrentTime();
+                    if (MyDebug.LOG) {
+                        Log.d(TAG, "------------ BTReceiver$ACTION_ACL_DISCONNECTED ------------" + currentTime);
+                    }
+                    //            connectionStatusTV.setText(getString(R.string.disconnected));
+                    PettPlantService plantService = PettPlantService.getInstance();
+                    if (plantService != null) {
+                        plantService.onConnectionLost();
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "action.equals returned null in " +
+                      "PettPlantFragment#BroadcastReceiver#onReceive", e);
             }
-         } catch (Exception e) {
-            Log.e(TAG, "action.equals returned null in " +
-                  "PettPlantFragment#BroadcastReceiver#onReceive", e);
-         }
-      }
-   };
+        }
+    };
 
-   @Override
-   public void populateData() {
+    @Override
+    public void populateData() {
 
-      if (plantState == null) {
+        if (plantState == null) {
 
 //         myPlantStateListener.onPlantState(plantState);
 
 //      } else {
 
-         pettPlantParams = new PettPlantParams(getActivity());
+            pettPlantParams = new PettPlantParams(getActivity());
 
-         entrainmentSpinner.setSelection(pettPlantParams.getEntrainmentSequence().getValue());
+            entrainmentSpinner.setSelection(pettPlantParams.getEntrainmentSequence().getValue());
 
-         entrainRunStopButton.setText(pettPlantParams.getEntrainmentRunButton());
-         if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.RUN)) {
-            // Entrainment is off
-            entrainRunStopButton.setBackgroundResource(R.drawable.button_run_background);
+            entrainRunStopButton.setText(pettPlantParams.getEntrainmentRunButton());
+            if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.RUN)) {
+                // Entrainment is off
+                entrainRunStopButton.setBackgroundResource(R.drawable.button_run_background);
 
-            // Enable color mode controls when entrainment is off
-            colorModeSpinner.setEnabled(true);
-            colorRunOffButton.setEnabled(true);
-            colorPauseResumeButton.setEnabled(true);
-            colorModeSeekbar.setEnabled(true);
-         } else {
-            // Entrainment is running
-            entrainRunStopButton.setBackgroundResource(R.drawable.button_stop_off_background);
+                // Enable color mode controls when entrainment is off
+                colorModeSpinner.setEnabled(true);
+                colorRunOffButton.setEnabled(true);
+                colorPauseResumeButton.setEnabled(true);
+                colorModeSeekbar.setEnabled(true);
+            } else {
+                // Entrainment is running
+                entrainRunStopButton.setBackgroundResource(R.drawable.button_stop_off_background);
 
-            // Disable color mode controls when entrainment is running
-            colorModeSpinner.setEnabled(false);
-            colorRunOffButton.setEnabled(false);
-            colorPauseResumeButton.setEnabled(false);
-            colorModeSeekbar.setEnabled(false);
-         }
+                // Disable color mode controls when entrainment is running
+                colorModeSpinner.setEnabled(false);
+                colorRunOffButton.setEnabled(false);
+                colorPauseResumeButton.setEnabled(false);
+                colorModeSeekbar.setEnabled(false);
+            }
 
 //         if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.RUN)) {
 //            entrainPauseResumeButton.setText(Entrainment.PauseResumeButton.PAUSE);
@@ -302,230 +302,230 @@ public class PettPlantFragment extends AbstractBaseFragment {
 //            entrainPauseResumeButton.setEnabled(true);
 //         }
 
-         // Convert int to boolean
-         loopCheckbox.setChecked(pettPlantParams.getEntrainmentLoopCheckbox().getValue() != 0);
+            // Convert int to boolean
+            loopCheckbox.setChecked(pettPlantParams.getEntrainmentLoopCheckbox().getValue() != 0);
 
-         colorModeSpinner.setSelection(pettPlantParams.getColorMode().getValue());
-         updateEntrainmentButton();
+            colorModeSpinner.setSelection(pettPlantParams.getColorMode().getValue());
+            updateEntrainmentButton();
 
-         colorRunOffButton.setText(pettPlantParams.getColorModeRunButton());
+            colorRunOffButton.setText(pettPlantParams.getColorModeRunButton());
 
-         if (colorRunOffButton.getText().equals(ColorMode.RunOffButton.RUN)) {
-            // The Run/Off button is Run
-            colorRunOffButton.setBackgroundResource(R.drawable.button_run_background);
+            if (colorRunOffButton.getText().equals(ColorMode.RunOffButton.RUN)) {
+                // The Run/Off button is Run
+                colorRunOffButton.setBackgroundResource(R.drawable.button_run_background);
 
-            colorPauseResumeButton.setText(pettPlantParams.getColorModePauseButton());
-            colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
-            colorPauseResumeButton.setEnabled(false);
-         } else {
-            // The Run/Off button is Off, Color Mode is running
-            colorRunOffButton.setBackgroundResource(R.drawable.button_stop_off_background);
-
-            colorPauseResumeButton.setText(pettPlantParams.getColorModePauseButton());
-            if (colorPauseResumeButton.getText().equals(ColorMode.PauseResumeButton.PAUSE)) {
-               // Button is Pause
-               colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
+                colorPauseResumeButton.setText(pettPlantParams.getColorModePauseButton());
+                colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
+                colorPauseResumeButton.setEnabled(false);
             } else {
-               // Button is Resume
-               colorPauseResumeButton.setBackgroundResource(R.drawable.button_resume_background);
+                // The Run/Off button is Off, Color Mode is running
+                colorRunOffButton.setBackgroundResource(R.drawable.button_stop_off_background);
+
+                colorPauseResumeButton.setText(pettPlantParams.getColorModePauseButton());
+                if (colorPauseResumeButton.getText().equals(ColorMode.PauseResumeButton.PAUSE)) {
+                    // Button is Pause
+                    colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
+                } else {
+                    // Button is Resume
+                    colorPauseResumeButton.setBackgroundResource(R.drawable.button_resume_background);
+                }
+
+                // Enable the control if entrainment is off
+                if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.RUN)) {
+                    colorPauseResumeButton.setEnabled(true);
+                }
             }
 
-            // Enable the control if entrainment is off
-            if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.RUN)) {
-               colorPauseResumeButton.setEnabled(true);
-            }
-         }
+            int speed = pettPlantParams.getColorModeSpeed();
+            colorModeSeekbar.setProgress(speed);
+            Locale myLocale = Resources.getSystem().getConfiguration().locale;
+            colorModeSpeedTV.setText(String.format(myLocale, "%d", speed));
+        }
 
-         int speed = pettPlantParams.getColorModeSpeed();
-         colorModeSeekbar.setProgress(speed);
-         Locale myLocale = Resources.getSystem().getConfiguration().locale;
-         colorModeSpeedTV.setText(String.format(myLocale, "%d", speed));
-      }
+        lastEntrainmentPos = entrainmentSpinner.getSelectedItemPosition();
+        lastColorModePos = colorModeSpinner.getSelectedItemPosition();
+        lastColorModeSpeed = colorModeSeekbar.getProgress();
 
-      lastEntrainmentPos = entrainmentSpinner.getSelectedItemPosition();
-      lastColorModePos = colorModeSpinner.getSelectedItemPosition();
-      lastColorModeSpeed = colorModeSeekbar.getProgress();
+    }
 
-   }
-
-   @Override
-   public void persistData() {
-      pettPlantParams.setEntrainmentSequence(Entrainment.Sequence.getSequence(entrainmentSpinner.getSelectedItemPosition()));
-      pettPlantParams.setEntrainmentRunButton(entrainRunStopButton.getText().toString());
+    @Override
+    public void persistData() {
+        pettPlantParams.setEntrainmentSequence(Entrainment.Sequence.getSequence(entrainmentSpinner.getSelectedItemPosition()));
+        pettPlantParams.setEntrainmentRunButton(entrainRunStopButton.getText().toString());
 //      pettPlantParams.setEntrainmentPauseButton(entrainPauseResumeButton.getText().toString());
-      pettPlantParams.setEntrainmentLoopCheckbox(loopCheckbox.isChecked() ?
-                  Entrainment.LoopCheckbox.ON : Entrainment.LoopCheckbox.OFF);
+        pettPlantParams.setEntrainmentLoopCheckbox(loopCheckbox.isChecked() ?
+              Entrainment.LoopCheckbox.ON : Entrainment.LoopCheckbox.OFF);
 
-      pettPlantParams.setColorMode(ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition()));
-      pettPlantParams.setColorModeRunButton(colorRunOffButton.getText().toString());
-      pettPlantParams.setColorModePauseButton(colorPauseResumeButton.getText().toString());
-      pettPlantParams.setColorModeSpeed(colorModeSeekbar.getProgress());
+        pettPlantParams.setColorMode(ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition()));
+        pettPlantParams.setColorModeRunButton(colorRunOffButton.getText().toString());
+        pettPlantParams.setColorModePauseButton(colorPauseResumeButton.getText().toString());
+        pettPlantParams.setColorModeSpeed(colorModeSeekbar.getProgress());
 
-      pettPlantParams.saveData();
-   }
+        pettPlantParams.saveData();
+    }
 
-   public void showNoPlantConnectedAlert() {
-      AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-      builder.setTitle(R.string.no_plant_connected_title);
-      builder.setMessage(R.string.no_plant_connected_message);
-      builder.setPositiveButton(R.string.ok, null);
-      builder.show();
-   }
+    public void showNoPlantConnectedAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.no_plant_connected_title);
+        builder.setMessage(R.string.no_plant_connected_message);
+        builder.setPositiveButton(R.string.ok, null);
+        builder.show();
+    }
 
-   //
-   // ----------- Control OnClick Listeners -----------
-   //
-   private class EntrainmentSpinnerOnItemSelected implements AdapterView.OnItemSelectedListener {
+    //
+    // ----------- Control OnClick Listeners -----------
+    //
+    private class EntrainmentSpinnerOnItemSelected implements AdapterView.OnItemSelectedListener {
 
-      @Override
-      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-         // The if is needed because the listener fires when the app starts
-         if (position != lastEntrainmentPos) {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            // The if is needed because the listener fires when the app starts
+            if (position != lastEntrainmentPos) {
 
-            if (MyDebug.LOG) {
-               Toast entrainmentToast = Toast.makeText(getActivity(),
-                     parent.getItemAtPosition(position) + " selected, was " +
-                           parent.getItemAtPosition(lastEntrainmentPos),
-                     Toast.LENGTH_LONG);
-               entrainmentToast.show();
+                if (MyDebug.LOG) {
+                    Toast entrainmentToast = Toast.makeText(getActivity(),
+                          parent.getItemAtPosition(position) + " selected, was " +
+                                parent.getItemAtPosition(lastEntrainmentPos),
+                          Toast.LENGTH_LONG);
+                    entrainmentToast.show();
+                }
+
+                lastEntrainmentPos = position;
             }
+        }
 
-            lastEntrainmentPos = position;
-         }
-      }
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
 
-      @Override
-      public void onNothingSelected(AdapterView<?> parent) {
+        }
+    }
 
-      }
-   }
-
-   private void SendSpeedCommand (final int speed) {
-      PettPlantService pettPlantService = PettPlantService.getInstance();
-      if (pettPlantService != null) {
-         // Make sure we are connected to a plant before trying to send it the command
-         if (pettPlantService.isConnected()) {
-
-            // Send command
-            pettPlantService.setSpeedColorMode((byte) speed,
-                  new PettPlantService.SetSpeedColorModeCallback() {
-                     @Override
-                     public void onSuccess() {
-                        colorModeSeekbar.setProgress(speed);
-                        Locale myLocale = Resources.getSystem().getConfiguration().locale;
-                        colorModeSpeedTV.setText(String.format(myLocale, "%d", speed));
-                     }
-
-                     @Override
-                     public void onFailed(String reason) {
-                        ErrorHandler errorHandler = ErrorHandler.getInstance();
-                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                    "ColorModeOnSeekbarChange(): Can't set color mode speed- " + reason,
-                              R.string.set_speed_color_mode_failed_title,
-                              R.string.set_speed_color_mode_failed_message);
-                     }
-                  });
-         }
-      }
-   }
-
-   private class EntrainmentRunStopOnClick implements View.OnClickListener {
-
-      @Override
-      public void onClick(View v) {
-
-         PettPlantService pettPlantService = PettPlantService.getInstance();
-         if (pettPlantService != null) {
+    private void SendSpeedCommand(final int speed) {
+        PettPlantService pettPlantService = PettPlantService.getInstance();
+        if (pettPlantService != null) {
             // Make sure we are connected to a plant before trying to send it the command
             if (pettPlantService.isConnected()) {
-               // Check the current mode of the button
-               if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.RUN)) {
 
-                  // Send the Run command
-                  pettPlantService.runEntrainmentSequence(
-                        Entrainment.Sequence.getSequence(entrainmentSpinner.getSelectedItemPosition()),
-                        new PettPlantService.RunEntrainmentCallback() {
+                // Send command
+                pettPlantService.setSpeedColorMode((byte) speed,
+                      new PettPlantService.SetSpeedColorModeCallback() {
+                          @Override
+                          public void onSuccess() {
+                              colorModeSeekbar.setProgress(speed);
+                              Locale myLocale = Resources.getSystem().getConfiguration().locale;
+                              colorModeSpeedTV.setText(String.format(myLocale, "%d", speed));
+                          }
 
-                           @Override
-                           public void onSuccess() {
-
-                              if (MyDebug.LOG) {
-                                 Toast.makeText(getActivity(), getString(R.string.run_entrainment_success),
-                                       Toast.LENGTH_LONG).show();
-                              }
-
-                              // Entrainment is now running, so change the Run/Stop button to Stop
-                              entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
-                              entrainRunStopButton.setBackgroundResource(R.drawable.button_stop_off_background);
-//                              entrainPauseResumeButton.setEnabled(true);
-                              entrainmentSpinner.setEnabled(false);
-
-                              //  Limit the color mode speed for entrainment
-                              int speed = colorModeSeekbar.getProgress();
-                              if (speed > ColorMode.Speed.MAX_ENTRAINTMENT_SPEED) {
-                                 SendSpeedCommand(ColorMode.Speed.MAX_ENTRAINTMENT_SPEED);
-//                                 colorModeSpeedTV.setText(Integer.toString(speed));
-                              }
-
-                              // Disable color mode controls when entrainment is running
-                              colorModeSpinner.setEnabled(false);
-                              colorRunOffButton.setEnabled(false);
-                              colorPauseResumeButton.setEnabled(false);
-                              colorModeSeekbar.setEnabled(false);
-                           }
-
-                           @Override
-                           public void onFailed(String reason) {
+                          @Override
+                          public void onFailed(String reason) {
                               ErrorHandler errorHandler = ErrorHandler.getInstance();
                               errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                          "EntrainmentRunStopOnClick.onClick(): Can't run entrainment - " + reason,
-                                    R.string.run_entrainment_failed_title,
-                                    R.string.run_entrainment_failed_message);
-                           }
-                        });
-
-               } else if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.STOP)) {
-
-                  // Send the Stop command
-                  pettPlantService.stopEntrainmentSequence(new PettPlantService.StopEntrainmentCallback() {
-
-                     @Override
-                     public void onSuccess() {
-
-                        if (MyDebug.LOG) {
-                           Toast.makeText(getActivity(), getString(R.string.stop_entrainment_success),
-                                 Toast.LENGTH_LONG).show();
-                        }
-
-                        // Entrainment is now stopped, so change the Run/Stop button to Run
-                        entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
-                        entrainRunStopButton.setBackgroundResource(R.drawable.button_run_background);
-//                        entrainPauseResumeButton.setEnabled(false);
-                        entrainmentSpinner.setEnabled(true);
-
-                        // Enable color mode controls when entrainment is off
-                        colorModeSpinner.setEnabled(true);
-                        colorRunOffButton.setEnabled(true);
-                        colorPauseResumeButton.setEnabled(true);
-                        colorModeSeekbar.setEnabled(true);
-                     }
-
-                     @Override
-                     public void onFailed(String reason) {
-                        ErrorHandler errorHandler = ErrorHandler.getInstance();
-                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                    "EntrainmentRunStopOnClick.onClick(): Can't stop entrainment - " + reason,
-                              R.string.stop_entrainment_failed_title,
-                              R.string.stop_entrainment_failed_message);
-                     }
-                  });
-               }
-            } else {
-               showNoPlantConnectedAlert();
+                                          "ColorModeOnSeekbarChange(): Can't set color mode speed- " + reason,
+                                    R.string.set_speed_color_mode_failed_title,
+                                    R.string.set_speed_color_mode_failed_message);
+                          }
+                      });
             }
-         }
-      }
-   }
+        }
+    }
+
+    private class EntrainmentRunStopOnClick implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+
+            PettPlantService pettPlantService = PettPlantService.getInstance();
+            if (pettPlantService != null) {
+                // Make sure we are connected to a plant before trying to send it the command
+                if (pettPlantService.isConnected()) {
+                    // Check the current mode of the button
+                    if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.RUN)) {
+
+                        // Send the Run command
+                        pettPlantService.runEntrainmentSequence(
+                              Entrainment.Sequence.getSequence(entrainmentSpinner.getSelectedItemPosition()),
+                              new PettPlantService.RunEntrainmentCallback() {
+
+                                  @Override
+                                  public void onSuccess() {
+
+                                      if (MyDebug.LOG) {
+                                          Toast.makeText(getActivity(), getString(R.string.run_entrainment_success),
+                                                Toast.LENGTH_LONG).show();
+                                      }
+
+                                      // Entrainment is now running, so change the Run/Stop button to Stop
+                                      entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
+                                      entrainRunStopButton.setBackgroundResource(R.drawable.button_stop_off_background);
+//                              entrainPauseResumeButton.setEnabled(true);
+                                      entrainmentSpinner.setEnabled(false);
+
+                                      //  Limit the color mode speed for entrainment
+                                      int speed = colorModeSeekbar.getProgress();
+                                      if (speed > ColorMode.Speed.MAX_ENTRAINTMENT_SPEED) {
+                                          SendSpeedCommand(ColorMode.Speed.MAX_ENTRAINTMENT_SPEED);
+//                                 colorModeSpeedTV.setText(Integer.toString(speed));
+                                      }
+
+                                      // Disable color mode controls when entrainment is running
+                                      colorModeSpinner.setEnabled(false);
+                                      colorRunOffButton.setEnabled(false);
+                                      colorPauseResumeButton.setEnabled(false);
+                                      colorModeSeekbar.setEnabled(false);
+                                  }
+
+                                  @Override
+                                  public void onFailed(String reason) {
+                                      ErrorHandler errorHandler = ErrorHandler.getInstance();
+                                      errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                                  "EntrainmentRunStopOnClick.onClick(): Can't run entrainment - " + reason,
+                                            R.string.run_entrainment_failed_title,
+                                            R.string.run_entrainment_failed_message);
+                                  }
+                              });
+
+                    } else if (entrainRunStopButton.getText().equals(Entrainment.RunStopButton.STOP)) {
+
+                        // Send the Stop command
+                        pettPlantService.stopEntrainmentSequence(new PettPlantService.StopEntrainmentCallback() {
+
+                            @Override
+                            public void onSuccess() {
+
+                                if (MyDebug.LOG) {
+                                    Toast.makeText(getActivity(), getString(R.string.stop_entrainment_success),
+                                          Toast.LENGTH_LONG).show();
+                                }
+
+                                // Entrainment is now stopped, so change the Run/Stop button to Run
+                                entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
+                                entrainRunStopButton.setBackgroundResource(R.drawable.button_run_background);
+//                        entrainPauseResumeButton.setEnabled(false);
+                                entrainmentSpinner.setEnabled(true);
+
+                                // Enable color mode controls when entrainment is off
+                                colorModeSpinner.setEnabled(true);
+                                colorRunOffButton.setEnabled(true);
+                                colorPauseResumeButton.setEnabled(true);
+                                colorModeSeekbar.setEnabled(true);
+                            }
+
+                            @Override
+                            public void onFailed(String reason) {
+                                ErrorHandler errorHandler = ErrorHandler.getInstance();
+                                errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                            "EntrainmentRunStopOnClick.onClick(): Can't stop entrainment - " + reason,
+                                      R.string.stop_entrainment_failed_title,
+                                      R.string.stop_entrainment_failed_message);
+                            }
+                        });
+                    }
+                } else {
+                    showNoPlantConnectedAlert();
+                }
+            }
+        }
+    }
 
 /*
    private class EntrainmentPauseResumeOnClick implements View.OnClickListener {
@@ -593,121 +593,121 @@ public class PettPlantFragment extends AbstractBaseFragment {
    }
 */
 
-   private class EntrainmentLoopOnClickListener implements View.OnClickListener {
+    private class EntrainmentLoopOnClickListener implements View.OnClickListener {
 
-      @Override
-      public void onClick(View v) {
-
-         PettPlantService pettPlantService = PettPlantService.getInstance();
-         if (pettPlantService != null) {
-            // Make sure we are connected to a plant before trying to send it the command
-            if (pettPlantService.isConnected()) {
-               // Check the current state of the checkbox, which is the NEW state
-               if (loopCheckbox.isChecked()) {
-
-                  // Send the Loop On command
-                  pettPlantService.loopOnEntrainmentSequence(new PettPlantService.LoopOnEntrainmentCallback() {
-
-                     @Override
-                     public void onSuccess() {
-
-                        if (MyDebug.LOG) {
-                           Toast.makeText(getActivity(), getString(R.string.loop_on_entrainment_success),
-                                 Toast.LENGTH_LONG).show();
-                        }
-                     }
-
-                     @Override
-                     public void onFailed(String reason) {
-                        ErrorHandler errorHandler = ErrorHandler.getInstance();
-                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                    "EntrainmentLoopOnClick.onClick(): Can't loop on entrainment - " + reason,
-                                    R.string.loop_on_entrainment_failed_title,
-                                    R.string.loop_on_entrainment_failed_message);
-                     }
-                  });
-
-                  } else {
-
-                  // Send the Loop Off command
-                  pettPlantService.loopOffEntrainmentSequence(new PettPlantService.LoopOffEntrainmentCallback() {
-
-                     @Override
-                     public void onSuccess() {
-                        if (MyDebug.LOG) {
-                           Toast.makeText(getActivity(), getString(R.string.loop_off_entrainment_success),
-                                 Toast.LENGTH_LONG).show();
-                        }
-                     }
-
-                     @Override
-                     public void onFailed(String reason) {
-                        ErrorHandler errorHandler = ErrorHandler.getInstance();
-                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                    "EntrainmentLoopOnClick.onClick(): Can't loop off entrainment - " + reason,
-                              R.string.loop_off_entrainment_failed_title,
-                              R.string.loop_off_entrainment_failed_message);
-                     }
-                  });
-
-               }
-            }
-         }
-      }
-   }
-
-   private void updateEntrainmentButton() {
-
-      switch (ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition())) {
-         // Enable or disable entrainment mode based on the selected color mode
-         case RAINBOW_LOOP_ALL:
-         case RAINBOW_LOOP_WHOLE:
-         case RAINBOW_LOOP_SPECTRUM:
-         case UP_AND_DOWN:
-            entrainRunStopButton.setEnabled(true);
-            break;
-
-         case SOUND_RESPONSIVE:
-         case AROUND_THE_WORLD:
-         case RANDOM_POP:
-         case FCK_YEAH_COLORS:
-         case FIFTY_FIFTY:
-            entrainRunStopButton.setEnabled(false);
-            break;
-      }
-   }
-
-   private class ColorModeSpinnerOnItemSelected implements AdapterView.OnItemSelectedListener {
-
-      @Override
-      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-         // The if is needed because the listener fires when the app starts
-         if (position != lastColorModePos) {
-
-            if (MyDebug.LOG) {
-               Toast colorModeToast = Toast.makeText(getActivity(),
-                     parent.getItemAtPosition(position) + " selected, was " +
-                           parent.getItemAtPosition(lastColorModePos), Toast.LENGTH_LONG);
-               colorModeToast.show();
-            }
-
-            lastColorModePos = position;
+        @Override
+        public void onClick(View v) {
 
             PettPlantService pettPlantService = PettPlantService.getInstance();
             if (pettPlantService != null) {
-               // Make sure we are connected to a plant before trying to send it the command
-               if (pettPlantService.isConnected()) {
+                // Make sure we are connected to a plant before trying to send it the command
+                if (pettPlantService.isConnected()) {
+                    // Check the current state of the checkbox, which is the NEW state
+                    if (loopCheckbox.isChecked()) {
 
-                  // Send the Set Color Mode command
-                  pettPlantService.setColorMode(
-                        ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition()),
-                        new PettPlantService.SetColorModeCallback() {
+                        // Send the Loop On command
+                        pettPlantService.loopOnEntrainmentSequence(new PettPlantService.LoopOnEntrainmentCallback() {
 
-                           @Override
-                           public void onSuccess() {
+                            @Override
+                            public void onSuccess() {
+
+                                if (MyDebug.LOG) {
+                                    Toast.makeText(getActivity(), getString(R.string.loop_on_entrainment_success),
+                                          Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailed(String reason) {
+                                ErrorHandler errorHandler = ErrorHandler.getInstance();
+                                errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                            "EntrainmentLoopOnClick.onClick(): Can't loop on entrainment - " + reason,
+                                      R.string.loop_on_entrainment_failed_title,
+                                      R.string.loop_on_entrainment_failed_message);
+                            }
+                        });
+
+                    } else {
+
+                        // Send the Loop Off command
+                        pettPlantService.loopOffEntrainmentSequence(new PettPlantService.LoopOffEntrainmentCallback() {
+
+                            @Override
+                            public void onSuccess() {
+                                if (MyDebug.LOG) {
+                                    Toast.makeText(getActivity(), getString(R.string.loop_off_entrainment_success),
+                                          Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailed(String reason) {
+                                ErrorHandler errorHandler = ErrorHandler.getInstance();
+                                errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                            "EntrainmentLoopOnClick.onClick(): Can't loop off entrainment - " + reason,
+                                      R.string.loop_off_entrainment_failed_title,
+                                      R.string.loop_off_entrainment_failed_message);
+                            }
+                        });
+
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateEntrainmentButton() {
+
+        switch (ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition())) {
+            // Enable or disable entrainment mode based on the selected color mode
+            case RAINBOW_LOOP_ALL:
+            case RAINBOW_LOOP_WHOLE:
+            case RAINBOW_LOOP_SPECTRUM:
+            case UP_AND_DOWN:
+                entrainRunStopButton.setEnabled(true);
+                break;
+
+            case SOUND_RESPONSIVE:
+            case AROUND_THE_WORLD:
+            case RANDOM_POP:
+            case FCK_YEAH_COLORS:
+            case FIFTY_FIFTY:
+                entrainRunStopButton.setEnabled(false);
+                break;
+        }
+    }
+
+    private class ColorModeSpinnerOnItemSelected implements AdapterView.OnItemSelectedListener {
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            // The if is needed because the listener fires when the app starts
+            if (position != lastColorModePos) {
+
+                if (MyDebug.LOG) {
+                    Toast colorModeToast = Toast.makeText(getActivity(),
+                          parent.getItemAtPosition(position) + " selected, was " +
+                                parent.getItemAtPosition(lastColorModePos), Toast.LENGTH_LONG);
+                    colorModeToast.show();
+                }
+
+                lastColorModePos = position;
+
+                PettPlantService pettPlantService = PettPlantService.getInstance();
+                if (pettPlantService != null) {
+                    // Make sure we are connected to a plant before trying to send it the command
+                    if (pettPlantService.isConnected()) {
+
+                        // Send the Set Color Mode command
+                        pettPlantService.setColorMode(
+                              ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition()),
+                              new PettPlantService.SetColorModeCallback() {
+
+                                  @Override
+                                  public void onSuccess() {
 //                              Toast.makeText(getActivity(), getString(R.string.set_color_mode_success),
 //                                    Toast.LENGTH_LONG).show();
-                              updateEntrainmentButton();
+                                      updateEntrainmentButton();
 //                              switch (ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition())) {
 //                                 // Enable or disable entrainment mode based on the selected color mode
 //                                 case RAINBOW_LOOP_ALL:
@@ -725,333 +725,335 @@ public class PettPlantFragment extends AbstractBaseFragment {
 //                                    entrainRunStopButton.setEnabled(false);
 //                                    break;
 //                              }
-                           }
+                                  }
 
-                           @Override
-                           public void onFailed(String reason) {
-                              ErrorHandler errorHandler = ErrorHandler.getInstance();
-                              errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                          "ColorModeSpinnerOnClick.onClick(): Can't set color mode - " + reason,
-                                    R.string.set_color_mode_failed_title,
-                                    R.string.set_color_mode_failed_message);
-                           }
-                        }
-                  );
-               }
+                                  @Override
+                                  public void onFailed(String reason) {
+                                      ErrorHandler errorHandler = ErrorHandler.getInstance();
+                                      errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                                  "ColorModeSpinnerOnClick.onClick(): Can't set color mode - " + reason,
+                                            R.string.set_color_mode_failed_title,
+                                            R.string.set_color_mode_failed_message);
+                                  }
+                              }
+                        );
+                    }
+                }
             }
-         }
-      }
+        }
 
-      @Override
-      public void onNothingSelected(AdapterView<?> parent) {
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
 
-      }
-   }
+        }
+    }
 
-   private class ColorModeRunOffOnClick implements View.OnClickListener {
+    private class ColorModeRunOffOnClick implements View.OnClickListener {
 
-      @Override
-      public void onClick(View v) {
+        @Override
+        public void onClick(View v) {
 
-         PettPlantService pettPlantService = PettPlantService.getInstance();
-         if (pettPlantService != null) {
-            // Make sure we are connected to a plant before trying to send it the command
-            if (pettPlantService.isConnected()) {
-               // Check the current mode of the button
-               if (colorRunOffButton.getText().equals(ColorMode.RunOffButton.RUN)) {
+            PettPlantService pettPlantService = PettPlantService.getInstance();
+            if (pettPlantService != null) {
+                // Make sure we are connected to a plant before trying to send it the command
+                if (pettPlantService.isConnected()) {
+                    // Check the current mode of the button
+                    if (colorRunOffButton.getText().equals(ColorMode.RunOffButton.RUN)) {
 
-                  // Send the Run command
-                  pettPlantService.runColorMode(
-                        ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition()),
-                        new PettPlantService.RunColorModeCallback() {
+                        // Send the Run command
+                        pettPlantService.runColorMode(
+                              ColorMode.Mode.getMode(colorModeSpinner.getSelectedItemPosition()),
+                              new PettPlantService.RunColorModeCallback() {
 
-                           @Override
-                           public void onSuccess() {
+                                  @Override
+                                  public void onSuccess() {
 //                              Toast.makeText(getActivity(), getString(R.string.run_color_mode_success),
 //                                    Toast.LENGTH_LONG).show();
-                              // Color Mode is now running, so change the Run/Off button to Off
-                              colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
-                              colorRunOffButton.setBackgroundResource(R.drawable.button_stop_off_background);
-                              colorPauseResumeButton.setEnabled(true);
-                           }
+                                      // Color Mode is now running, so change the Run/Off button to Off
+                                      colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
+                                      colorRunOffButton.setBackgroundResource(R.drawable.button_stop_off_background);
+                                      colorPauseResumeButton.setEnabled(true);
+                                  }
 
-                           @Override
-                           public void onFailed(String reason) {
-                              ErrorHandler errorHandler = ErrorHandler.getInstance();
-                              errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                          "ColorModeRunOffOnClick.onClick(): Can't run color mode - " + reason,
-                                    R.string.run_color_mode_failed_title,
-                                    R.string.run_color_mode_failed_message);
-                           }
-                        });
+                                  @Override
+                                  public void onFailed(String reason) {
+                                      ErrorHandler errorHandler = ErrorHandler.getInstance();
+                                      errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                                  "ColorModeRunOffOnClick.onClick(): Can't run color mode - " + reason,
+                                            R.string.run_color_mode_failed_title,
+                                            R.string.run_color_mode_failed_message);
+                                  }
+                              });
 
-               } else if (colorRunOffButton.getText().equals(ColorMode.RunOffButton.OFF)) {
+                    } else if (colorRunOffButton.getText().equals(ColorMode.RunOffButton.OFF)) {
 
-                  // Send the Off command
-                  pettPlantService.offColorMode(new PettPlantService.OffColorModeCallback() {
+                        // Send the Off command
+                        pettPlantService.offColorMode(new PettPlantService.OffColorModeCallback() {
 
-                     @Override
-                     public void onSuccess() {
+                            @Override
+                            public void onSuccess() {
 //                        Toast.makeText(getActivity(), getString(R.string.off_color_mode_success),
 //                              Toast.LENGTH_LONG).show();
-                        // Color mode is now off, so change the Run/Off button to Run
-                        colorRunOffButton.setText(ColorMode.RunOffButton.RUN);
-                        colorRunOffButton.setBackgroundResource(R.drawable.button_run_background);
-                        colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
-                        colorPauseResumeButton.setEnabled(false);
-                        colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
-                     }
+                                // Color mode is now off, so change the Run/Off button to Run
+                                colorRunOffButton.setText(ColorMode.RunOffButton.RUN);
+                                colorRunOffButton.setBackgroundResource(R.drawable.button_run_background);
+                                colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
+                                colorPauseResumeButton.setEnabled(false);
+                                colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
+                            }
 
-                     @Override
-                     public void onFailed(String reason) {
-                        ErrorHandler errorHandler = ErrorHandler.getInstance();
-                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                    "ColorModeRunOffOnClick.onClick(): Can't turn off color mode - " + reason,
-                              R.string.off_color_mode_failed_title,
-                              R.string.off_color_mode_failed_message);
-                     }
-                  });
-               }
-            } else {
-               showNoPlantConnectedAlert();
+                            @Override
+                            public void onFailed(String reason) {
+                                ErrorHandler errorHandler = ErrorHandler.getInstance();
+                                errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                            "ColorModeRunOffOnClick.onClick(): Can't turn off color mode - " + reason,
+                                      R.string.off_color_mode_failed_title,
+                                      R.string.off_color_mode_failed_message);
+                            }
+                        });
+                    }
+                } else {
+                    showNoPlantConnectedAlert();
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   private class ColorModePauseResumeOnClick implements View.OnClickListener {
+    private class ColorModePauseResumeOnClick implements View.OnClickListener {
 
-      @Override
-      public void onClick(View v) {
+        @Override
+        public void onClick(View v) {
 
-         PettPlantService pettPlantService = PettPlantService.getInstance();
-         if (pettPlantService != null) {
-            // Make sure we are connected to a plant before trying to send it the command
-            if (pettPlantService.isConnected()) {
-               // Check the current mode of the button
-               if (colorPauseResumeButton.getText().equals(ColorMode.PauseResumeButton.PAUSE)) {
+            PettPlantService pettPlantService = PettPlantService.getInstance();
+            if (pettPlantService != null) {
+                // Make sure we are connected to a plant before trying to send it the command
+                if (pettPlantService.isConnected()) {
+                    // Check the current mode of the button
+                    if (colorPauseResumeButton.getText().equals(ColorMode.PauseResumeButton.PAUSE)) {
 
-                  pettPlantService.pauseColorMode(new PettPlantService.PauseColorModeCallback() {
+                        pettPlantService.pauseColorMode(new PettPlantService.PauseColorModeCallback() {
 
-                     @Override
-                     public void onSuccess() {
+                            @Override
+                            public void onSuccess() {
 //                        Toast.makeText(getActivity(), getString(R.string.pause_color_mode_success),
 //                              Toast.LENGTH_LONG).show();
-                        // Color Mode is now paused, so change the Pause/Resume button to Resume
-                        colorPauseResumeButton.setText(ColorMode.PauseResumeButton.RESUME);
-                        colorPauseResumeButton.setBackgroundResource(R.drawable.button_resume_background);
-                     }
+                                // Color Mode is now paused, so change the Pause/Resume button to Resume
+                                colorPauseResumeButton.setText(ColorMode.PauseResumeButton.RESUME);
+                                colorPauseResumeButton.setBackgroundResource(R.drawable.button_resume_background);
+                            }
 
-                     @Override
-                     public void onFailed(String reason) {
-                        ErrorHandler errorHandler = ErrorHandler.getInstance();
-                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                    "ColorModePauseResumeOnClick.onClick(): Can't pause color mode - " + reason,
-                              R.string.pause_color_mode_failed_title,
-                              R.string.pause_color_mode_failed_message);
-                     }
-                  });
+                            @Override
+                            public void onFailed(String reason) {
+                                ErrorHandler errorHandler = ErrorHandler.getInstance();
+                                errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                            "ColorModePauseResumeOnClick.onClick(): Can't pause color mode - " + reason,
+                                      R.string.pause_color_mode_failed_title,
+                                      R.string.pause_color_mode_failed_message);
+                            }
+                        });
 
-               } else if (colorPauseResumeButton.getText().equals(ColorMode.PauseResumeButton.RESUME)) {
+                    } else if (colorPauseResumeButton.getText().equals(ColorMode.PauseResumeButton.RESUME)) {
 
-                  pettPlantService.resumeColorMode(new PettPlantService.ResumeColorModeCallback() {
+                        pettPlantService.resumeColorMode(new PettPlantService.ResumeColorModeCallback() {
 
-                     @Override
-                     public void onSuccess() {
+                            @Override
+                            public void onSuccess() {
 //                        Toast.makeText(getActivity(), getString(R.string.resume_color_mode_success),
 //                              Toast.LENGTH_LONG).show();
-                        // Color Mode is now resumed, so change the Pause/Resume button to Pause
-                        colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
-                        colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
-                     }
+                                // Color Mode is now resumed, so change the Pause/Resume button to Pause
+                                colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
+                                colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
+                            }
 
-                     @Override
-                     public void onFailed(String reason) {
-                        ErrorHandler errorHandler = ErrorHandler.getInstance();
-                        errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                    "ColorModePauseResumeOnClick.onClick(): Can't resume color mode - " + reason,
-                              R.string.resume_color_mode_failed_title,
-                              R.string.resume_color_mode_failed_message);
-                     }
-                  });
-
-               }
-            }
-         }
-      }
-   }
-
-   private class ColorModeOnSeekbarChange implements SeekBar.OnSeekBarChangeListener {
-
-      @Override
-      public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-         int speed = progress;
-
-         if (speed == 0) {
-            speed = 1;
-         }
-
-         colorModeSeekbar.setProgress(speed);
-         Locale myLocale = Resources.getSystem().getConfiguration().locale;
-         colorModeSpeedTV.setText(String.format(myLocale, "%d", speed));
-
-         if (speed != lastColorModeSpeed) {
-            lastColorModeSpeed = speed;
-
-            PettPlantService pettPlantService = PettPlantService.getInstance();
-            if (pettPlantService != null) {
-               // Make sure we are connected to a plant before trying to send it the command
-               if (pettPlantService.isConnected()) {
-
-                  // Send command
-                  pettPlantService.setSpeedColorMode((byte) speed,
-                        new PettPlantService.SetSpeedColorModeCallback() {
-                           @Override
-                           public void onSuccess() {
-                           }
-
-                           @Override
-                           public void onFailed(String reason) {
-                              ErrorHandler errorHandler = ErrorHandler.getInstance();
-                              errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
-                                          "ColorModeOnSeekbarChange(): Can't set color mode speed- " + reason,
-                                    R.string.set_speed_color_mode_failed_title,
-                                    R.string.set_speed_color_mode_failed_message);
-                           }
+                            @Override
+                            public void onFailed(String reason) {
+                                ErrorHandler errorHandler = ErrorHandler.getInstance();
+                                errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                            "ColorModePauseResumeOnClick.onClick(): Can't resume color mode - " + reason,
+                                      R.string.resume_color_mode_failed_title,
+                                      R.string.resume_color_mode_failed_message);
+                            }
                         });
-               }
+
+                    }
+                }
             }
-         }
-      }
+        }
+    }
 
-      @Override
-      public void onStartTrackingTouch(SeekBar seekBar) {}
+    private class ColorModeOnSeekbarChange implements SeekBar.OnSeekBarChangeListener {
 
-      @Override
-      public void onStopTrackingTouch(SeekBar seekBar) {}
-   }
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            int speed = progress;
 
-   public void updateState(PlantState pState) {
+            if (speed == 0) {
+                speed = 1;
+            }
 
-      if (pState != null) {
+            colorModeSeekbar.setProgress(speed);
+            Locale myLocale = Resources.getSystem().getConfiguration().locale;
+            colorModeSpeedTV.setText(String.format(myLocale, "%d", speed));
 
-         this.plantState = pState;
+            if (speed != lastColorModeSpeed) {
+                lastColorModeSpeed = speed;
 
-         lastEntrainmentPos = plantState.getEntrainSequence().getValue();
-         entrainmentSpinner.setSelection(lastEntrainmentPos);
+                PettPlantService pettPlantService = PettPlantService.getInstance();
+                if (pettPlantService != null) {
+                    // Make sure we are connected to a plant before trying to send it the command
+                    if (pettPlantService.isConnected()) {
 
-         switch (plantState.getEntrainmentState()) {
-            case STOPPED:
-               entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
-               entrainmentSpinner.setEnabled(true);
+                        // Send command
+                        pettPlantService.setSpeedColorMode((byte) speed,
+                              new PettPlantService.SetSpeedColorModeCallback() {
+                                  @Override
+                                  public void onSuccess() {
+                                  }
 
-               // Enable color mode controls when entrainment is off
-               colorModeSpinner.setEnabled(true);
-               colorRunOffButton.setEnabled(true);
-               colorPauseResumeButton.setEnabled(true);
-               colorModeSeekbar.setEnabled(true);
+                                  @Override
+                                  public void onFailed(String reason) {
+                                      ErrorHandler errorHandler = ErrorHandler.getInstance();
+                                      errorHandler.logError(Level.WARNING, "PettPlantFragment$" +
+                                                  "ColorModeOnSeekbarChange(): Can't set color mode speed- " + reason,
+                                            R.string.set_speed_color_mode_failed_title,
+                                            R.string.set_speed_color_mode_failed_message);
+                                  }
+                              });
+                    }
+                }
+            }
+        }
 
-               // Make sure any future time indicator gets reset here.
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
 
-               break;
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        }
+    }
 
-            case RUNNING:
-               entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
-               entrainmentSpinner.setEnabled(false);
+    public void updateState(PlantState pState) {
 
-               // Disable color mode controls when entrainment is running
-               colorModeSpinner.setEnabled(false);
-               colorRunOffButton.setEnabled(false);
-               colorPauseResumeButton.setEnabled(false);
-               colorModeSeekbar.setEnabled(false);
+        if (pState != null) {
 
-               break;
-         }
+            this.plantState = pState;
 
-         // Convert from int to boolean
-         loopCheckbox.setChecked(plantState.getLoopCheckbox().getValue() != 0);
+            lastEntrainmentPos = plantState.getEntrainSequence().getValue();
+            entrainmentSpinner.setSelection(lastEntrainmentPos);
 
-         lastColorModePos = plantState.getColorMode().getValue();
-         colorModeSpinner.setSelection(lastColorModePos);
-         updateEntrainmentButton();
+            switch (plantState.getEntrainmentState()) {
+                case STOPPED:
+                    entrainRunStopButton.setText(Entrainment.RunStopButton.RUN);
+                    entrainmentSpinner.setEnabled(true);
 
-         switch (plantState.getColorModeState()) {
-            case OFF:
-               colorRunOffButton.setText(ColorMode.RunOffButton.RUN);
-               colorRunOffButton.setBackgroundResource(R.drawable.button_run_background);
+                    // Enable color mode controls when entrainment is off
+                    colorModeSpinner.setEnabled(true);
+                    colorRunOffButton.setEnabled(true);
+                    colorPauseResumeButton.setEnabled(true);
+                    colorModeSeekbar.setEnabled(true);
 
-               colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
-               colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
-               colorPauseResumeButton.setEnabled(false);
-               break;
+                    // Make sure any future time indicator gets reset here.
 
-            case RUNNING:
-               colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
-               colorRunOffButton.setBackgroundResource(R.drawable.button_stop_off_background);
+                    break;
 
-               colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
-               colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
+                case RUNNING:
+                    entrainRunStopButton.setText(Entrainment.RunStopButton.STOP);
+                    entrainmentSpinner.setEnabled(false);
 
-               if (plantState.getEntrainmentState() == Entrainment.State.STOPPED) {
-                  colorPauseResumeButton.setEnabled(true);
-               }
+                    // Disable color mode controls when entrainment is running
+                    colorModeSpinner.setEnabled(false);
+                    colorRunOffButton.setEnabled(false);
+                    colorPauseResumeButton.setEnabled(false);
+                    colorModeSeekbar.setEnabled(false);
 
-               break;
+                    break;
+            }
 
-            case PAUSED:
-               colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
-               colorRunOffButton.setBackgroundResource(R.drawable.button_stop_off_background);
+            // Convert from int to boolean
+            loopCheckbox.setChecked(plantState.getLoopCheckbox().getValue() != 0);
 
-               colorPauseResumeButton.setText(ColorMode.PauseResumeButton.RESUME);
-               colorPauseResumeButton.setBackgroundResource(R.drawable.button_resume_background);
-               colorPauseResumeButton.setEnabled(true);
-               break;
-         }
+            lastColorModePos = plantState.getColorMode().getValue();
+            colorModeSpinner.setSelection(lastColorModePos);
+            updateEntrainmentButton();
 
-         int speed = plantState.getColorModeSpeed();
-         colorModeSeekbar.setProgress(speed);
-         Locale myLocale = Resources.getSystem().getConfiguration().locale;
+            switch (plantState.getColorModeState()) {
+                case OFF:
+                    colorRunOffButton.setText(ColorMode.RunOffButton.RUN);
+                    colorRunOffButton.setBackgroundResource(R.drawable.button_run_background);
+
+                    colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
+                    colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
+                    colorPauseResumeButton.setEnabled(false);
+                    break;
+
+                case RUNNING:
+                    colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
+                    colorRunOffButton.setBackgroundResource(R.drawable.button_stop_off_background);
+
+                    colorPauseResumeButton.setText(ColorMode.PauseResumeButton.PAUSE);
+                    colorPauseResumeButton.setBackgroundResource(R.drawable.button_pause_background);
+
+                    if (plantState.getEntrainmentState() == Entrainment.State.STOPPED) {
+                        colorPauseResumeButton.setEnabled(true);
+                    }
+
+                    break;
+
+                case PAUSED:
+                    colorRunOffButton.setText(ColorMode.RunOffButton.OFF);
+                    colorRunOffButton.setBackgroundResource(R.drawable.button_stop_off_background);
+
+                    colorPauseResumeButton.setText(ColorMode.PauseResumeButton.RESUME);
+                    colorPauseResumeButton.setBackgroundResource(R.drawable.button_resume_background);
+                    colorPauseResumeButton.setEnabled(true);
+                    break;
+            }
+
+            int speed = plantState.getColorModeSpeed();
+            colorModeSeekbar.setProgress(speed);
+            Locale myLocale = Resources.getSystem().getConfiguration().locale;
 //         colorModeSpeedTV.setText(Integer.toString(speed));
-         colorModeSpeedTV.setText(String.format(myLocale, "%d", speed));
-      }
-   }
+            colorModeSpeedTV.setText(String.format(myLocale, "%d", speed));
+        }
+    }
 
-   private class MyPlantStateListener implements PlantStateListener {
+    private class MyPlantStateListener implements PlantStateListener {
 
-      @Override
-      public void onPlantState(PlantState pState) {
-         if (MyDebug.LOG) {
-            Log.d(TAG, "processor state changed. state=" + pState);
-         }
-
-         // All state data was validated prior to this call
-         updateState(pState);
-      }
-
-      @Override
-      public void onError(String reason) {
-         Toast.makeText(getActivity(), reason, Toast.LENGTH_LONG).show();
-         if (MyDebug.LOG) {
-            Log.d(TAG, "processor state failed. " + reason);
-         }
-      }
-   }
-
-   private BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
-      @Override
-      public void onReceive(Context context, Intent intent) {
-         String message = intent.getStringExtra(PettPlantService.EXTRA_EVENT_MESSAGE);
-         if (MyDebug.LOG) {
-            Log.d("receiver", "Got message: " + message);
-         }
-
-         if (message.equals(PettPlantService.SERVICE_CREATED)) {
-            PettPlantService pettPlantService = PettPlantService.getInstance();
-            if (pettPlantService != null) {
-               pettPlantService.addPlantStateListener(myPlantStateListener);
+        @Override
+        public void onPlantState(PlantState pState) {
+            if (MyDebug.LOG) {
+                Log.d(TAG, "processor state changed. state=" + pState);
             }
-         }
-      }
-   };
+
+            // All state data was validated prior to this call
+            updateState(pState);
+        }
+
+        @Override
+        public void onError(String reason) {
+            Toast.makeText(getActivity(), reason, Toast.LENGTH_LONG).show();
+            if (MyDebug.LOG) {
+                Log.d(TAG, "processor state failed. " + reason);
+            }
+        }
+    }
+
+    private BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra(PettPlantService.EXTRA_EVENT_MESSAGE);
+            if (MyDebug.LOG) {
+                Log.d("receiver", "Got message: " + message);
+            }
+
+            if (message.equals(PettPlantService.SERVICE_CREATED)) {
+                PettPlantService pettPlantService = PettPlantService.getInstance();
+                if (pettPlantService != null) {
+                    pettPlantService.addPlantStateListener(myPlantStateListener);
+                }
+            }
+        }
+    };
 
 }

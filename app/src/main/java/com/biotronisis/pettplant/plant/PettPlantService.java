@@ -54,62 +54,62 @@ import java.util.logging.Level;
 
 public class PettPlantService extends Service {
 
-   private static final String TAG = "PettPlantService";
+    private static final String TAG = "PettPlantService";
 
-   private static final int NOTIFICATION_ID = 0xAA00001;
+    private static final int NOTIFICATION_ID = 0xAA00001;
 
-   public static final String EXTRA_EVENT_MESSAGE = "message";
-   public static final String SERVICE_EVENT = "pett plant service event";
-   public static final String SERVICE_CREATED = "pett plant service created";
-   public static final String SERVICE_DESTROYED = "pett plant service destroyed";
+    public static final String EXTRA_EVENT_MESSAGE = "message";
+    public static final String SERVICE_EVENT = "pett plant service event";
+    public static final String SERVICE_CREATED = "pett plant service created";
+    public static final String SERVICE_DESTROYED = "pett plant service destroyed";
 
-   private static PettPlantService instance;
+    private static PettPlantService instance;
 
-   private NotificationManager notificationManager;
+    private NotificationManager notificationManager;
 
-   // Registry of listeners that want to be notified for the status of communications
-   // *access synchronized on statusListeners*
-   public final Set<CommunicationManagerListener> statusListeners = new LinkedHashSet<>();
+    // Registry of listeners that want to be notified for the status of communications
+    // *access synchronized on statusListeners*
+    public final Set<CommunicationManagerListener> statusListeners = new LinkedHashSet<>();
 
-   // registry of listeners that want to be notified for the status of communications
-   // *access synchronized on plantStateListeners*
-   public final Set<PlantStateListener> plantStateListeners = new LinkedHashSet<>();
+    // registry of listeners that want to be notified for the status of communications
+    // *access synchronized on plantStateListeners*
+    public final Set<PlantStateListener> plantStateListeners = new LinkedHashSet<>();
 
-   private CommunicationManager communicationManager;
+    private CommunicationManager communicationManager;
 
-   private Handler uiHandler;
+    private Handler uiHandler;
 
-   public static Intent createIntent(Context callee) {
-      return new Intent(callee, PettPlantService.class);
-   }
+    public static Intent createIntent(Context callee) {
+        return new Intent(callee, PettPlantService.class);
+    }
 
-   @Override
-   public void onCreate() {
-      super.onCreate();
+    @Override
+    public void onCreate() {
+        super.onCreate();
 
-      // save the ref to the singleton managed by android
-      instance = this;
+        // save the ref to the singleton managed by android
+        instance = this;
 
-      notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-      ErrorHandler errorHandler = ErrorHandler.getInstance();
-      if (errorHandler == null) {
-         if (MyDebug.LOG) {
-            Log.d(TAG, "PettPlantService.onCreate() - errorHandler is null");
-         }
-      } else {
-         errorHandler.logError(Level.INFO, "PettPlantService.onCreate().", 0, 0);
-      }
-      if (MyDebug.LOG) {
-         Log.i(TAG, "------------ onCreate ------------");
-      }
+        ErrorHandler errorHandler = ErrorHandler.getInstance();
+        if (errorHandler == null) {
+            if (MyDebug.LOG) {
+                Log.d(TAG, "PettPlantService.onCreate() - errorHandler is null");
+            }
+        } else {
+            errorHandler.logError(Level.INFO, "PettPlantService.onCreate().", 0, 0);
+        }
+        if (MyDebug.LOG) {
+            Log.i(TAG, "------------ onCreate ------------");
+        }
 
-      uiHandler = new Handler(getMainLooper());
+        uiHandler = new Handler(getMainLooper());
 
-      CommunicationParams communicationParams = new CommunicationParams(this);
+        CommunicationParams communicationParams = new CommunicationParams(this);
 
-      communicationManager = new CommunicationManager(this, communicationParams);
-      communicationManager.connect();
+        communicationManager = new CommunicationManager(this, communicationParams);
+        communicationManager.connect();
 
 //      IntentFilter usbFilter = new IntentFilter();
 //      usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
@@ -117,318 +117,318 @@ public class PettPlantService extends Service {
 //      usbFilter.setPriority(500);
 //      this.registerReceiver(mUsbReceiver, usbFilter);
 
-      Intent intent = new Intent(SERVICE_EVENT);
-      intent.putExtra(EXTRA_EVENT_MESSAGE, SERVICE_CREATED);
-      LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-   }
+        Intent intent = new Intent(SERVICE_EVENT);
+        intent.putExtra(EXTRA_EVENT_MESSAGE, SERVICE_CREATED);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
 
-   @Override
-   public void onDestroy() {
-      super.onDestroy();
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
-      if (MyDebug.LOG) {
-         Log.i(TAG, "------------ onDestroy ------------");
-      }
+        if (MyDebug.LOG) {
+            Log.i(TAG, "------------ onDestroy ------------");
+        }
 
-      if (communicationManager != null) {
-         communicationManager.disconnect();
-      }
+        if (communicationManager != null) {
+            communicationManager.disconnect();
+        }
 
-      instance = null;
-      ErrorHandler errorHandler = ErrorHandler.getInstance();
-      if (errorHandler != null) {
-         errorHandler.logError(Level.INFO, "PettPlantService.onDestroy().", 0, 0);
-      } else {
-         if (MyDebug.LOG) {
-            Log.d(TAG, "errorHandler is null.");
-         }
-      }
+        instance = null;
+        ErrorHandler errorHandler = ErrorHandler.getInstance();
+        if (errorHandler != null) {
+            errorHandler.logError(Level.INFO, "PettPlantService.onDestroy().", 0, 0);
+        } else {
+            if (MyDebug.LOG) {
+                Log.d(TAG, "errorHandler is null.");
+            }
+        }
 
-      Runnable run = new Runnable() {
-         public void run() {
-            notificationManager.cancel(NOTIFICATION_ID);
-         }
-      };
-      uiHandler.post(run);
+        Runnable run = new Runnable() {
+            public void run() {
+                notificationManager.cancel(NOTIFICATION_ID);
+            }
+        };
+        uiHandler.post(run);
 
 //      unregisterReceiver(mUsbReceiver);
 
-      // Let others know that the service is being destroyed
-      Intent intent = new Intent(SERVICE_EVENT);
-      intent.putExtra(EXTRA_EVENT_MESSAGE, SERVICE_DESTROYED);
-      LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-   }
+        // Let others know that the service is being destroyed
+        Intent intent = new Intent(SERVICE_EVENT);
+        intent.putExtra(EXTRA_EVENT_MESSAGE, SERVICE_DESTROYED);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
 
-   public static PettPlantService getInstance() {
-      return instance;
-   }
+    public static PettPlantService getInstance() {
+        return instance;
+    }
 
-   /**
-    * Adds a listener to be notified for the status of communications
-    */
-   public synchronized void addCommStatusListener(CommunicationManagerListener listener) {
-      if (MyDebug.LOG) {
-         Log.d(TAG, "Adding CommStatusListener");
-      }
-      synchronized (statusListeners) {
-         statusListeners.add(listener);
-      }
-   }
+    /**
+     * Adds a listener to be notified for the status of communications
+     */
+    public synchronized void addCommStatusListener(CommunicationManagerListener listener) {
+        if (MyDebug.LOG) {
+            Log.d(TAG, "Adding CommStatusListener");
+        }
+        synchronized (statusListeners) {
+            statusListeners.add(listener);
+        }
+    }
 
-   /**
-    * Removes a listener to be notified for the status of communications
-    */
-   public synchronized void removeCommStatusListener(CommunicationManagerListener listener) {
-      boolean result;
-      synchronized (statusListeners) {
-         result = statusListeners.remove(listener);
-      }
-      if (MyDebug.LOG) {
-         Log.d(TAG, "Removing CommStatusListener " + result);
-      }
-   }
+    /**
+     * Removes a listener to be notified for the status of communications
+     */
+    public synchronized void removeCommStatusListener(CommunicationManagerListener listener) {
+        boolean result;
+        synchronized (statusListeners) {
+            result = statusListeners.remove(listener);
+        }
+        if (MyDebug.LOG) {
+            Log.d(TAG, "Removing CommStatusListener " + result);
+        }
+    }
 
-   /**
-    * Adds a listener to be notified for the state of the plant
-    */
-   public synchronized void addPlantStateListener(PlantStateListener listener) {
-      if (MyDebug.LOG) {
-         Log.d(TAG, "Adding PlantStateListener");
-      }
-      synchronized (plantStateListeners) {
-         plantStateListeners.add(listener);
-      }
-   }
+    /**
+     * Adds a listener to be notified for the state of the plant
+     */
+    public synchronized void addPlantStateListener(PlantStateListener listener) {
+        if (MyDebug.LOG) {
+            Log.d(TAG, "Adding PlantStateListener");
+        }
+        synchronized (plantStateListeners) {
+            plantStateListeners.add(listener);
+        }
+    }
 
-   /**
-    * Removes a listener to be notified of the state of the plant
-    */
-   public synchronized void removePlantStateListener(PlantStateListener listener) {
-      boolean result;
-      synchronized (plantStateListeners) {
-         result = plantStateListeners.remove(listener);
-      }
-      if (MyDebug.LOG) {
-         Log.d(TAG, "Removing PlantStateListener " + result);
-      }
-   }
+    /**
+     * Removes a listener to be notified of the state of the plant
+     */
+    public synchronized void removePlantStateListener(PlantStateListener listener) {
+        boolean result;
+        synchronized (plantStateListeners) {
+            result = plantStateListeners.remove(listener);
+        }
+        if (MyDebug.LOG) {
+            Log.d(TAG, "Removing PlantStateListener " + result);
+        }
+    }
 
-   public boolean isReConnectingToBtDevice(String address) {
-      return communicationManager.isReConnectingToBtDevice(address);
-   }
+    public boolean isReConnectingToBtDevice(String address) {
+        return communicationManager.isReConnectingToBtDevice(address);
+    }
 
-   @Override
-   public IBinder onBind(Intent intent) {
-      return null;
-   }
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 
-   private Notification createNotification(String message, boolean ongoing) throws NullPointerException {
-      if (MyDebug.LOG) {
-         Log.d(TAG, "Create Notification with message: " + message);
-      }
-      Intent intent = MainActivity.createIntent(this);
-      intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
-      PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT);
+    private Notification createNotification(String message, boolean ongoing) throws NullPointerException {
+        if (MyDebug.LOG) {
+            Log.d(TAG, "Create Notification with message: " + message);
+        }
+        Intent intent = MainActivity.createIntent(this);
+        intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent,
+              PendingIntent.FLAG_UPDATE_CURRENT);
 
-      BitmapDrawable icon = (BitmapDrawable) ContextCompat.getDrawable(this, R.drawable.ic_launcher);
-      // depricated method getResources().getDrawable(R.drawable.ic_launcher);
+        BitmapDrawable icon = (BitmapDrawable) ContextCompat.getDrawable(this, R.drawable.ic_launcher);
+        // depricated method getResources().getDrawable(R.drawable.ic_launcher);
 
-      @SuppressWarnings("ConstantConditions")
-      Notification notification = new NotificationCompat.Builder(this)
-            .setContentTitle(getString(R.string.pett_plant))
-            .setContentText(message).setContentIntent(contentIntent)
-            .setSmallIcon(R.drawable.ic_launcher)
-            .setLargeIcon(icon.getBitmap())
-            .setOngoing(ongoing)
-            .setTicker(message)
-            .build();
+        @SuppressWarnings("ConstantConditions")
+        Notification notification = new NotificationCompat.Builder(this)
+              .setContentTitle(getString(R.string.pett_plant))
+              .setContentText(message).setContentIntent(contentIntent)
+              .setSmallIcon(R.drawable.ic_launcher)
+              .setLargeIcon(icon.getBitmap())
+              .setOngoing(ongoing)
+              .setTicker(message)
+              .build();
 
-      return notification;
-   }
+        return notification;
+    }
 
-   public boolean isConnected() {
-      ICommAdapter commAdapter = null;
+    public boolean isConnected() {
+        ICommAdapter commAdapter = null;
 
-      if (MyDebug.LOG) {
-         Log.d(TAG, "isConnected");
-      }
+        if (MyDebug.LOG) {
+            Log.d(TAG, "isConnected");
+        }
 
-      if (communicationManager != null) {
-         commAdapter = communicationManager.getCurrentCommAdapter();
-      }
+        if (communicationManager != null) {
+            commAdapter = communicationManager.getCurrentCommAdapter();
+        }
 //      if (commAdapter == null) {
 //         return false;
 //      }
 //      return commAdapter.getConnectionState() == ConnectionState.ESTABLISHED;
-      return (commAdapter != null) && (commAdapter.getConnectionState() == ConnectionState.ESTABLISHED);
-   }
+        return (commAdapter != null) && (commAdapter.getConnectionState() == ConnectionState.ESTABLISHED);
+    }
 
-   public void onCommConnecting() {
-      dispatchCommConnecting();
-   }
+    public void onCommConnecting() {
+        dispatchCommConnecting();
+    }
 
-   private void dispatchCommConnecting() {
-      Runnable run = new Runnable() {
-         public void run() {
-            String message = getString(R.string.title_connecting);
+    private void dispatchCommConnecting() {
+        Runnable run = new Runnable() {
+            public void run() {
+                String message = getString(R.string.title_connecting);
 //            notificationManager.notify(NOTIFICATION_ID, createNotification(message, true));
-            Toast.makeText(PettPlantService.this, message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(PettPlantService.this, message, Toast.LENGTH_SHORT).show();
 
-            synchronized (statusListeners) {
-               for (CommunicationManagerListener listener : statusListeners) {
-                  listener.onConnecting();
-               }
+                synchronized (statusListeners) {
+                    for (CommunicationManagerListener listener : statusListeners) {
+                        listener.onConnecting();
+                    }
+                }
             }
-         }
-      };
-      uiHandler.post(run);
-   }
+        };
+        uiHandler.post(run);
+    }
 
-   public void onCommConnected() {
-      if (MyDebug.LOG) {
-         Log.d(TAG, "onCommConnected");
-      }
-      // Send an RequestState command right after comm connect,
-      // then dispatch connected if the command was responded to
-      RequestStateCommand requestStateCommand = new RequestStateCommand();
+    public void onCommConnected() {
+        if (MyDebug.LOG) {
+            Log.d(TAG, "onCommConnected");
+        }
+        // Send an RequestState command right after comm connect,
+        // then dispatch connected if the command was responded to
+        RequestStateCommand requestStateCommand = new RequestStateCommand();
 
-      final Plant plant = new Plant();
-      requestStateCommand.setResponseCallback(new ResponseCallback<RequestStateResponse>() {
-         @Override
-         public void onResponse(RequestStateResponse response) {
-            // Validate data
-            if (Plant.isValidState(response)) {
-               plant.setState(response);
-               dispatchPlantStateChanged(plant);
-               dispatchCommConnected();
+        final Plant plant = new Plant();
+        requestStateCommand.setResponseCallback(new ResponseCallback<RequestStateResponse>() {
+            @Override
+            public void onResponse(RequestStateResponse response) {
+                // Validate data
+                if (Plant.isValidState(response)) {
+                    plant.setState(response);
+                    dispatchPlantStateChanged(plant);
+                    dispatchCommConnected();
+                }
             }
-         }
 
-         @Override
-         public void onFailed(CommunicationErrorType type) {
-            dispatchCommError(type, toUserMessage(type), RequestStateCommand.COMMAND_ID);
+            @Override
+            public void onFailed(CommunicationErrorType type) {
+                dispatchCommError(type, toUserMessage(type), RequestStateCommand.COMMAND_ID);
 
-            ErrorHandler errorHandler = ErrorHandler.getInstance();
-            errorHandler.logError(Level.WARNING, "PettPlantService.onCommConnected()$" +
-                        "ResponseCallback.onFailed(): requestStateCommand failed with the error - " + type,
-                  R.string.plant_not_responding_title,
-                  R.string.plant_not_responding_message);
-         }
-      });
-
-      communicationManager.sendCommand(requestStateCommand);
-   }
-
-   private void dispatchPlantStateChanged(final Plant plant) {
-
-      Runnable run = new Runnable() {
-         public void run() {
-            String message = getString(R.string.got_me_some_state_yo);
-            notificationManager.notify(NOTIFICATION_ID, createNotification(message, true));
-            Toast.makeText(PettPlantService.this, message, Toast.LENGTH_SHORT).show();
-
-            synchronized (plantStateListeners) {
-               for (PlantStateListener listener : plantStateListeners) {
-                  listener.onPlantState(plant.getState());
-               }
+                ErrorHandler errorHandler = ErrorHandler.getInstance();
+                errorHandler.logError(Level.WARNING, "PettPlantService.onCommConnected()$" +
+                            "ResponseCallback.onFailed(): requestStateCommand failed with the error - " + type,
+                      R.string.plant_not_responding_title,
+                      R.string.plant_not_responding_message);
             }
-         }
-      };
-      uiHandler.post(run);
-   }
+        });
 
-   private void dispatchCommConnected() {
-      final CommunicationParams communicationParams = new CommunicationParams(this);
+        communicationManager.sendCommand(requestStateCommand);
+    }
 
-      Runnable run = new Runnable() {
-         public void run() {
-            String message = getString(R.string.title_connected_to, communicationParams.getName());
-            notificationManager.notify(NOTIFICATION_ID, createNotification(message, true));
-            Toast.makeText(PettPlantService.this, message, Toast.LENGTH_SHORT).show();
+    private void dispatchPlantStateChanged(final Plant plant) {
 
-            synchronized (statusListeners) {
-               for (CommunicationManagerListener listener : statusListeners) {
-                  listener.onConnected();
-               }
+        Runnable run = new Runnable() {
+            public void run() {
+                String message = getString(R.string.got_me_some_state_yo);
+                notificationManager.notify(NOTIFICATION_ID, createNotification(message, true));
+                Toast.makeText(PettPlantService.this, message, Toast.LENGTH_SHORT).show();
+
+                synchronized (plantStateListeners) {
+                    for (PlantStateListener listener : plantStateListeners) {
+                        listener.onPlantState(plant.getState());
+                    }
+                }
             }
-         }
-      };
-      uiHandler.post(run);
-   }
+        };
+        uiHandler.post(run);
+    }
 
-   public void onCommDisconnected() {
-      dispatchCommDisconnected();
-   }
+    private void dispatchCommConnected() {
+        final CommunicationParams communicationParams = new CommunicationParams(this);
 
-   private void dispatchCommDisconnected() {
-      Runnable run = new Runnable() {
-         public void run() {
-            String message = getString(R.string.title_not_connected);
+        Runnable run = new Runnable() {
+            public void run() {
+                String message = getString(R.string.title_connected_to, communicationParams.getName());
+                notificationManager.notify(NOTIFICATION_ID, createNotification(message, true));
+                Toast.makeText(PettPlantService.this, message, Toast.LENGTH_SHORT).show();
+
+                synchronized (statusListeners) {
+                    for (CommunicationManagerListener listener : statusListeners) {
+                        listener.onConnected();
+                    }
+                }
+            }
+        };
+        uiHandler.post(run);
+    }
+
+    public void onCommDisconnected() {
+        dispatchCommDisconnected();
+    }
+
+    private void dispatchCommDisconnected() {
+        Runnable run = new Runnable() {
+            public void run() {
+                String message = getString(R.string.title_not_connected);
 //            notificationManager.notify(NOTIFICATION_ID, createNotification(message, false));
-            Toast.makeText(PettPlantService.this, message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(PettPlantService.this, message, Toast.LENGTH_SHORT).show();
 
-            synchronized (statusListeners) {
-               for (CommunicationManagerListener listener : statusListeners) {
-                  listener.onDisconnected();
-               }
+                synchronized (statusListeners) {
+                    for (CommunicationManagerListener listener : statusListeners) {
+                        listener.onDisconnected();
+                    }
+                }
             }
-         }
-      };
-      uiHandler.post(run);
-   }
+        };
+        uiHandler.post(run);
+    }
 
-   public void onConnectionLost() {
-      communicationManager.connectionLost();
-   }
+    public void onConnectionLost() {
+        communicationManager.connectionLost();
+    }
 
-   public void onCommFailed() {
-      dispatchCommFailed();
-   }
+    public void onCommFailed() {
+        dispatchCommFailed();
+    }
 
-   private void dispatchCommFailed() {
-      Runnable run = new Runnable() {
-         public void run() {
+    private void dispatchCommFailed() {
+        Runnable run = new Runnable() {
+            public void run() {
 //                String message = getString(R.string.meter_comm_failed);
 //            notificationManager.notify(NOTIFICATION_ID, createNotification(getString(
 //                  R.string.meter_disconnected), false));
-            Toast.makeText(PettPlantService.this, getString(R.string.title_comm_failed),
-                  Toast.LENGTH_SHORT).show();
-         }
-      };
-      uiHandler.post(run);
-   }
-
-   public void dispatchCommSent() {
-      Runnable run = new Runnable() {
-         public void run() {
-            synchronized (statusListeners) {
-               for (CommunicationManagerListener listener : statusListeners) {
-                  listener.onDataSent();
-               }
+                Toast.makeText(PettPlantService.this, getString(R.string.title_comm_failed),
+                      Toast.LENGTH_SHORT).show();
             }
-         }
-      };
-      uiHandler.post(run);
-   }
+        };
+        uiHandler.post(run);
+    }
 
-   public void dispatchCommReceived() {
-      Runnable run = new Runnable() {
-         public void run() {
-            synchronized (statusListeners) {
-               for (CommunicationManagerListener listener : statusListeners) {
-                  listener.onDataRecieved();
-               }
+    public void dispatchCommSent() {
+        Runnable run = new Runnable() {
+            public void run() {
+                synchronized (statusListeners) {
+                    for (CommunicationManagerListener listener : statusListeners) {
+                        listener.onDataSent();
+                    }
+                }
             }
-         }
-      };
-      uiHandler.post(run);
-   }
+        };
+        uiHandler.post(run);
+    }
 
-   public void dispatchCommError(final CommunicationErrorType type, String reason, Byte commandId) {
-      if (MyDebug.LOG) {
-         Log.e(TAG, "dispatchCommError: " + reason);
-      }
+    public void dispatchCommReceived() {
+        Runnable run = new Runnable() {
+            public void run() {
+                synchronized (statusListeners) {
+                    for (CommunicationManagerListener listener : statusListeners) {
+                        listener.onDataRecieved();
+                    }
+                }
+            }
+        };
+        uiHandler.post(run);
+    }
+
+    public void dispatchCommError(final CommunicationErrorType type, String reason, Byte commandId) {
+        if (MyDebug.LOG) {
+            Log.e(TAG, "dispatchCommError: " + reason);
+        }
 
 //      try {
 //         CommunicationParams communicationParams = communicationParamsDao.queryForDefault();
@@ -483,69 +483,69 @@ public class PettPlantService extends Service {
 //               R.string.communication_params_file_open_error_message);
 ////            stopSelf();
 //      }
-   }
+    }
 
-   private String toUserMessage(CommunicationErrorType errorType) {
+    private String toUserMessage(CommunicationErrorType errorType) {
 
-      switch (errorType) {
-         case TIMEOUT_RESPONSE:
-            return getString(R.string.plantCommandTimeout);
-         case MALFORMED_RESPONSE:
-            return getString(R.string.malformed_response);
-         case TRANSMIT_FAILED:
-            return getString(R.string.transmit_failed);
-         case UNEXPECTED_RESPONSE:
-            return getString(R.string.unexpected_response);
-         case UNKNOWN_RESPONSE:
-            return getString(R.string.unknown_response);
-         default:
-            return getString(R.string.plantCommandUnknownError);
-      }
-   }
+        switch (errorType) {
+            case TIMEOUT_RESPONSE:
+                return getString(R.string.plantCommandTimeout);
+            case MALFORMED_RESPONSE:
+                return getString(R.string.malformed_response);
+            case TRANSMIT_FAILED:
+                return getString(R.string.transmit_failed);
+            case UNEXPECTED_RESPONSE:
+                return getString(R.string.unexpected_response);
+            case UNKNOWN_RESPONSE:
+                return getString(R.string.unknown_response);
+            default:
+                return getString(R.string.plantCommandUnknownError);
+        }
+    }
 
-   //
-   // ----------- Commands -----------
-   //
-   public void runEntrainmentSequence(Entrainment.Sequence eMode, RunEntrainmentCallback callback) {
-      try {
-         RunEntrainmentCommand command = new RunEntrainmentCommand();
-         command.setEntrainmentSequence(eMode);
-         command.setResponseCallback(new RunEntrainmentResponseCallback(callback));
+    //
+    // ----------- Commands -----------
+    //
+    public void runEntrainmentSequence(Entrainment.Sequence eMode, RunEntrainmentCallback callback) {
+        try {
+            RunEntrainmentCommand command = new RunEntrainmentCommand();
+            command.setEntrainmentSequence(eMode);
+            command.setResponseCallback(new RunEntrainmentResponseCallback(callback));
 
-         // Test
-         boolean test = false;
-         if (test) {
-            throw new Exception("test");
-         }
+            // Test
+            boolean test = false;
+            if (test) {
+                throw new Exception("test");
+            }
 
-         communicationManager.sendCommand(command);
-      } catch (Exception ex) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send run entrainment sequence command", ex);
-         }
-         callback.onFailed(ex.toString());
-      }
-   }
+            communicationManager.sendCommand(command);
+        } catch (Exception ex) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "failed to send run entrainment sequence command", ex);
+            }
+            callback.onFailed(ex.toString());
+        }
+    }
 
-   public void stopEntrainmentSequence(StopEntrainmentCallback callback) {
-      try {
-         StopEntrainmentCommand command = new StopEntrainmentCommand();
-         command.setResponseCallback(new StopEntrainmentResponseCallback(callback));
+    public void stopEntrainmentSequence(StopEntrainmentCallback callback) {
+        try {
+            StopEntrainmentCommand command = new StopEntrainmentCommand();
+            command.setResponseCallback(new StopEntrainmentResponseCallback(callback));
 
-         // Test
-         boolean test = false;
-         if (test) {
-            throw new Exception("test");
-         }
+            // Test
+            boolean test = false;
+            if (test) {
+                throw new Exception("test");
+            }
 
-         communicationManager.sendCommand(command);
-      } catch (Exception ex) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send stop entrainment sequence command", ex);
-         }
-         callback.onFailed(ex.toString());
-      }
-   }
+            communicationManager.sendCommand(command);
+        } catch (Exception ex) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "failed to send stop entrainment sequence command", ex);
+            }
+            callback.onFailed(ex.toString());
+        }
+    }
 
 //   public void pauseEntrainmentSequence(PauseEntrainmentCallback callback) {
 //      try {
@@ -587,221 +587,221 @@ public class PettPlantService extends Service {
 //      }
 //   }
 
-   public void loopOnEntrainmentSequence(LoopOnEntrainmentCallback callback) {
-      try {
-         LoopOnEntrainmentCommand command = new LoopOnEntrainmentCommand();
-         command.setResponseCallback(new LoopOnEntrainmentResponseCallback(callback));
+    public void loopOnEntrainmentSequence(LoopOnEntrainmentCallback callback) {
+        try {
+            LoopOnEntrainmentCommand command = new LoopOnEntrainmentCommand();
+            command.setResponseCallback(new LoopOnEntrainmentResponseCallback(callback));
 
-         // Test
-         boolean test = false;
-         if (test) {
-            throw new Exception("test");
-         }
-
-         communicationManager.sendCommand(command);
-      } catch (Exception ex) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send loop on entrainment command", ex);
-         }
-         callback.onFailed(ex.toString());
-      }
-   }
-
-   public void loopOffEntrainmentSequence(LoopOffEntrainmentCallback callback) {
-      try {
-         LoopOffEntrainmentCommand command = new LoopOffEntrainmentCommand();
-         command.setResponseCallback(new LoopOffEntrainmentResponseCallback(callback));
-
-         // Test
-         boolean test = false;
-         if (test) {
-            throw new Exception("test");
-         }
-
-         communicationManager.sendCommand(command);
-      } catch (Exception ex) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send loop off entrainment command", ex);
-         }
-         callback.onFailed(ex.toString());
-      }
-   }
-
-   public void setColorMode(ColorMode.Mode cMode, SetColorModeCallback callback) {
-      try {
-         SetColorModeCommand command = new SetColorModeCommand();
-         command.setColorMode(cMode);
-         command.setResponseCallback(new SetColorModeResponseCallback(callback));
-
-         // Test
-         boolean test = false;
-         if (test) {
-            throw new Exception("test");
-         }
-
-         communicationManager.sendCommand(command);
-      } catch (Exception ex) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send set color mode command", ex);
-         }
-         callback.onFailed(ex.toString());
-      }
-   }
-
-   public void runColorMode(ColorMode.Mode cMode, RunColorModeCallback callback) {
-      try {
-         RunColorModeCommand command = new RunColorModeCommand();
-         command.setColorMode(cMode);
-         command.setResponseCallback(new RunColorModeResponseCallback(callback));
-
-         // Test
-         boolean test = false;
-         if (test) {
-            throw new Exception("test");
-         }
-
-         communicationManager.sendCommand(command);
-      } catch (Exception ex) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send run color mode command", ex);
-         }
-         callback.onFailed(ex.toString());
-      }
-   }
-
-   public void offColorMode(OffColorModeCallback callback) {
-      try {
-         OffColorModeCommand command = new OffColorModeCommand();
-         command.setResponseCallback(new OffColorModeResponseCallback(callback));
-
-         // Test
-         boolean test = false;
-         if (test) {
-            throw new Exception("test");
-         }
-
-         communicationManager.sendCommand(command);
-      } catch (Exception ex) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send off color mode command", ex);
-         }
-         callback.onFailed(ex.toString());
-      }
-   }
-
-   public void pauseColorMode(PauseColorModeCallback callback) {
-      try {
-         PauseColorModeCommand command = new PauseColorModeCommand();
-         command.setResponseCallback(new PauseColorModeResponseCallback(callback));
-
-         // Test
-         boolean test = false;
-         if (test) {
-            throw new Exception("test");
-         }
-
-         communicationManager.sendCommand(command);
-      } catch (Exception ex) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send pause color mode command", ex);
-         }
-         callback.onFailed(ex.toString());
-      }
-   }
-
-   public void resumeColorMode(ResumeColorModeCallback callback) {
-      try {
-         ResumeColorModeCommand command = new ResumeColorModeCommand();
-         command.setResponseCallback(new ResumeColorModeResponseCallback(callback));
-
-         // Test
-         boolean test = false;
-         if (test) {
-            throw new Exception("test");
-         }
-
-         communicationManager.sendCommand(command);
-      } catch (Exception ex) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send resume color mode command", ex);
-         }
-         callback.onFailed(ex.toString());
-      }
-   }
-
-   public void setSpeedColorMode(byte speed, SetSpeedColorModeCallback callback) {
-      try {
-         SetSpeedColorModeCommand command = new SetSpeedColorModeCommand();
-         command.setSpeed(speed);
-         command.setResponseCallback(new SetSpeedColorModeResponseCallback(callback));
-
-         // Test
-         boolean test = false;
-         if (test) {
-            throw new Exception("test");
-         }
-
-         communicationManager.sendCommand(command);
-      } catch (Exception ex) {
-         if (MyDebug.LOG) {
-            Log.e(TAG, "failed to send set speed color mode command", ex);
-         }
-         callback.onFailed(ex.toString());
-      }
-   }
-
-   //
-   // ----------- Command Response Callbacks -----------
-   //
-   private class RunEntrainmentResponseCallback implements ResponseCallback<RunEntrainmentResponse> {
-
-      private RunEntrainmentCallback callback;
-
-      RunEntrainmentResponseCallback(RunEntrainmentCallback callback) {
-         this.callback = callback;
-      }
-
-      public void onResponse(RunEntrainmentResponse response) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onSuccess();
+            // Test
+            boolean test = false;
+            if (test) {
+                throw new Exception("test");
             }
-         });
-      }
 
-      public void onFailed(final CommunicationErrorType type) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onFailed(toUserMessage(type));
+            communicationManager.sendCommand(command);
+        } catch (Exception ex) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "failed to send loop on entrainment command", ex);
             }
-         });
-      }
-   }
+            callback.onFailed(ex.toString());
+        }
+    }
 
-   private class StopEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
+    public void loopOffEntrainmentSequence(LoopOffEntrainmentCallback callback) {
+        try {
+            LoopOffEntrainmentCommand command = new LoopOffEntrainmentCommand();
+            command.setResponseCallback(new LoopOffEntrainmentResponseCallback(callback));
 
-      private StopEntrainmentCallback callback;
-
-      StopEntrainmentResponseCallback(StopEntrainmentCallback callback) {
-         this.callback = callback;
-      }
-
-      public void onResponse(EmptyResponse response) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onSuccess();
+            // Test
+            boolean test = false;
+            if (test) {
+                throw new Exception("test");
             }
-         });
-      }
 
-      public void onFailed(final CommunicationErrorType type) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onFailed(toUserMessage(type));
+            communicationManager.sendCommand(command);
+        } catch (Exception ex) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "failed to send loop off entrainment command", ex);
             }
-         });
-      }
-   }
+            callback.onFailed(ex.toString());
+        }
+    }
+
+    public void setColorMode(ColorMode.Mode cMode, SetColorModeCallback callback) {
+        try {
+            SetColorModeCommand command = new SetColorModeCommand();
+            command.setColorMode(cMode);
+            command.setResponseCallback(new SetColorModeResponseCallback(callback));
+
+            // Test
+            boolean test = false;
+            if (test) {
+                throw new Exception("test");
+            }
+
+            communicationManager.sendCommand(command);
+        } catch (Exception ex) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "failed to send set color mode command", ex);
+            }
+            callback.onFailed(ex.toString());
+        }
+    }
+
+    public void runColorMode(ColorMode.Mode cMode, RunColorModeCallback callback) {
+        try {
+            RunColorModeCommand command = new RunColorModeCommand();
+            command.setColorMode(cMode);
+            command.setResponseCallback(new RunColorModeResponseCallback(callback));
+
+            // Test
+            boolean test = false;
+            if (test) {
+                throw new Exception("test");
+            }
+
+            communicationManager.sendCommand(command);
+        } catch (Exception ex) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "failed to send run color mode command", ex);
+            }
+            callback.onFailed(ex.toString());
+        }
+    }
+
+    public void offColorMode(OffColorModeCallback callback) {
+        try {
+            OffColorModeCommand command = new OffColorModeCommand();
+            command.setResponseCallback(new OffColorModeResponseCallback(callback));
+
+            // Test
+            boolean test = false;
+            if (test) {
+                throw new Exception("test");
+            }
+
+            communicationManager.sendCommand(command);
+        } catch (Exception ex) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "failed to send off color mode command", ex);
+            }
+            callback.onFailed(ex.toString());
+        }
+    }
+
+    public void pauseColorMode(PauseColorModeCallback callback) {
+        try {
+            PauseColorModeCommand command = new PauseColorModeCommand();
+            command.setResponseCallback(new PauseColorModeResponseCallback(callback));
+
+            // Test
+            boolean test = false;
+            if (test) {
+                throw new Exception("test");
+            }
+
+            communicationManager.sendCommand(command);
+        } catch (Exception ex) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "failed to send pause color mode command", ex);
+            }
+            callback.onFailed(ex.toString());
+        }
+    }
+
+    public void resumeColorMode(ResumeColorModeCallback callback) {
+        try {
+            ResumeColorModeCommand command = new ResumeColorModeCommand();
+            command.setResponseCallback(new ResumeColorModeResponseCallback(callback));
+
+            // Test
+            boolean test = false;
+            if (test) {
+                throw new Exception("test");
+            }
+
+            communicationManager.sendCommand(command);
+        } catch (Exception ex) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "failed to send resume color mode command", ex);
+            }
+            callback.onFailed(ex.toString());
+        }
+    }
+
+    public void setSpeedColorMode(byte speed, SetSpeedColorModeCallback callback) {
+        try {
+            SetSpeedColorModeCommand command = new SetSpeedColorModeCommand();
+            command.setSpeed(speed);
+            command.setResponseCallback(new SetSpeedColorModeResponseCallback(callback));
+
+            // Test
+            boolean test = false;
+            if (test) {
+                throw new Exception("test");
+            }
+
+            communicationManager.sendCommand(command);
+        } catch (Exception ex) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "failed to send set speed color mode command", ex);
+            }
+            callback.onFailed(ex.toString());
+        }
+    }
+
+    //
+    // ----------- Command Response Callbacks -----------
+    //
+    private class RunEntrainmentResponseCallback implements ResponseCallback<RunEntrainmentResponse> {
+
+        private RunEntrainmentCallback callback;
+
+        RunEntrainmentResponseCallback(RunEntrainmentCallback callback) {
+            this.callback = callback;
+        }
+
+        public void onResponse(RunEntrainmentResponse response) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onSuccess();
+                }
+            });
+        }
+
+        public void onFailed(final CommunicationErrorType type) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onFailed(toUserMessage(type));
+                }
+            });
+        }
+    }
+
+    private class StopEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
+
+        private StopEntrainmentCallback callback;
+
+        StopEntrainmentResponseCallback(StopEntrainmentCallback callback) {
+            this.callback = callback;
+        }
+
+        public void onResponse(EmptyResponse response) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onSuccess();
+                }
+            });
+        }
+
+        public void onFailed(final CommunicationErrorType type) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onFailed(toUserMessage(type));
+                }
+            });
+        }
+    }
 
 //   private class PauseEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
 //
@@ -853,205 +853,205 @@ public class PettPlantService extends Service {
 //      }
 //   }
 
-   private class LoopOnEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
+    private class LoopOnEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
 
-      private LoopOnEntrainmentCallback callback;
+        private LoopOnEntrainmentCallback callback;
 
-      LoopOnEntrainmentResponseCallback(LoopOnEntrainmentCallback callback) {
-         this.callback = callback;
-      }
+        LoopOnEntrainmentResponseCallback(LoopOnEntrainmentCallback callback) {
+            this.callback = callback;
+        }
 
-      public void onResponse(EmptyResponse response) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onSuccess();
-            }
-         });
-      }
+        public void onResponse(EmptyResponse response) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onSuccess();
+                }
+            });
+        }
 
-      public void onFailed(final CommunicationErrorType type) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onFailed(toUserMessage(type));
-            }
-         });
-      }
-   }
+        public void onFailed(final CommunicationErrorType type) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onFailed(toUserMessage(type));
+                }
+            });
+        }
+    }
 
-   private class LoopOffEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
+    private class LoopOffEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
 
-      private LoopOffEntrainmentCallback callback;
+        private LoopOffEntrainmentCallback callback;
 
-      LoopOffEntrainmentResponseCallback(LoopOffEntrainmentCallback callback) {
-         this.callback = callback;
-      }
+        LoopOffEntrainmentResponseCallback(LoopOffEntrainmentCallback callback) {
+            this.callback = callback;
+        }
 
-      public void onResponse(EmptyResponse response) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onSuccess();
-            }
-         });
-      }
+        public void onResponse(EmptyResponse response) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onSuccess();
+                }
+            });
+        }
 
-      public void onFailed(final CommunicationErrorType type) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onFailed(toUserMessage(type));
-            }
-         });
-      }
-   }
+        public void onFailed(final CommunicationErrorType type) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onFailed(toUserMessage(type));
+                }
+            });
+        }
+    }
 
-   private class SetColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
+    private class SetColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
 
-      private SetColorModeCallback callback;
+        private SetColorModeCallback callback;
 
-      SetColorModeResponseCallback(SetColorModeCallback callback) {
-         this.callback = callback;
-      }
+        SetColorModeResponseCallback(SetColorModeCallback callback) {
+            this.callback = callback;
+        }
 
-      public void onResponse(EmptyResponse response) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onSuccess();
-            }
-         });
-      }
+        public void onResponse(EmptyResponse response) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onSuccess();
+                }
+            });
+        }
 
-      public void onFailed(final CommunicationErrorType type) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onFailed(toUserMessage(type));
-            }
-         });
-      }
-   }
+        public void onFailed(final CommunicationErrorType type) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onFailed(toUserMessage(type));
+                }
+            });
+        }
+    }
 
-   private class RunColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
+    private class RunColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
 
-      private RunColorModeCallback callback;
+        private RunColorModeCallback callback;
 
-      RunColorModeResponseCallback(RunColorModeCallback callback) {
-         this.callback = callback;
-      }
+        RunColorModeResponseCallback(RunColorModeCallback callback) {
+            this.callback = callback;
+        }
 
-      public void onResponse(EmptyResponse response) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onSuccess();
-            }
-         });
-      }
+        public void onResponse(EmptyResponse response) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onSuccess();
+                }
+            });
+        }
 
-      public void onFailed(final CommunicationErrorType type) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onFailed(toUserMessage(type));
-            }
-         });
-      }
-   }
+        public void onFailed(final CommunicationErrorType type) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onFailed(toUserMessage(type));
+                }
+            });
+        }
+    }
 
-   private class OffColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
+    private class OffColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
 
-      private OffColorModeCallback callback;
+        private OffColorModeCallback callback;
 
-      OffColorModeResponseCallback(OffColorModeCallback callback) {
-         this.callback = callback;
-      }
+        OffColorModeResponseCallback(OffColorModeCallback callback) {
+            this.callback = callback;
+        }
 
-      public void onResponse(EmptyResponse response) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onSuccess();
-            }
-         });
-      }
+        public void onResponse(EmptyResponse response) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onSuccess();
+                }
+            });
+        }
 
-      public void onFailed(final CommunicationErrorType type) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onFailed(toUserMessage(type));
-            }
-         });
-      }
-   }
+        public void onFailed(final CommunicationErrorType type) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onFailed(toUserMessage(type));
+                }
+            });
+        }
+    }
 
-   private class PauseColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
+    private class PauseColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
 
-      private PauseColorModeCallback callback;
+        private PauseColorModeCallback callback;
 
-      PauseColorModeResponseCallback(PauseColorModeCallback callback) {
-         this.callback = callback;
-      }
+        PauseColorModeResponseCallback(PauseColorModeCallback callback) {
+            this.callback = callback;
+        }
 
-      public void onResponse(EmptyResponse response) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onSuccess();
-            }
-         });
-      }
+        public void onResponse(EmptyResponse response) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onSuccess();
+                }
+            });
+        }
 
-      public void onFailed(final CommunicationErrorType type) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onFailed(toUserMessage(type));
-            }
-         });
-      }
-   }
+        public void onFailed(final CommunicationErrorType type) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onFailed(toUserMessage(type));
+                }
+            });
+        }
+    }
 
-   private class ResumeColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
+    private class ResumeColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
 
-      private ResumeColorModeCallback callback;
+        private ResumeColorModeCallback callback;
 
-      ResumeColorModeResponseCallback(ResumeColorModeCallback callback) {
-         this.callback = callback;
-      }
+        ResumeColorModeResponseCallback(ResumeColorModeCallback callback) {
+            this.callback = callback;
+        }
 
-      public void onResponse(EmptyResponse response) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onSuccess();
-            }
-         });
-      }
+        public void onResponse(EmptyResponse response) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onSuccess();
+                }
+            });
+        }
 
-      public void onFailed(final CommunicationErrorType type) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onFailed(toUserMessage(type));
-            }
-         });
-      }
-   }
+        public void onFailed(final CommunicationErrorType type) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onFailed(toUserMessage(type));
+                }
+            });
+        }
+    }
 
-   private class SetSpeedColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
+    private class SetSpeedColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
 
-      private SetSpeedColorModeCallback callback;
+        private SetSpeedColorModeCallback callback;
 
-      SetSpeedColorModeResponseCallback(SetSpeedColorModeCallback callback) {
-         this.callback = callback;
-      }
+        SetSpeedColorModeResponseCallback(SetSpeedColorModeCallback callback) {
+            this.callback = callback;
+        }
 
-      public void onResponse(EmptyResponse response) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onSuccess();
-            }
-         });
-      }
+        public void onResponse(EmptyResponse response) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onSuccess();
+                }
+            });
+        }
 
-      public void onFailed(final CommunicationErrorType type) {
-         uiHandler.post(new Runnable() {
-            public void run() {
-               callback.onFailed(toUserMessage(type));
-            }
-         });
-      }
-   }
+        public void onFailed(final CommunicationErrorType type) {
+            uiHandler.post(new Runnable() {
+                public void run() {
+                    callback.onFailed(toUserMessage(type));
+                }
+            });
+        }
+    }
 
 //   private  class RequestStateResponseCallback implements ResponseCallback<RequestStateResponse> {
 //
@@ -1076,22 +1076,22 @@ public class PettPlantService extends Service {
 //   }
 
 
-   //
-   // ----------- Command Callbacks -----------
-   //
-   public interface RunEntrainmentCallback {
+    //
+    // ----------- Command Callbacks -----------
+    //
+    public interface RunEntrainmentCallback {
 
-      void onSuccess();
+        void onSuccess();
 
-      void onFailed(String reason);
-   }
+        void onFailed(String reason);
+    }
 
-   public interface StopEntrainmentCallback {
+    public interface StopEntrainmentCallback {
 
-      void onSuccess();
+        void onSuccess();
 
-      void onFailed(String reason);
-   }
+        void onFailed(String reason);
+    }
 
 //   public interface PauseEntrainmentCallback {
 //
@@ -1107,66 +1107,66 @@ public class PettPlantService extends Service {
 //      void onFailed(String reason);
 //   }
 
-   public interface LoopOnEntrainmentCallback {
+    public interface LoopOnEntrainmentCallback {
 
-      void onSuccess();
+        void onSuccess();
 
-      void onFailed(String reason);
-   }
+        void onFailed(String reason);
+    }
 
-   public interface LoopOffEntrainmentCallback {
+    public interface LoopOffEntrainmentCallback {
 
-      void onSuccess();
+        void onSuccess();
 
-      void onFailed(String reason);
-   }
+        void onFailed(String reason);
+    }
 
-   public interface SetColorModeCallback {
+    public interface SetColorModeCallback {
 
-      void onSuccess();
+        void onSuccess();
 
-      void onFailed(String reason);
-   }
+        void onFailed(String reason);
+    }
 
-   public interface RunColorModeCallback {
+    public interface RunColorModeCallback {
 
-      void onSuccess();
+        void onSuccess();
 
-      void onFailed(String reason);
-   }
+        void onFailed(String reason);
+    }
 
-   public interface OffColorModeCallback {
+    public interface OffColorModeCallback {
 
-      void onSuccess();
+        void onSuccess();
 
-      void onFailed(String reason);
-   }
+        void onFailed(String reason);
+    }
 
-   public interface PauseColorModeCallback {
+    public interface PauseColorModeCallback {
 
-      void onSuccess();
+        void onSuccess();
 
-      void onFailed(String reason);
-   }
+        void onFailed(String reason);
+    }
 
-   public interface ResumeColorModeCallback {
+    public interface ResumeColorModeCallback {
 
-      void onSuccess();
+        void onSuccess();
 
-      void onFailed(String reason);
-   }
+        void onFailed(String reason);
+    }
 
-   public interface SetSpeedColorModeCallback {
+    public interface SetSpeedColorModeCallback {
 
-      void onSuccess();
+        void onSuccess();
 
-      void onFailed(String reason);
-   }
+        void onFailed(String reason);
+    }
 
-   public interface PlantStateListener {
+    public interface PlantStateListener {
 
-      void onPlantState(PlantState plantState);
+        void onPlantState(PlantState plantState);
 
-      void onError(String reason);
-   }
+        void onError(String reason);
+    }
 }

@@ -31,7 +31,7 @@ import java.util.Locale;
 import java.util.Set;
 
 public final class BluetoothScanFragment extends DialogFragment {
-	
+
     private static final String TAG = "BluetoothScanFragment";
 
     private LayoutInflater inflator;
@@ -42,17 +42,17 @@ public final class BluetoothScanFragment extends DialogFragment {
     private MyDeviceAdapter listAdapter;
     private MyBluetoothBroadcastReceiver bluetoothReceiver;
     private Context parentContext;
-    
+
     private OnBluetoothDeviceSelectedListener listener;
 
     public void setContext(Context thisContext) {
-      parentContext = thisContext;
-   }
-    
-    public void setOnBluetoothDeviceSelectedListener(OnBluetoothDeviceSelectedListener listener) {
-    	this.listener = listener;
+        parentContext = thisContext;
     }
-    
+
+    public void setOnBluetoothDeviceSelectedListener(OnBluetoothDeviceSelectedListener listener) {
+        this.listener = listener;
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -84,7 +84,7 @@ public final class BluetoothScanFragment extends DialogFragment {
 
         return view;
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
@@ -114,12 +114,12 @@ public final class BluetoothScanFragment extends DialogFragment {
 
         doDiscovery();
     }
-    
+
     @Override
     public void onPause() {
-    	super.onPause();
-    	
-    	// Make sure we're not doing discovery anymore
+        super.onPause();
+
+        // Make sure we're not doing discovery anymore
         if (bluetoothAdapter != null) {
             bluetoothAdapter.cancelDiscovery();
         }
@@ -144,70 +144,70 @@ public final class BluetoothScanFragment extends DialogFragment {
         // Request discover from BluetoothAdapter
         bluetoothAdapter.startDiscovery();
     }
-    
+
     private class MyItem {
-    	private BluetoothDevice device;
-    	
-    	MyItem(BluetoothDevice device) {
-    		this.device = device;
-    	}
-    	
+        private BluetoothDevice device;
+
+        MyItem(BluetoothDevice device) {
+            this.device = device;
+        }
+
     }
-    
+
     private class MyDeviceAdapter extends BaseAdapter implements OnItemClickListener {
 
-		@Override
-		public int getCount() {
-			return items.size();
-		}
+        @Override
+        public int getCount() {
+            return items.size();
+        }
 
-		@Override
-		public Object getItem(int position) {
-			return items.get(position);
-		}
+        @Override
+        public Object getItem(int position) {
+            return items.get(position);
+        }
 
-		@Override
-		public long getItemId(int position) {
-			return items.get(position).hashCode();
-		}
+        @Override
+        public long getItemId(int position) {
+            return items.get(position).hashCode();
+        }
 
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			
-			if (convertView == null) {
-				convertView = inflator.inflate(android.R.layout.simple_list_item_2, null);
-			}
-			
-			MyItem item = items.get(position);
-			boolean bonded = (item.device.getBondState() == BluetoothDevice.BOND_BONDED);
-			int colorId = bonded ? android.R.color.black : android.R.color.darker_gray;
-			int color = getResources().getColor(colorId);
-			
-			TextView text1 = convertView.findViewById(android.R.id.text1);
-			text1.setText(item.device.getName());
-			text1.setTextColor(color);
-			
-			TextView text2 = convertView.findViewById(android.R.id.text2);
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            if (convertView == null) {
+                convertView = inflator.inflate(android.R.layout.simple_list_item_2, null);
+            }
+
+            MyItem item = items.get(position);
+            boolean bonded = (item.device.getBondState() == BluetoothDevice.BOND_BONDED);
+            int colorId = bonded ? android.R.color.black : android.R.color.darker_gray;
+            int color = getResources().getColor(colorId);
+
+            TextView text1 = convertView.findViewById(android.R.id.text1);
+            text1.setText(item.device.getName());
+            text1.setTextColor(color);
+
+            TextView text2 = convertView.findViewById(android.R.id.text2);
             Locale myLocale = Resources.getSystem().getConfiguration().locale;
             String pairedStr = getString(bonded ? R.string.paired : R.string.not_paired);
             text2.setText(String.format(myLocale, "%s - %s", item.device.getAddress(), pairedStr));
-			text2.setTextColor(color);
-			
-			return convertView;
-		}
+            text2.setTextColor(color);
 
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			// Cancel discovery because it's costly and we're about to connect
-			bluetoothAdapter.cancelDiscovery();
+            return convertView;
+        }
 
-			if (listener != null) {
-				listener.onBluetoothDeviceSelectedListener(items.get(position).device);
-			}
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // Cancel discovery because it's costly and we're about to connect
+            bluetoothAdapter.cancelDiscovery();
 
-			dismiss();
-		}
-    	
+            if (listener != null) {
+                listener.onBluetoothDeviceSelectedListener(items.get(position).device);
+            }
+
+            dismiss();
+        }
+
     }
 
     // The BroadcastReceiver that listens for discovered devices and
@@ -226,7 +226,7 @@ public final class BluetoothScanFragment extends DialogFragment {
                     items.add(new MyItem(device));
                     listAdapter.notifyDataSetChanged();
                 }
-            // When discovery is finished, change the Activity title
+                // When discovery is finished, change the Activity title
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 getActivity().setProgressBarIndeterminateVisibility(false);
             }
@@ -234,8 +234,8 @@ public final class BluetoothScanFragment extends DialogFragment {
     }
 
     public interface OnBluetoothDeviceSelectedListener {
-    	
-    	void onBluetoothDeviceSelectedListener(BluetoothDevice device);
+
+        void onBluetoothDeviceSelectedListener(BluetoothDevice device);
     }
 
 }
