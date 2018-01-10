@@ -31,7 +31,7 @@ public class ErrorHandler {
     private static final String TAG = "ErrorHandler";
     private static final String NO_ALERT = "none";
 //    public static final String USE_GENERIC_MSG = "generic";
-    
+
 //    public static final String ERROR_HANDLING_SERVICE_EVENT = "pett plant service event";
 //    public static final String ERROR_HANDLING_SERVICE_CREATED = "pett plant service created";
 //    public static final String ERROR_HANDLING_SERVICE_DESTROYED = "pett plant service destroyed";
@@ -81,16 +81,16 @@ public class ErrorHandler {
                 }
 
                 createAlertDialog(appContext.getString(R.string.sd_card_error_title),
-                                  appContext.getString(R.string.sd_card_error_message),
-                                  null);
+                      appContext.getString(R.string.sd_card_error_message),
+                      null);
             }
         } catch (Exception e) {
             if (MyDebug.LOG) {
                 Log.e(TAG, "Could not construct a new FileHandler.");
             }
             createAlertDialog(appContext.getString(R.string.error_log_file_error_title),
-                              appContext.getString(R.string.error_log_file_error_message),
-                              null);
+                  appContext.getString(R.string.error_log_file_error_message),
+                  null);
         }
     }
 
@@ -110,7 +110,7 @@ public class ErrorHandler {
 
         // Create a DateFormat to format the logger timestamp.
         private DateFormat df = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss.SSS");
-     
+
         @Override
         public String format(LogRecord record) {
             StringBuilder builder = new StringBuilder(1000);
@@ -122,16 +122,16 @@ public class ErrorHandler {
             builder.append("\n");
             return builder.toString();
         }
-     
+
         public String getHead(java.util.logging.Handler h) {
             return super.getHead(h);
         }
-     
+
         public String getTail(java.util.logging.Handler h) {
             return super.getTail(h);
         }
     }
-    
+
     private void onDestroy() {
 
         instance = null;
@@ -143,60 +143,60 @@ public class ErrorHandler {
     /**
      * Writes an error message in the error log file
      *
-     * @param level - error severity level
+     * @param level      - error severity level
      * @param logMessage - log file message
      */
-    public void logError (Level level, String logMessage) {
+    public void logError(Level level, String logMessage) {
         logError(level, logMessage, NO_ALERT, NO_ALERT, null);
     }
 
     /**
      * Writes an error message in the error log file and optionally displays an alert dialog
      *
-     * @param level - error severity level
-     * @param logMessage - log file message
-     * @param alertTitle - Alert dialog title.
+     * @param level        - error severity level
+     * @param logMessage   - log file message
+     * @param alertTitle   - Alert dialog title.
      *                     0 = use generic error title,
      *                     "none" = do not show an alert dialog.
      * @param alertMessage - Alert dialog title message.
      *                     0 = use generic error message.
      */
-    public void logError (Level level, String logMessage, Integer alertTitle, Integer alertMessage) {
+    public void logError(Level level, String logMessage, Integer alertTitle, Integer alertMessage) {
         String alertTitleStr = null;
         String alertMessageStr = null;
-        
+
         if (alertTitle != 0) {
             alertTitleStr = appContext.getString(alertTitle);
-        } 
-            
+        }
+
         if (alertMessage != 0) {
             alertMessageStr = appContext.getString(alertMessage);
-        } 
-            
+        }
+
         logError(level, logMessage, alertTitleStr, alertMessageStr);
     }
-    
-    public void logError (Level level, String logMessage, Integer alertTitle,
-            String alertMessageStr) {
+
+    public void logError(Level level, String logMessage, Integer alertTitle,
+                         String alertMessageStr) {
         String alertTitleStr = null;
-        
+
         if (alertTitle != 0) {
             alertTitleStr = appContext.getString(alertTitle);
-        } 
-            
+        }
+
         logError(level, logMessage, alertTitleStr, alertMessageStr);
     }
-    
-    public void logError (Level level, String logMessage, String alertTitleStr,
-            String alertMessageStr) {
+
+    public void logError(Level level, String logMessage, String alertTitleStr,
+                         String alertMessageStr) {
         logError(level, logMessage, alertTitleStr, alertMessageStr, null);
     }
-        
-    public void logError (final Level level, String logMessage, String alertTitle,
-            String alertMessage, final AbstractBaseActivity.MyOnClickListener okOnClickListener) {
+
+    public void logError(final Level level, String logMessage, String alertTitle,
+                         String alertMessage, final AbstractBaseActivity.MyOnClickListener okOnClickListener) {
 
         LOGGER.log(level, logMessage);
-        
+
         if (alertTitle == null) {
             alertTitle = appContext.getString(R.string.generic_error_title);
         }
@@ -239,7 +239,7 @@ public class ErrorHandler {
             createAlertDialog(alertTitle, alertMessage, listener);
         }
     }
-    
+
     private BroadcastReceiver pettPlantEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -251,8 +251,8 @@ public class ErrorHandler {
             }
 
             if (message.equals(PettPlantService.SERVICE_CREATED)) {
-            } else if  (message.equals(PettPlantService.SERVICE_DESTROYED)) {
-                
+            } else if (message.equals(PettPlantService.SERVICE_DESTROYED)) {
+
                 // The pett plant service has stopped, after a fatal exception, so close the log file and
                 // throw a RTE to kill the app.
                 if (MyDebug.LOG) {
@@ -261,7 +261,7 @@ public class ErrorHandler {
 
                 if (instance != null) {
                     instance.logError(Level.INFO, "ErrorHandler.pettPlantEventReceiver - " +
-                    		"pettPlantService has been destroyed.");
+                          "pettPlantService has been destroyed.");
                     instance.onDestroy();
                 }
                 throw new RuntimeException("An unexpected error has occurred.");
