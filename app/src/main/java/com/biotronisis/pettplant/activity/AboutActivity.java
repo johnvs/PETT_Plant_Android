@@ -5,20 +5,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
-//import android.support.v7.appcompat.BuildConfig;
 
 import com.biotronisis.pettplant.BuildConfig;
 import com.biotronisis.pettplant.R;
-//import com.biotronisis.pettplant.plant.processor.PlantState;
 
 public class AboutActivity extends AbstractBaseActivity {
 
     private static final String TAG = "AboutActivity";
-
-    private TextView versionNumberTV;
 
     @Override
     public String getActivityName() {
@@ -31,9 +25,7 @@ public class AboutActivity extends AbstractBaseActivity {
     }
 
     public static Intent createIntent(Context context) {
-        Intent intent = new Intent(context, AboutActivity.class);
-//      intent.putExtra(EXTRA_PLANT_STATE, plantState);
-        return intent;
+        return new Intent(context, AboutActivity.class);
     }
 
     @Override
@@ -41,13 +33,10 @@ public class AboutActivity extends AbstractBaseActivity {
         super.onCreate(savedInstanceSate);
         setContentView(R.layout.activity_about);
 
-        versionNumberTV = (TextView) findViewById(R.id.versionNumber);
+        TextView versionNumberTV = findViewById(R.id.versionNumber);
 
-//      int versionCode = BuildConfig.VERSION_CODE;
-        String versionName = BuildConfig.VERSION_NAME;
         // Get the version number from the system
-        versionNumberTV.setText(versionName);
-//      versionNumberTV.setText("test");
+        versionNumberTV.setText(BuildConfig.VERSION_NAME);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
