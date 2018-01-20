@@ -43,7 +43,7 @@
     <!--  Bluetooth connection messages  -->
     <string name="not_connected_to_plant">You are not connected to a Plant</string>
     <string name="bt_not_enabled_leaving">Bluetooth was not enabled. Try again.</string>
-    <string name="title_connecting">connecting...</string>
+    <string name="title_connecting">connecting…</string>
     <string name="title_connected_to">Connected to <xliff:g id="device_name">%1$s</xliff:g></string>
     <string name="title_not_connected">Not connected to a Plant</string>
     <string name="title_comm_failed">Failed to connect to a Plant</string>
@@ -52,7 +52,7 @@
         plant to continue.</string>
 
     <!--  BluetoothScanFragment -->
-    <string name="scanning">scanning for devices...</string>
+    <string name="scanning">scanning for devices…</string>
     <string name="select_device">Select a Plant to connect to</string>
     <string name="none_paired">No devices have been paired</string>
     <string name="none_found">No devices found</string>
@@ -98,14 +98,14 @@ USE AT YOUR OWN RISK! </string>
     <string name="stop_entrainment_failed_title">Stop Entrainment Failed</string>
     <string name="stop_entrainment_failed_message">An error was encountered while trying to stop the
         entrainment sequence.</string>
-    <string name="pause_entrainment_success">Pause Entrainment</string>
-    <string name="pause_entrainment_failed_title">Pause Entrainment Failed</string>
-    <string name="pause_entrainment_failed_message">An error was encountered while trying to pause
-        the entrainment sequence.</string>
-    <string name="resume_entrainment_success">Resume Entrainment</string>
-    <string name="resume_entrainment_failed_title">Resume Entrainment Failed</string>
-    <string name="resume_entrainment_failed_message">An error was encountered while trying to resume
-        the entrainment sequence.</string>
+    <!--<string name="pause_entrainment_success">Pause Entrainment</string>-->
+    <!--<string name="pause_entrainment_failed_title">Pause Entrainment Failed</string>-->
+    <!--<string name="pause_entrainment_failed_message">An error was encountered while trying to pause-->
+        <!--the entrainment sequence.</string>-->
+    <!--<string name="resume_entrainment_success">Resume Entrainment</string>-->
+    <!--<string name="resume_entrainment_failed_title">Resume Entrainment Failed</string>-->
+    <!--<string name="resume_entrainment_failed_message">An error was encountered while trying to resume-->
+        <!--the entrainment sequence.</string>-->
     <string name="loop_off_entrainment_success">Loop Entrainment Off</string>
     <string name="loop_off_entrainment_failed_title">Loop Off Entrainment Failed</string>
     <string name="loop_off_entrainment_failed_message">An error was encountered while trying to turn
