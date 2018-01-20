@@ -63,7 +63,6 @@ public abstract class AbstractBaseActivity extends AppCompatActivity implements 
         return active;
     }
 
-    //   private class HelpOnMenuItemClicked implements OnMenuItemClickListener {
     private class HelpOnMenuItemClicked implements ActionMenuView.OnMenuItemClickListener {
 
         @Override
