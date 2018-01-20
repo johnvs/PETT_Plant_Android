@@ -64,6 +64,22 @@ public class PlantState implements Serializable {
     }
 
     @Override
+    public boolean equals(Object obj) {
+
+        if (obj.getClass() == PlantState.class) {
+            PlantState pS = (PlantState) obj;
+            if (this.entrainSequence != pS.entrainSequence)   return false;
+            if (this.entrainmentState != pS.entrainmentState) return false;
+            if (this.loopCheckbox != pS.loopCheckbox)         return false;
+            if (this.colorMode != pS.colorMode)               return false;
+            if (this.colorModeState != pS.colorModeState)     return false;
+            if (this.colorModeSpeed != pS.colorModeSpeed)     return false;
+        } else return false;
+
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "PlantState{" +
               "entrainSequence=" + entrainSequence +
