@@ -231,14 +231,13 @@ public class PettPlantService extends Service {
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent,
               PendingIntent.FLAG_UPDATE_CURRENT);
 
-        BitmapDrawable icon = (BitmapDrawable) ContextCompat.getDrawable(this, R.drawable.ic_launcher);
-        // depricated method getResources().getDrawable(R.drawable.ic_launcher);
+        BitmapDrawable icon = (BitmapDrawable) ContextCompat.getDrawable(this, R.mipmap.ic_launcher);
 
         @SuppressWarnings("ConstantConditions")
         Notification notification = new NotificationCompat.Builder(this)
               .setContentTitle(getString(R.string.pett_plant))
               .setContentText(message).setContentIntent(contentIntent)
-              .setSmallIcon(R.drawable.ic_launcher)
+              .setSmallIcon(R.mipmap.ic_launcher)
               .setLargeIcon(icon.getBitmap())
               .setOngoing(ongoing)
               .setTicker(message)
