@@ -34,21 +34,21 @@ public class BluetoothCommAdapter implements ICommAdapter {
 
     private CommAdapterListener listener;
 
-    private BluetoothAdapter bluetoothAdapter;
+    private final BluetoothAdapter bluetoothAdapter;
     private ConnectThread connectThread;
     private ConnectedThread connectedThread;
     private ConnectionState connectionState;
     private MyBluetoothBroadcastReceiver bluetoothReceiver;
     private MyBluetoothBroadcastReceiver resetReceiver;
     private MyBluetoothBroadcastReceiver enableReceiver;
-    private Context pettPlantService;
+    private final Context pettPlantService;
     private String currentDeviceAddress;
     private boolean isActivating;
     private boolean isReConnecting;
     private boolean isResetting;
     private boolean isEnabling;
     private Boolean waitingForBTState;
-    private Handler backgroundHandler;
+    private final Handler backgroundHandler;
 
 
     BluetoothCommAdapter(CommAdapterListener listener, PettPlantService pettPlantService) {
@@ -549,7 +549,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
     private class ConnectThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
-        private String mSocketType;
+        private final String mSocketType;
         private boolean cancelled = false;
 
         ConnectThread(BluetoothDevice device, boolean secure) {

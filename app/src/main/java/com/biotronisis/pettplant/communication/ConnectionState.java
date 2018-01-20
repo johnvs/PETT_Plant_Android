@@ -8,7 +8,7 @@ public enum ConnectionState {
     CONNECTING(3),    // now initiating an outgoing connection
     ESTABLISHED(4);   // now connected to a remote device
 
-    private int id;
+    private final int id;
 
     ConnectionState(int id) {
         this.id = id;

@@ -34,25 +34,25 @@ public class CommunicationManager {
 
     private static final String TAG = "CommunicationManager";
 
-    private PettPlantService pettPlantService;
+    private final PettPlantService pettPlantService;
 
-    private CommunicationParams communicationParams;
+    private final CommunicationParams communicationParams;
 
     // handles sending and receiving bytes over some channel
     private ICommAdapter commAdapter;
 
     // a general purpose handler to ensure a Runnable is run on the background thread
-    private Handler backgroundHandler;
+    private final Handler backgroundHandler;
 
     // a general handler for running code on the ui thread
-    private Handler uiHandler;
+    private final Handler uiHandler;
 
     // mapping response id and command id to waiting command
-    private Map<Byte, AbstractCommand<?>> responseIdToWaitingCommands;
-    private Map<Byte, AbstractCommand<?>> commandIdToWaitingCommands;
+    private final Map<Byte, AbstractCommand<?>> responseIdToWaitingCommands;
+    private final Map<Byte, AbstractCommand<?>> commandIdToWaitingCommands;
 
     // the timeout for the currently waiting command that is waiting a response
-    private Map<AbstractCommand<?>, TimeoutBackgroundRunnable> waitingCommandsToTimeouts;
+    private final Map<AbstractCommand<?>, TimeoutBackgroundRunnable> waitingCommandsToTimeouts;
 
     // maps the end interval command id to the waitingCommand id
 //   private Map<Byte, Byte> endCommandIdToStartCommandId;

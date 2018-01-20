@@ -4,7 +4,7 @@ public enum CommunicationType {
 
     MOCK(0), BLUETOOTH(1), USB(2), TEST(3);
 
-    private int id;
+    private final int id;
 
     CommunicationType(int id) {
         this.id = id;

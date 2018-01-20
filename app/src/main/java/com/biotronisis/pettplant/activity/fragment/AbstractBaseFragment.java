@@ -51,7 +51,7 @@ public abstract class AbstractBaseFragment extends Fragment implements IntentPar
         }
     }
 
-    MyOnClickListener okOnClickListener = new MyOnClickListener() {
+    final MyOnClickListener okOnClickListener = new MyOnClickListener() {
         @Override
         public void onClick() {
             getActivity().finish();

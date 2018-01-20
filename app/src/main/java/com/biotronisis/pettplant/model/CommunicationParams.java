@@ -24,7 +24,7 @@ public class CommunicationParams {
     private static final String NONE = "none";
     private static final String MOCKING_JAY = "MockingJay";
 
-    private SharedPreferences appParams;
+    private final SharedPreferences appParams;
 
     private String name;
     private CommunicationType communicationType;

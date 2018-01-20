@@ -8,7 +8,7 @@ public class Plant {
 
     private static final String TAG = "Plant_Class";
 
-    private PlantState state;
+    private final PlantState state;
 
     public Plant() {
         state = new PlantState();

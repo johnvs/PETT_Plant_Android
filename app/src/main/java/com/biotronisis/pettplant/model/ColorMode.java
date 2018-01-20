@@ -14,7 +14,7 @@ public class ColorMode {
         UP_AND_DOWN(7),
         FIFTY_FIFTY(8);
 
-        private int id;
+        private final int id;
 
         Mode(int id) {
             this.id = id;
@@ -48,7 +48,7 @@ public class ColorMode {
         RUNNING(1),
         PAUSED(2);
 
-        private int id;
+        private final int id;
 
         State(int id) {
             this.id = id;

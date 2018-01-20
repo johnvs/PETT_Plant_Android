@@ -25,7 +25,7 @@ public class PettPlantParams {
     private static final String COLOR_MODE_RUN_BUTTON = "colorModeRunButton";
     private static final String COLOR_MODE_PAUSE_BUTTON = "colorModePauseButton";
 
-    private SharedPreferences appParams;
+    private final SharedPreferences appParams;
 
     private Entrainment.Sequence entrainmentSequence;
     private String entrainmentRunButton;
