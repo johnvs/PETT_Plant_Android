@@ -28,13 +28,11 @@ public abstract class AbstractResponse implements Serializable {
 
         if (bytes.length < getMinimumResponseLength()) {
             result = false;
-//			return false;              // DEBUG
         }
 
 //		int msglen = bytes[0]+1;
         if (bytes.length != bytes[0] + 1) {
             result = false;
-//			return false;
         }
 
         byte checksum = 0;
@@ -44,10 +42,8 @@ public abstract class AbstractResponse implements Serializable {
 
         if (checksum != bytes[bytes.length - 1]) {
             result = false;
-//			return false;
         }
         return result;
-//		return true;
     }
 
 }
