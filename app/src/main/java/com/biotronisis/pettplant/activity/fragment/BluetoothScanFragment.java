@@ -6,7 +6,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -23,6 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.biotronisis.pettplant.R;
+import com.biotronisis.pettplant.activity.SettingsActivity;
 import com.biotronisis.pettplant.debug.MyDebug;
 
 import java.util.ArrayList;
@@ -33,16 +36,13 @@ import java.util.Set;
 public final class BluetoothScanFragment extends DialogFragment {
 
     private static final String TAG = "BluetoothScanFragment";
-
-    private LayoutInflater inflator;
-
-    // Member fields
+    private int orientation;
+    private LayoutInflater inflater;
     private BluetoothAdapter bluetoothAdapter;
     private List<MyItem> items;
     private MyDeviceAdapter listAdapter;
     private MyBluetoothBroadcastReceiver bluetoothReceiver;
     private Context parentContext;
-
     private OnBluetoothDeviceSelectedListener listener;
 
     public void setContext(Context thisContext) {
@@ -63,7 +63,7 @@ public final class BluetoothScanFragment extends DialogFragment {
 
         View view = inflater.inflate(R.layout.fragment_bluetooth_scan, container, false);
 
-        this.inflator = inflater;
+        this.inflater = inflater;
 
         // Hide the title.
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
@@ -75,7 +75,9 @@ public final class BluetoothScanFragment extends DialogFragment {
         ListView listView = view.findViewById(R.id.listView);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(listAdapter);
-        listView.setBackground(ContextCompat.getDrawable(parentContext, R.drawable.layout_background_bluetooth));
+//        Drawable cc = ContextCompat.getDrawable(getActivity(), R.drawable.layout_background_bluetooth);
+//        listView.setBackground(cc);
+        listView.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.layout_background_bluetooth));
 
         bluetoothReceiver = new MyBluetoothBroadcastReceiver();
 
@@ -89,8 +91,10 @@ public final class BluetoothScanFragment extends DialogFragment {
     public void onResume() {
         super.onResume();
 
+        orientation = getResources().getConfiguration().orientation;
+
         if (MyDebug.LOG) {
-            Log.i(TAG, "------------ onResume ------------");
+            Log.i(TAG, "------------ onResume ---------- Current Orientation = " + orientation);
         }
 
         items.clear();
@@ -119,6 +123,20 @@ public final class BluetoothScanFragment extends DialogFragment {
     public void onPause() {
         super.onPause();
 
+        // Check to see if the device was rotated while the dialog was displayed
+        if (orientation != getResources().getConfiguration().orientation) {
+            // We are pausing because of an orientation change
+            dismiss();
+        } else {
+            // We're pausing for reasons other than a device rotation
+            SettingsActivity settingsActivity = (SettingsActivity) getActivity();
+            settingsActivity.setbTScanFragDisplayed(false);
+        }
+
+        if (MyDebug.LOG) {
+            Log.i(TAG, "------------ onPause ---------- Current Orientation = " + orientation);
+        }
+
         // Make sure we're not doing discovery anymore
         if (bluetoothAdapter != null) {
             bluetoothAdapter.cancelDiscovery();
@@ -146,7 +164,7 @@ public final class BluetoothScanFragment extends DialogFragment {
     }
 
     private class MyItem {
-        private BluetoothDevice device;
+        private final BluetoothDevice device;
 
         MyItem(BluetoothDevice device) {
             this.device = device;
@@ -175,7 +193,7 @@ public final class BluetoothScanFragment extends DialogFragment {
         public View getView(int position, View convertView, ViewGroup parent) {
 
             if (convertView == null) {
-                convertView = inflator.inflate(android.R.layout.simple_list_item_2, null);
+                convertView = inflater.inflate(android.R.layout.simple_list_item_2, null);
             }
 
             MyItem item = items.get(position);
