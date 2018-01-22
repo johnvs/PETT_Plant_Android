@@ -416,7 +416,7 @@ public class PettPlantService extends Service {
             public void run() {
                 synchronized (statusListeners) {
                     for (CommunicationManagerListener listener : statusListeners) {
-                        listener.onDataRecieved();
+                        listener.onDataReceived();
                     }
                 }
             }

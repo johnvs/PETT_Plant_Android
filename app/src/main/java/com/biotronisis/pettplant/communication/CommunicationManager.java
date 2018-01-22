@@ -461,7 +461,7 @@ public class CommunicationManager {
      */
     public interface CommunicationManagerListener {
 
-        void onDataRecieved();
+        void onDataReceived();
 
         void onDataSent();
 
