@@ -5,105 +5,114 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+//import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import com.biotronisis.pettplant.R;
+import com.biotronisis.pettplant.debug.MyDebug;
 
 public class HelpActivity extends AbstractBaseActivity {
 
-   private static final String TAG = "HelpActivity";
-   public static final String EXTRA_ACTIVITY_NAME = "activityName";
-   public static final String EXTRA_FRAGMENT_NAME = "fragmentName";
+    private static final String TAG = "HelpActivity";
+    public static final String EXTRA_ACTIVITY_NAME = "activityName";
+    public static final String EXTRA_FRAGMENT_NAME = "fragmentName";
 
-//   private String activityName;
-   private String fragmentName;
+    @Override
+    public String getActivityName() {
+        return TAG;
+    }
 
-   //  @InjectView(R.id.webView)
-   private WebView webView;
+    @Override
+    public String getHelpKey() {
+        return null;         // no help
+    }
 
-   @Override
-   public String getActivityName() {
-      return TAG;
-   }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_help);
 
-   @Override
-   public String getHelpKey() {
-      return null;         // no help
-   }
+        WebView webView = findViewById(R.id.webView);
 
-   @Override
-   public void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      setContentView(R.layout.activity_help);
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setDefaultFontSize(18);
+        webView.setBackgroundColor(Color.TRANSPARENT);
+        webView.setBackground(ContextCompat.getDrawable(this, R.drawable.layout_background_help));
 
-      webView = (WebView) findViewById(R.id.webView);
+        try {
+            //noinspection ConstantConditions
+            String fragmentName = getIntent().getExtras().getString(EXTRA_FRAGMENT_NAME);
+//         String helpStr;
+//      int resID = 0;
 
-      WebSettings webSettings = webView.getSettings();
-      webSettings.setDefaultFontSize(18);
-      webView.setBackgroundColor(Color.TRANSPARENT);
-      webView.setBackground(ContextCompat.getDrawable(this, R.drawable.layout_background_help));
+//      if (fragmentName == null) {
+//         helpStr = getString(R.string.cant_find_help_text);
+////         resID = getResources().getIdentifier(activityName, "string", getPackageName());
+//      } else {
+            int resID = getResources().getIdentifier(fragmentName, "string", getPackageName());
+//      }
 
-//      activityName = getIntent().getExtras().getString(EXTRA_ACTIVITY_NAME);
-      fragmentName = getIntent().getExtras().getString(EXTRA_FRAGMENT_NAME);
+//      if (resID == 0) {
+//         helpStr = getString(R.string.cant_find_help_text);
+//      } else {
+//         String helpStr = getString(resID);
+//      }
 
-      String helpStr;
-      int resID = 0;
+            webView.loadData(getString(resID), "text/html", "UTF8");
+        } catch (Exception e) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "getIntent().getExtras().getString() returned null in HelpActivity#onCreate", e);
+            }
+        }
 
-      if (fragmentName == null) {
-         helpStr = getString(R.string.cant_find_help_text);
-//         resID = getResources().getIdentifier(activityName, "string", getPackageName());
-      } else {
-         resID = getResources().getIdentifier(fragmentName, "string", getPackageName());
-      }
+        ActionBar actionBar = getSupportActionBar();
+        try {
+            //noinspection ConstantConditions
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        } catch (Exception e) {
+            if (MyDebug.LOG) {
+                Log.e(TAG, "setDisplayHomeAsUpEnabled() returned null in HelpActivity#onCreate", e);
+            }
+        }
 
-      if (resID == 0) {
-         helpStr = getString(R.string.cant_find_help_text);
-      } else {
-         helpStr = getString(resID);
-      }
+    }
 
-      webView.loadData(helpStr, "text/html", "UTF8");
-
-      ActionBar actionBar = getSupportActionBar();
-      actionBar.setDisplayHomeAsUpEnabled(true);
-
-   }
-
-   @Override
-   public boolean onCreateOptionsMenu(Menu menu) {
-      // Inflate the menu; this adds items to the action bar.
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar.
 //      getMenuInflater().inflate(R.menu.menu_main, menu);
-      super.onCreateOptionsMenu(menu);
+        super.onCreateOptionsMenu(menu);
 
-      return true;
-   }
+        return true;
+    }
 
-   @Override
-   public boolean onOptionsItemSelected(MenuItem item) {
-      switch (item.getItemId()) {
-         case android.R.id.home:
-            this.finish();
-            return true;
-         default:
-            return super.onOptionsItemSelected(item);
-      }
-   }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
-   /**
-    * Creates an Intent for this Activity.
-    *
-    * @param callee
-    * @return Intent
-    */
-   public static Intent createIntent(Context callee, String activityName, String fragmentName) {
+    /**
+     * Creates an Intent for this Activity.
+     *
+     * @param callee the calling activity
+     * @return Intent
+     */
 //   public static Intent createIntent(Context callee, String fragmentName) {
-      Intent intent = new Intent(callee, HelpActivity.class);
-      intent.putExtra(EXTRA_ACTIVITY_NAME, activityName);
-      intent.putExtra(EXTRA_FRAGMENT_NAME, fragmentName);
-      return intent;
-   }
+    public static Intent createIntent(Context callee, String activityName, String fragmentName) {
+        Intent intent = new Intent(callee, HelpActivity.class);
+        intent.putExtra(EXTRA_ACTIVITY_NAME, activityName);
+        intent.putExtra(EXTRA_FRAGMENT_NAME, fragmentName);
+        return intent;
+    }
 }

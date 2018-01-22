@@ -4,7 +4,7 @@ public class RunEntrainmentResponse extends AbstractResponse {
     private static final long serialVersionUID = 1L;
 
     public static final Byte RESPONSE_ID = (byte) 0x90;
-    public static final int MIN_RESPONSE_BYTES = 0;
+    private static final int MIN_RESPONSE_BYTES = 0;
 
     @Override
     public Byte getResponseId() {

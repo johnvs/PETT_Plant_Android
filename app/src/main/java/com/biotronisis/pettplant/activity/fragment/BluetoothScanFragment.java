@@ -6,9 +6,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+//import android.content.res.Configuration;
+import android.content.res.Resources;
+//import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,82 +25,85 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.biotronisis.pettplant.R;
+import com.biotronisis.pettplant.activity.SettingsActivity;
+import com.biotronisis.pettplant.debug.MyDebug;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public final class BluetoothScanFragment extends DialogFragment {
-	
-//    private static final String TAG = "BluetoothScanFragment";
 
-    // Return Intent extra
-//    public static String EXTRA_DEVICE_ADDRESS = "device_address";
-
-   private LayoutInflater inflator;
-
-   // Member fields
-   private BluetoothAdapter bluetoothAdapter;
-   private List<MyItem> items;
-   private MyDeviceAdapter listAdapter;
-   private MyBluetoothBroadcastReceiver receiver;
-   private Context parentContext;
-    
+    private static final String TAG = "BluetoothScanFragment";
+    private int orientation;
+    private LayoutInflater inflater;
+    private BluetoothAdapter bluetoothAdapter;
+    private List<MyItem> items;
+    private MyDeviceAdapter listAdapter;
+    private MyBluetoothBroadcastReceiver bluetoothReceiver;
+    private Context parentContext;
     private OnBluetoothDeviceSelectedListener listener;
 
-   public void setContext(Context thisContext) {
-      parentContext = thisContext;
-   }
-    
-    public void setOnBluetoothDeviceSelectedListener(OnBluetoothDeviceSelectedListener listener) {
-    	this.listener = listener;
+    public void setContext(Context thisContext) {
+        parentContext = thisContext;
     }
-    
+
+    public void setOnBluetoothDeviceSelectedListener(OnBluetoothDeviceSelectedListener listener) {
+        this.listener = listener;
+    }
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        if (MyDebug.LOG) {
+            Log.i(TAG, "------------ onCreateView ------------");
+        }
+
         View view = inflater.inflate(R.layout.fragment_bluetooth_scan, container, false);
 
-        this.inflator = inflater;
+        this.inflater = inflater;
 
-//       view.setBackground(ContextCompat.getDrawable(parentContext, R.drawable.layout_background_spinner));
+        // Hide the title.
+        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
-//       getDialog().setTitle(getString(R.string.select_device));
-
-       // Hide the title.
-       getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-
-        items = new ArrayList<MyItem>();
+        items = new ArrayList<>();
         listAdapter = new MyDeviceAdapter();
 
         // Find and set up the ListView for paired devices
-        ListView listView = (ListView) view.findViewById(R.id.listView);
+        ListView listView = view.findViewById(R.id.listView);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(listAdapter);
-        listView.setBackground(ContextCompat.getDrawable(parentContext, R.drawable.layout_background_bluetooth));
+//        Drawable cc = ContextCompat.getDrawable(getActivity(), R.drawable.layout_background_bluetooth);
+//        listView.setBackground(cc);
+        listView.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.layout_background_bluetooth));
 
-        receiver = new MyBluetoothBroadcastReceiver();
+        bluetoothReceiver = new MyBluetoothBroadcastReceiver();
 
         // Get the local Bluetooth adapter
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         return view;
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
 
+        orientation = getResources().getConfiguration().orientation;
+
+        if (MyDebug.LOG) {
+            Log.i(TAG, "------------ onResume ---------- Current Orientation = " + orientation);
+        }
+
         items.clear();
         listAdapter.notifyDataSetChanged();
 
-        // Register for broadcasts when a device is discovered
+        // Register for Bluetooth device found and discovery finished events
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        getActivity().registerReceiver(receiver, filter);
-
-        // Register for broadcasts when discovery has finished
-        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        getActivity().registerReceiver(receiver, filter);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        getActivity().registerReceiver(bluetoothReceiver, filter);
 
         // Get a set of currently paired devices
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
@@ -110,18 +118,32 @@ public final class BluetoothScanFragment extends DialogFragment {
 
         doDiscovery();
     }
-    
+
     @Override
     public void onPause() {
-    	super.onPause();
-    	
-    	// Make sure we're not doing discovery anymore
+        super.onPause();
+
+        // Check to see if the device was rotated while the dialog was displayed
+        if (orientation != getResources().getConfiguration().orientation) {
+            // We are pausing because of an orientation change
+            dismiss();
+        } else {
+            // We're pausing for reasons other than a device rotation
+            SettingsActivity settingsActivity = (SettingsActivity) getActivity();
+            settingsActivity.setbTScanFragDisplayed(false);
+        }
+
+        if (MyDebug.LOG) {
+            Log.i(TAG, "------------ onPause ---------- Current Orientation = " + orientation);
+        }
+
+        // Make sure we're not doing discovery anymore
         if (bluetoothAdapter != null) {
             bluetoothAdapter.cancelDiscovery();
         }
 
         // Unregister broadcast listeners
-        getActivity().unregisterReceiver(receiver);
+        getActivity().unregisterReceiver(bluetoothReceiver);
     }
 
     /**
@@ -140,69 +162,70 @@ public final class BluetoothScanFragment extends DialogFragment {
         // Request discover from BluetoothAdapter
         bluetoothAdapter.startDiscovery();
     }
-    
+
     private class MyItem {
-    	private BluetoothDevice device;
-    	
-    	public MyItem(BluetoothDevice device) {
-    		this.device = device;
-    	}
-    	
+        private final BluetoothDevice device;
+
+        MyItem(BluetoothDevice device) {
+            this.device = device;
+        }
+
     }
-    
+
     private class MyDeviceAdapter extends BaseAdapter implements OnItemClickListener {
 
-		@Override
-		public int getCount() {
-			return items.size();
-		}
+        @Override
+        public int getCount() {
+            return items.size();
+        }
 
-		@Override
-		public Object getItem(int position) {
-			return items.get(position);
-		}
+        @Override
+        public Object getItem(int position) {
+            return items.get(position);
+        }
 
-		@Override
-		public long getItemId(int position) {
-			return items.get(position).hashCode();
-		}
+        @Override
+        public long getItemId(int position) {
+            return items.get(position).hashCode();
+        }
 
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			
-			if (convertView == null) {
-				convertView = inflator.inflate(android.R.layout.simple_list_item_2, null);
-			}
-			
-			MyItem item = items.get(position);
-			boolean bonded = (item.device.getBondState() == BluetoothDevice.BOND_BONDED);
-			int colorId = bonded ? android.R.color.black : android.R.color.darker_gray;
-			int color = getResources().getColor(colorId);
-			
-			TextView text1 = (TextView) convertView.findViewById(android.R.id.text1);
-			text1.setText(item.device.getName());
-			text1.setTextColor(color);
-			
-			TextView text2 = (TextView) convertView.findViewById(android.R.id.text2);
-			text2.setText(item.device.getAddress() + " - " +
-               getString(bonded ? R.string.paired : R.string.not_paired));
-			text2.setTextColor(color);
-			
-			return convertView;
-		}
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
 
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			// Cancel discovery because it's costly and we're about to connect
-			bluetoothAdapter.cancelDiscovery();
+            if (convertView == null) {
+                convertView = inflater.inflate(android.R.layout.simple_list_item_2, null);
+            }
 
-			if (listener != null) {
-				listener.onBluetoothDeviceSelectedListener(items.get(position).device);
-			}
+            MyItem item = items.get(position);
+            boolean bonded = (item.device.getBondState() == BluetoothDevice.BOND_BONDED);
+            int colorId = bonded ? android.R.color.black : android.R.color.darker_gray;
+            int color = getResources().getColor(colorId);
 
-			dismiss();
-		}
-    	
+            TextView text1 = convertView.findViewById(android.R.id.text1);
+            text1.setText(item.device.getName());
+            text1.setTextColor(color);
+
+            TextView text2 = convertView.findViewById(android.R.id.text2);
+            Locale myLocale = Resources.getSystem().getConfiguration().locale;
+            String pairedStr = getString(bonded ? R.string.paired : R.string.not_paired);
+            text2.setText(String.format(myLocale, "%s - %s", item.device.getAddress(), pairedStr));
+            text2.setTextColor(color);
+
+            return convertView;
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // Cancel discovery because it's costly and we're about to connect
+            bluetoothAdapter.cancelDiscovery();
+
+            if (listener != null) {
+                listener.onBluetoothDeviceSelectedListener(items.get(position).device);
+            }
+
+            dismiss();
+        }
+
     }
 
     // The BroadcastReceiver that listens for discovered devices and
@@ -221,7 +244,7 @@ public final class BluetoothScanFragment extends DialogFragment {
                     items.add(new MyItem(device));
                     listAdapter.notifyDataSetChanged();
                 }
-            // When discovery is finished, change the Activity title
+                // When discovery is finished, change the Activity title
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 getActivity().setProgressBarIndeterminateVisibility(false);
             }
@@ -229,8 +252,8 @@ public final class BluetoothScanFragment extends DialogFragment {
     }
 
     public interface OnBluetoothDeviceSelectedListener {
-    	
-    	void onBluetoothDeviceSelectedListener(BluetoothDevice device);
+
+        void onBluetoothDeviceSelectedListener(BluetoothDevice device);
     }
 
 }

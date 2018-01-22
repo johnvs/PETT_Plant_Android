@@ -32,170 +32,170 @@ import java.util.logging.Level;
  */
 public class CommunicationManager {
 
-   private static final String TAG = "CommunicationManager";
+    private static final String TAG = "CommunicationManager";
 
-   private PettPlantService pettPlantService;
+    private final PettPlantService pettPlantService;
 
-   private CommunicationParams communicationParams;
+    private final CommunicationParams communicationParams;
 
-   // handles sending and receiving bytes over some channel
-   private ICommAdapter commAdapter;
+    // handles sending and receiving bytes over some channel
+    private ICommAdapter commAdapter;
 
-   // the callback used by the current commAdapter to notify this of responses
-   public CommAdapterListener commResponseListener = new MyCommAdapterListener();
+    // a general purpose handler to ensure a Runnable is run on the background thread
+    private final Handler backgroundHandler;
 
-   // a general purpose handler to ensure a Runnable is run on the background thread
-   private Handler backgroundHandler;
+    // a general handler for running code on the ui thread
+    private final Handler uiHandler;
 
-   // a general handler for running code on the ui thread
-   private Handler uiHandler;
+    // mapping response id and command id to waiting command
+    private final Map<Byte, AbstractCommand<?>> responseIdToWaitingCommands;
+    private final Map<Byte, AbstractCommand<?>> commandIdToWaitingCommands;
 
-   // mapping response id and command id to waiting command
-   private Map<Byte, AbstractCommand<?>> responseIdToWaitingCommands;
-   private Map<Byte, AbstractCommand<?>> commandIdToWaitingCommands;
+    // the timeout for the currently waiting command that is waiting a response
+    private final Map<AbstractCommand<?>, TimeoutBackgroundRunnable> waitingCommandsToTimeouts;
 
-   // the timeout for the currently waiting command that is waiting a response
-   private Map<AbstractCommand<?>, TimeoutBackgroundRunnable> waitingCommandsToTimeouts;
-
-   // maps the end interval command id to the waitingCommand id
+    // maps the end interval command id to the waitingCommand id
 //   private Map<Byte, Byte> endCommandIdToStartCommandId;
 
 //   private boolean justEndedInterval;
 
-   @SuppressLint("UseSparseArrays")
-   public CommunicationManager(PettPlantService pettPlantService, CommunicationParams communicationParams) {
+    @SuppressLint("UseSparseArrays")
+    public CommunicationManager(PettPlantService pettPlantService, CommunicationParams communicationParams) {
 
-      this.pettPlantService = pettPlantService;
-      this.communicationParams = communicationParams;
+        this.pettPlantService = pettPlantService;
+        this.communicationParams = communicationParams;
 
-      HandlerThread backgroundThread = new HandlerThread("meter-service");
-      backgroundThread.start();
-      this.backgroundHandler = new Handler(backgroundThread.getLooper());
+        HandlerThread backgroundThread = new HandlerThread("pett-plant-service");
+        backgroundThread.start();
+        this.backgroundHandler = new Handler(backgroundThread.getLooper());
 
-      this.uiHandler = new Handler(Looper.getMainLooper());
+        this.uiHandler = new Handler(Looper.getMainLooper());
 
-      this.responseIdToWaitingCommands = new HashMap<Byte, AbstractCommand<?>>();
-      this.commandIdToWaitingCommands = new HashMap<Byte, AbstractCommand<?>>();
-      this.waitingCommandsToTimeouts = new HashMap<AbstractCommand<?>, TimeoutBackgroundRunnable>();
+        this.responseIdToWaitingCommands = new HashMap<>();
+        this.commandIdToWaitingCommands = new HashMap<>();
+        this.waitingCommandsToTimeouts = new HashMap<>();
 //      this.endCommandIdToStartCommandId = new HashMap<Byte, Byte>();
 
-      // Test
+        // the callback used by the current commAdapter to notify this of responses
+        CommAdapterListener commResponseListener = new MyCommAdapterListener();
+
+        // Test
 //		switch (CommunicationType.TEST) {
-      switch (communicationParams.getCommunicationType()) {
-         case MOCK:
-            this.commAdapter = new MockCommAdapter(commResponseListener);
-            break;
-         case BLUETOOTH:
-            this.commAdapter = new BluetoothCommAdapter(commResponseListener, this.pettPlantService);
-            break;
+        switch (communicationParams.getCommunicationType()) {
+            case MOCK:
+                this.commAdapter = new MockCommAdapter(commResponseListener);
+                break;
+            case BLUETOOTH:
+                this.commAdapter = new BluetoothCommAdapter(commResponseListener, this.pettPlantService);
+                break;
 //			case USB:
 //				this.commAdapter = new UsbCommAdapter(commResponseListener, this.pettPlantService);
 //				break;
-         default:
-            ErrorHandler errorHandler = ErrorHandler.getInstance(this.pettPlantService);
-            errorHandler.logError(Level.WARNING, "CommunicationManager.CommunicationManager(): " +
-                        "unknown CommunicationType - " + communicationParams.getCommunicationType(),
-                  R.string.communication_type_error_title,
-                  R.string.communication_type_error_message);
-      }
-   }
+            default:
+                ErrorHandler errorHandler = ErrorHandler.getInstance(this.pettPlantService);
+                errorHandler.logError(Level.WARNING, "CommunicationManager.CommunicationManager(): " +
+                            "unknown CommunicationType - " + communicationParams.getCommunicationType(),
+                      R.string.communication_type_error_title,
+                      R.string.communication_type_error_message);
+        }
+    }
 
-   public boolean isReConnectingToBtDevice(String address) {
-      return (communicationParams.getCommunicationType() == CommunicationType.BLUETOOTH &&
-            commAdapter.isReConnectingToDevice(address));
-   }
+    public boolean isReConnectingToBtDevice(String address) {
+        return (communicationParams.getCommunicationType() == CommunicationType.BLUETOOTH &&
+              commAdapter.isReConnectingToDevice(address));
+    }
 
 //    public boolean isUsbDeviceAttached(PettPlantService meter) {
 //        return UsbCommAdapter.isUsbDeviceAttached(meter);
 //    }
 
-   public void connect() {            // throws Exception {
-      if (MyDebug.LOG) {
-         Log.d(TAG, "connect. name=" + communicationParams.getName() + " address:" +
-               communicationParams.getAddress());
-      }
-      if (commAdapter == null) {
-         ErrorHandler errorHandler = ErrorHandler.getInstance(pettPlantService);
-         errorHandler.logError(Level.SEVERE, "CommunicationManager.connect(): " +
-                     "commAdapter does not exist.",
-               R.string.bluetooth_adapter_error_title,
-               R.string.bluetooth_adapter_error_message);
-      } else {
-         commAdapter.activate(communicationParams.getAddress());
+    public void connect() {            // throws Exception {
+        if (MyDebug.LOG) {
+            Log.d(TAG, "connect. name=" + communicationParams.getName() + " address:" +
+                  communicationParams.getAddress());
+        }
+        if (commAdapter == null) {
+            ErrorHandler errorHandler = ErrorHandler.getInstance(pettPlantService);
+            errorHandler.logError(Level.SEVERE, "CommunicationManager.connect(): " +
+                        "commAdapter does not exist.",
+                  R.string.bluetooth_adapter_error_title,
+                  R.string.bluetooth_adapter_error_message);
+        } else {
+            commAdapter.activate(communicationParams.getAddress());
 
-         ErrorHandler errorHandler = ErrorHandler.getInstance();
-         if (errorHandler != null) {
-            errorHandler.logError(Level.INFO, "CommunicationManager.connect():" +
-                  " executing commAdapter.activate(" + communicationParams.getAddress() + ").", 0, 0);
-         } else {
-            if (MyDebug.LOG) {
-               Log.d(TAG, "errorHandler is null.");
+            ErrorHandler errorHandler = ErrorHandler.getInstance();
+            if (errorHandler != null) {
+                errorHandler.logError(Level.INFO, "CommunicationManager.connect():" +
+                      " executing commAdapter.activate(" + communicationParams.getAddress() + ").", 0, 0);
+            } else {
+                if (MyDebug.LOG) {
+                    Log.d(TAG, "errorHandler is null.");
+                }
             }
-         }
 
-      }
-   }
+        }
+    }
 
-   public void connectionLost() {
-      commAdapter.connLost();
-   }
+    public void connectionLost() {
+        commAdapter.connLost();
+    }
 
-   public void disconnect() {
-      commAdapter.deactivate();
-   }
+    public void disconnect() {
+        commAdapter.deactivate();
+    }
 
-   /**
-    * Returns the current CommAdapter being used for sending data to the meter
-    */
-   public ICommAdapter getCurrentCommAdapter() {
-      return commAdapter;
-   }
+    /**
+     * Returns the current CommAdapter being used for sending data to the meter
+     */
+    public ICommAdapter getCurrentCommAdapter() {
+        return commAdapter;
+    }
 
-   /**
-    * Sends a Command to the meter and will callback the ResponseCallback when a response
-    * is received or on failure. ResponseCallback should be null for commands with no response.
-    * NOTE: Do not reuse Command objects.
-    * NOTE: This call is async and returns before the command is actually sent
-    */
-   public void sendCommand(final AbstractCommand<? extends AbstractResponse> command) {
+    /**
+     * Sends a Command to the meter and will callback the ResponseCallback when a response
+     * is received or on failure. ResponseCallback should be null for commands with no response.
+     * NOTE: Do not reuse Command objects.
+     * NOTE: This call is async and returns before the command is actually sent
+     */
+    public void sendCommand(final AbstractCommand<? extends AbstractResponse> command) {
 
-      // Test
+        // Test
 //	    if (command.getCommandId() == EndIntervalReadingCommand.COMMAND_ID) {
 //	      backgroundHandler = null;
 //	    }
 
-      backgroundHandler.post(new Runnable() {
-         @Override
-         public void run() {
-            sendCommandBackground(command);
-         }
-      });
-   }
+        backgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                sendCommandBackground(command);
+            }
+        });
+    }
 
-   private void sendCommandBackground(AbstractCommand<? extends AbstractResponse> command) {
+    private void sendCommandBackground(AbstractCommand<? extends AbstractResponse> command) {
 
-      ErrorHandler errorHandler = ErrorHandler.getInstance();
-      if (errorHandler != null) {
-         errorHandler.logError(Level.INFO, "CommunicationManager.sendCommandBackground():" +
-               " sent command - " + command.getCommandId(), 0, 0);
-      } else {
-         if (MyDebug.LOG) {
-            Log.d(TAG, "errorHandler is null.");
-         }
-      }
+        ErrorHandler errorHandler = ErrorHandler.getInstance();
+        if (errorHandler != null) {
+            errorHandler.logError(Level.INFO, "CommunicationManager.sendCommandBackground():" +
+                  " sent command - " + command.getCommandId(), 0, 0);
+        } else {
+            if (MyDebug.LOG) {
+                Log.d(TAG, "errorHandler is null.");
+            }
+        }
 
-      Byte commandId = command.getCommandId();
-      if (commandIdToWaitingCommands.containsKey(commandId)) {
-         pettPlantService.dispatchCommError(CommunicationErrorType.TRANSMIT_FAILED,
-               "a command with this same command id is already in progress", commandId);
-         return;
-      }
-      Byte responseId = command.getResponseId();
-      if (responseId != null && responseIdToWaitingCommands.containsKey(responseId)) {
-         pettPlantService.dispatchCommError(CommunicationErrorType.TRANSMIT_FAILED,
-               "a command with this same response id is already in progress", commandId);
-         return;
-      }
+        Byte commandId = command.getCommandId();
+        if (commandIdToWaitingCommands.containsKey(commandId)) {
+            pettPlantService.dispatchCommError(CommunicationErrorType.TRANSMIT_FAILED,
+                  "a command with this same command id is already in progress", commandId);
+            return;
+        }
+        Byte responseId = command.getResponseId();
+        if (responseId != null && responseIdToWaitingCommands.containsKey(responseId)) {
+            pettPlantService.dispatchCommError(CommunicationErrorType.TRANSMIT_FAILED,
+                  "a command with this same response id is already in progress", commandId);
+            return;
+        }
 
 //      ErrorHandler errorHandler = ErrorHandler.getInstance();
 //      if (errorHandler != null) {
@@ -207,14 +207,14 @@ public class CommunicationManager {
 //         }
 //      }
 
-      ICommAdapter adapter = getCurrentCommAdapter();
-      byte[] bytes = command.toCommandBytes();
-      if (MyDebug.LOG) {
-         Log.d(TAG, "sendBytes=" + new BigInteger(bytes).toString(16));
-      }
-      adapter.sendBytes(bytes);
+        ICommAdapter adapter = getCurrentCommAdapter();
+        byte[] bytes = command.toCommandBytes();
+        if (MyDebug.LOG) {
+            Log.d(TAG, "sendBytes=" + new BigInteger(bytes).toString(16));
+        }
+        adapter.sendBytes(bytes);
 
-      // check if this command ends an interval
+        // check if this command ends an interval
 //      if (endCommandIdToStartCommandId.containsKey(commandId)) {
 //
 //         Byte startCommandId = endCommandIdToStartCommandId.remove(commandId);
@@ -231,246 +231,246 @@ public class CommunicationManager {
 //         justEndedInterval = true;
 //      }
 
-      ResponseCallback<? extends AbstractResponse> callback = command.getResponseCallback();
-      if (callback != null) {
+        ResponseCallback<? extends AbstractResponse> callback = command.getResponseCallback();
+        if (callback != null) {
 
-         if (responseId == null) {
-            // not looking for a response id, dispatch an empty response to be sent
-            uiHandler.post(new ResponseCallbackUiRunnable(callback, new EmptyResponse()));
-         } else {
+            if (responseId == null) {
+                // not looking for a response id, dispatch an empty response to be sent
+                uiHandler.post(new ResponseCallbackUiRunnable(callback, new EmptyResponse()));
+            } else {
 
-            commandIdToWaitingCommands.put(commandId, command);
-            responseIdToWaitingCommands.put(responseId, command);
+                commandIdToWaitingCommands.put(commandId, command);
+                responseIdToWaitingCommands.put(responseId, command);
 
-            // check if this command starts an interval
+                // check if this command starts an interval
 //				if (command.isInterval()) {
 //					endCommandIdToStartCommandId.put(command.getIntervalEndCommandId(), commandId);
 //					justEndedInterval = false;
 //				}
 
-            TimeoutBackgroundRunnable timeout = new TimeoutBackgroundRunnable(command);
-            waitingCommandsToTimeouts.put(command, timeout);
-            backgroundHandler.postDelayed(timeout, command.getResponseTimeoutMs());
-         }
-      }
+                TimeoutBackgroundRunnable timeout = new TimeoutBackgroundRunnable(command);
+                waitingCommandsToTimeouts.put(command, timeout);
+                backgroundHandler.postDelayed(timeout, command.getResponseTimeoutMs());
+            }
+        }
 
-      pettPlantService.dispatchCommSent();
-   }
+        pettPlantService.dispatchCommSent();
+    }
 
-   private void handleResponseBytes(final byte[] responseBytes) {
-      backgroundHandler.post(new Runnable() {
-         @Override
-         public void run() {
-            handleResponseBytesBackground(responseBytes);
-         }
-      });
-   }
+    private void handleResponseBytes(final byte[] responseBytes) {
+        backgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                handleResponseBytesBackground(responseBytes);
+            }
+        });
+    }
 
-   private void handleResponseBytesBackground(byte[] responseBytes) {
-      StringBuilder responseBytesStr = new StringBuilder();
-      if (responseBytes.length > 0) {
-         for (byte b : responseBytes) {
-            responseBytesStr.append(String.format("%02X ", b));
-         }
-      }
-      if (MyDebug.LOG) {
-         Log.d(TAG, "responseBytes= " + responseBytesStr.toString());
+    private void handleResponseBytesBackground(byte[] responseBytes) {
+        StringBuilder responseBytesStr = new StringBuilder();
+        if (responseBytes.length > 0) {
+            for (byte b : responseBytes) {
+                responseBytesStr.append(String.format("%02X ", b));
+            }
+        }
+        if (MyDebug.LOG) {
+            Log.d(TAG, "responseBytes= " + responseBytesStr.toString());
 //            Log.d(TAG, "responseBytes=" + new BigInteger(responseBytes).toString(16));
-      }
+        }
 
-      ErrorHandler errorHandler = ErrorHandler.getInstance();
-      if (errorHandler != null) {
-         errorHandler.logError(Level.INFO, "CommunicationManager.handleResponseBytesBackground():" +
-               " received bytes - " + responseBytesStr, 0, 0);
-      } else {
-         if (MyDebug.LOG) {
-            Log.d(TAG, "errorHandler is null.");
-         }
-      }
+        ErrorHandler errorHandler = ErrorHandler.getInstance();
+        if (errorHandler != null) {
+            errorHandler.logError(Level.INFO, "CommunicationManager.handleResponseBytesBackground():" +
+                  " received bytes - " + responseBytesStr, 0, 0);
+        } else {
+            if (MyDebug.LOG) {
+                Log.d(TAG, "errorHandler is null.");
+            }
+        }
 
-      if (responseBytes.length < 3) {
-         pettPlantService.dispatchCommError(CommunicationErrorType.MALFORMED_RESPONSE,
-               "response length too short", null);
-         return;
-      }
+        if (responseBytes.length < 3) {
+            pettPlantService.dispatchCommError(CommunicationErrorType.MALFORMED_RESPONSE,
+                  "response length too short", null);
+            return;
+        }
 
-      byte msgLength = responseBytes[0];
-      if (responseBytes.length < msgLength) {
-         pettPlantService.dispatchCommError(CommunicationErrorType.MALFORMED_RESPONSE,
-               "response length too short", null);
-         return;
-      }
+        byte msgLength = responseBytes[0];
+        if (responseBytes.length < msgLength) {
+            pettPlantService.dispatchCommError(CommunicationErrorType.MALFORMED_RESPONSE,
+                  "response length too short", null);
+            return;
+        }
 
-      Byte responseId = responseBytes[1];
-      AbstractCommand<?> waitingCommand = responseIdToWaitingCommands.get(responseId);
+        Byte responseId = responseBytes[1];
+        AbstractCommand<?> waitingCommand = responseIdToWaitingCommands.get(responseId);
 
-      if (waitingCommand == null) {
-         pettPlantService.dispatchCommError(CommunicationErrorType.UNEXPECTED_RESPONSE,
-               "received response but none requested", responseId);
+        if (waitingCommand == null) {
+            pettPlantService.dispatchCommError(CommunicationErrorType.UNEXPECTED_RESPONSE,
+                  "received response but none requested", responseId);
 
-         // can't call onFailed on a callback, because we don't know who this belongs to
-         return;
-      }
+            // can't call onFailed on a callback, because we don't know who this belongs to
+            return;
+        }
 
-      AbstractResponse response;
-      try {
-         Class<?> responseClass = waitingCommand.getResponseClass();
-         response = (AbstractResponse) responseClass.newInstance();
-      } catch (Exception ex) {
-         pettPlantService.dispatchCommError(CommunicationErrorType.UNKNOWN_RESPONSE,
-               "unable to create response instance", null);
-         return;
-      }
+        AbstractResponse response;
+        try {
+            Class<?> responseClass = waitingCommand.getResponseClass();
+            response = (AbstractResponse) responseClass.newInstance();
+        } catch (Exception ex) {
+            pettPlantService.dispatchCommError(CommunicationErrorType.UNKNOWN_RESPONSE,
+                  "unable to create response instance", null);
+            return;
+        }
 
-      if (!response.validateChecksum(responseBytes)) {
-         pettPlantService.dispatchCommError(CommunicationErrorType.MALFORMED_RESPONSE,
-               "response checksum did not match", null);
-         return;
-      }
+        if (!response.validateChecksum(responseBytes)) {
+            pettPlantService.dispatchCommError(CommunicationErrorType.MALFORMED_RESPONSE,
+                  "response checksum did not match", null);
+            return;
+        }
 
-      // populate the response object with the data in the response bytes
-      response.fromResponseBytes(responseBytes);
+        // populate the response object with the data in the response bytes
+        response.fromResponseBytes(responseBytes);
 
-      // notify all listeners data has been received
-      pettPlantService.dispatchCommReceived();
+        // notify all listeners data has been received
+        pettPlantService.dispatchCommReceived();
 
-      TimeoutBackgroundRunnable timeout = waitingCommandsToTimeouts.get(waitingCommand);
-      backgroundHandler.removeCallbacks(timeout);
+        TimeoutBackgroundRunnable timeout = waitingCommandsToTimeouts.get(waitingCommand);
+        backgroundHandler.removeCallbacks(timeout);
 
-      uiHandler.post(new ResponseCallbackUiRunnable(waitingCommand.getResponseCallback(), response));
+        uiHandler.post(new ResponseCallbackUiRunnable(waitingCommand.getResponseCallback(), response));
 
 //		if (waitingCommand.isInterval()) {
 //			// is interval, expecting another, so reset the timeout
 //			backgroundHandler.postDelayed(timeout, waitingCommand.getResponseTimeoutMs());
 //		} else {
-      commandIdToWaitingCommands.remove(waitingCommand.getCommandId());
-      responseIdToWaitingCommands.remove(waitingCommand.getResponseId());
+        commandIdToWaitingCommands.remove(waitingCommand.getCommandId());
+        responseIdToWaitingCommands.remove(waitingCommand.getResponseId());
 //		}
-   }
+    }
 
-   /**
-    * Sends an Response on the callback
-    */
-   private class ResponseCallbackUiRunnable implements Runnable {
+    /**
+     * Sends an Response on the callback
+     */
+    private class ResponseCallbackUiRunnable implements Runnable {
 
-      @SuppressWarnings("rawtypes")
-      private ResponseCallback callback;
-      private AbstractResponse response;
+        @SuppressWarnings("rawtypes")
+        private final ResponseCallback callback;
+        private final AbstractResponse response;
 
-      public ResponseCallbackUiRunnable(ResponseCallback<?> callback, AbstractResponse response) {
-         this.callback = callback;
-         this.response = response;
-      }
+        ResponseCallbackUiRunnable(ResponseCallback<?> callback, AbstractResponse response) {
+            this.callback = callback;
+            this.response = response;
+        }
 
-      @SuppressWarnings("unchecked")
-      @Override
-      public void run() {
-         callback.onResponse(response);
-      }
-   }
+        @SuppressWarnings("unchecked")
+        @Override
+        public void run() {
+            callback.onResponse(response);
+        }
+    }
 
-   /**
-    * Run on a delay to invoke the timeout after the configured amount of time.
-    */
-   private class TimeoutBackgroundRunnable implements Runnable {
+    /**
+     * Run on a delay to invoke the timeout after the configured amount of time.
+     */
+    private class TimeoutBackgroundRunnable implements Runnable {
 
-      private AbstractCommand<?> command;
+        private final AbstractCommand<?> command;
 
-      public TimeoutBackgroundRunnable(AbstractCommand<?> command) {
-         this.command = command;
-      }
+        TimeoutBackgroundRunnable(AbstractCommand<?> command) {
+            this.command = command;
+        }
 
-      @Override
-      public void run() {
-         // check if the command we were waiting for still hasn't been handled
-         Byte responseId = command.getResponseId();
-         Byte commandId = command.getCommandId();
-         if (responseIdToWaitingCommands.containsKey(responseId)) {
+        @Override
+        public void run() {
+            // check if the command we were waiting for still hasn't been handled
+            Byte responseId = command.getResponseId();
+            Byte commandId = command.getCommandId();
+            if (responseIdToWaitingCommands.containsKey(responseId)) {
 
-            responseIdToWaitingCommands.remove(responseId);
-            commandIdToWaitingCommands.remove(commandId);
-            waitingCommandsToTimeouts.remove(command);
+                responseIdToWaitingCommands.remove(responseId);
+                commandIdToWaitingCommands.remove(commandId);
+                waitingCommandsToTimeouts.remove(command);
 
-            uiHandler.post(new TimeoutCallbackUiRunnable(command.getResponseCallback()));
+                uiHandler.post(new TimeoutCallbackUiRunnable(command.getResponseCallback()));
 
-            ErrorHandler errorHandler = ErrorHandler.getInstance();
-            if (errorHandler != null) {
-               errorHandler.logError(Level.INFO, "CommunicationManager$TimeoutBackgroundRunnable" +
-                     ".run() - Plant response timed out.", 0, 0);
-            } else {
-               if (MyDebug.LOG) {
-                  Log.d(TAG, "errorHandler is null.");
-               }
+                ErrorHandler errorHandler = ErrorHandler.getInstance();
+                if (errorHandler != null) {
+                    errorHandler.logError(Level.INFO, "CommunicationManager$TimeoutBackgroundRunnable" +
+                          ".run() - Plant response timed out.", 0, 0);
+                } else {
+                    if (MyDebug.LOG) {
+                        Log.d(TAG, "errorHandler is null.");
+                    }
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   /**
-    * Sends an ErrorType on the callback
-    */
-   private class TimeoutCallbackUiRunnable implements Runnable {
+    /**
+     * Sends an ErrorType on the callback
+     */
+    private class TimeoutCallbackUiRunnable implements Runnable {
 
-      @SuppressWarnings("rawtypes")
-      private ResponseCallback callback;
+        @SuppressWarnings("rawtypes")
+        private final ResponseCallback callback;
 
-      public TimeoutCallbackUiRunnable(ResponseCallback<?> callback) {
-         this.callback = callback;
-      }
+        TimeoutCallbackUiRunnable(ResponseCallback<?> callback) {
+            this.callback = callback;
+        }
 
-      @Override
-      public void run() {
-         callback.onFailed(CommunicationErrorType.TIMEOUT_RESPONSE);
-      }
-   }
+        @Override
+        public void run() {
+            callback.onFailed(CommunicationErrorType.TIMEOUT_RESPONSE);
+        }
+    }
 
-   /**
-    * Listens to the CommAdapter for received bytes
-    */
-   private class MyCommAdapterListener implements CommAdapterListener {
+    /**
+     * Listens to the CommAdapter for received bytes
+     */
+    private class MyCommAdapterListener implements CommAdapterListener {
 
-      @Override
-      public void onConnectionState(ConnectionState connectionState) {
+        @Override
+        public void onConnectionState(ConnectionState connectionState) {
 
-         switch (connectionState) {
-            case ESTABLISHED:
-               pettPlantService.onCommConnected();
-               break;
-            case CONNECTING:
-               pettPlantService.onCommConnecting();
-               break;
-            case NONE:
-               pettPlantService.onCommDisconnected();
-               break;
-            case FAILED:
-               pettPlantService.onCommFailed();
-               break;
-            default:
-               break;
-         }
-      }
+            switch (connectionState) {
+                case ESTABLISHED:
+                    pettPlantService.onCommConnected();
+                    break;
+                case CONNECTING:
+                    pettPlantService.onCommConnecting();
+                    break;
+                case NONE:
+                    pettPlantService.onCommDisconnected();
+                    break;
+                case FAILED:
+                    pettPlantService.onCommFailed();
+                    break;
+                default:
+                    break;
+            }
+        }
 
-      @Override
-      public void onReceiveBytes(byte[] response) {
-         handleResponseBytes(response);
-      }
-   }
+        @Override
+        public void onReceiveBytes(byte[] response) {
+            handleResponseBytes(response);
+        }
+    }
 
-   /**
-    * Listeners that want to be notified of the status of the CommunicationService
-    */
-   public interface CommunicationManagerListener {
+    /**
+     * Listeners that want to be notified of the status of the CommunicationService
+     */
+    public interface CommunicationManagerListener {
 
-      void onDataRecieved();
+        void onDataReceived();
 
-      void onDataSent();
+        void onDataSent();
 
-      void onConnecting();
+        void onConnecting();
 
-      void onConnected();
+        void onConnected();
 
-      void onDisconnected();
+        void onDisconnected();
 
-      void onError(CommunicationErrorType type);
-   }
+        void onError(CommunicationErrorType type);
+    }
 }

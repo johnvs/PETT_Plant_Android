@@ -21,8 +21,8 @@ gen/
 .gradle/
 
 # Ignore build dirs at all levels
-build/
-#/*/build/
+build
+release
 
 # Local configuration file (sdk path, etc)
 local.properties
