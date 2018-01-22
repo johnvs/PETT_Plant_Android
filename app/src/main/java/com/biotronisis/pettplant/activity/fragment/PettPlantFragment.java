@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.biotronisis.pettplant.activity.fragment;
 
 import android.app.AlertDialog;
@@ -26,7 +10,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-//import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -59,7 +42,7 @@ import java.util.logging.Level;
 /**
  * This fragment contains the PETT Plant controls
  */
-public class PettPlantFragment extends AbstractBaseFragment {
+public class PettPlantFragment extends AbstractBaseFragment implements PlantState.PlantStateGetter {
 
     private static final String TAG = "PettPlantFragment";
 
@@ -75,7 +58,6 @@ public class PettPlantFragment extends AbstractBaseFragment {
     private SeekBar colorModeSeekbar;
     private TextView colorModeSpeedTV;
 
-    private PettPlantParams pettPlantParams;
     private PlantState plantState;
 
     private int lastEntrainmentPos;
@@ -86,7 +68,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
     static final String STATE_COLOR_MODE = "colorMode";
     static final String STATE_COLOR_MODE_SPEED = "colorModeSpeed";
 
-    private MyPlantStateListener myPlantStateListener = new MyPlantStateListener();
+    private final MyPlantStateListener myPlantStateListener = new MyPlantStateListener();
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
@@ -269,7 +251,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
 //      } else {
 
-            pettPlantParams = new PettPlantParams(getActivity());
+            PettPlantParams pettPlantParams = new PettPlantParams(getActivity());
 
             entrainmentSpinner.setSelection(pettPlantParams.getEntrainmentSequence().getValue());
 
@@ -350,6 +332,8 @@ public class PettPlantFragment extends AbstractBaseFragment {
 
     @Override
     public void persistData() {
+        PettPlantParams pettPlantParams = new PettPlantParams(getActivity());
+
         pettPlantParams.setEntrainmentSequence(Entrainment.Sequence.getSequence(entrainmentSpinner.getSelectedItemPosition()));
         pettPlantParams.setEntrainmentRunButton(entrainRunStopButton.getText().toString());
 //      pettPlantParams.setEntrainmentPauseButton(entrainPauseResumeButton.getText().toString());
@@ -370,6 +354,11 @@ public class PettPlantFragment extends AbstractBaseFragment {
         builder.setMessage(R.string.no_plant_connected_message);
         builder.setPositiveButton(R.string.ok, null);
         builder.show();
+    }
+
+    @Override
+    public PlantState getPlantState() {
+        return plantState;
     }
 
     //
@@ -1039,7 +1028,7 @@ public class PettPlantFragment extends AbstractBaseFragment {
         }
     }
 
-    private BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra(PettPlantService.EXTRA_EVENT_MESSAGE);
@@ -1055,5 +1044,4 @@ public class PettPlantFragment extends AbstractBaseFragment {
             }
         }
     };
-
 }
