@@ -41,7 +41,7 @@ public class ErrorHandler {
 
     private static final Logger LOGGER = Logger.getLogger(ErrorHandler.class.getName());
     private FileHandler fileHandler;
-    private Context appContext;
+    private final Context appContext;
 
     public static ErrorHandler getInstance(Context callee) {
         if (instance == null) {
@@ -109,7 +109,7 @@ public class ErrorHandler {
     class MyFormatter extends Formatter {
 
         // Create a DateFormat to format the logger timestamp.
-        private DateFormat df = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss.SSS");
+        private final DateFormat df = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss.SSS");
 
         @Override
         public String format(LogRecord record) {
@@ -240,7 +240,7 @@ public class ErrorHandler {
         }
     }
 
-    private BroadcastReceiver pettPlantEventReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver pettPlantEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 

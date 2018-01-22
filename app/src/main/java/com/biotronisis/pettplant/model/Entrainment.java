@@ -8,7 +8,7 @@ public class Entrainment {
         SLEEP(1),
         STAY_AWAKE(2);
 
-        private int id;
+        private final int id;
 
         Sequence(int id) {
             this.id = id;
@@ -42,7 +42,7 @@ public class Entrainment {
         RUNNING(1),
         PAUSED(2);
 
-        private int id;
+        private final int id;
 
         State(int id) {
             this.id = id;
@@ -93,7 +93,7 @@ public class Entrainment {
         OFF(0),
         ON(1);
 
-        private int id;
+        private final int id;
 
         LoopCheckbox(int id) {
             this.id = id;

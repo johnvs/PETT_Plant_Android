@@ -354,8 +354,8 @@ public class CommunicationManager {
     private class ResponseCallbackUiRunnable implements Runnable {
 
         @SuppressWarnings("rawtypes")
-        private ResponseCallback callback;
-        private AbstractResponse response;
+        private final ResponseCallback callback;
+        private final AbstractResponse response;
 
         ResponseCallbackUiRunnable(ResponseCallback<?> callback, AbstractResponse response) {
             this.callback = callback;
@@ -374,7 +374,7 @@ public class CommunicationManager {
      */
     private class TimeoutBackgroundRunnable implements Runnable {
 
-        private AbstractCommand<?> command;
+        private final AbstractCommand<?> command;
 
         TimeoutBackgroundRunnable(AbstractCommand<?> command) {
             this.command = command;
@@ -412,7 +412,7 @@ public class CommunicationManager {
     private class TimeoutCallbackUiRunnable implements Runnable {
 
         @SuppressWarnings("rawtypes")
-        private ResponseCallback callback;
+        private final ResponseCallback callback;
 
         TimeoutCallbackUiRunnable(ResponseCallback<?> callback) {
             this.callback = callback;

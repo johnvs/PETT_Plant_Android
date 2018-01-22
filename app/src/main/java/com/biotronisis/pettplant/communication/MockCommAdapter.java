@@ -15,8 +15,8 @@ public class MockCommAdapter implements ICommAdapter {
 
     private static final String TAG = "MockCommAdapter";
 
-    private Handler commHandler;
-    private CommAdapterListener listener;
+    private final Handler commHandler;
+    private final CommAdapterListener listener;
     private boolean active = false;
 
     private ConnectionState connectionState = ConnectionState.NONE;

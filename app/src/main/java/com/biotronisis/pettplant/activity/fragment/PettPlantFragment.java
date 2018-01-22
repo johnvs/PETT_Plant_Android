@@ -64,9 +64,9 @@ public class PettPlantFragment extends AbstractBaseFragment implements PlantStat
     private int lastColorModePos;
     private int lastColorModeSpeed;
 
-    static final String STATE_ENTRAINMENT_MODE = "entrainmentMode";
-    static final String STATE_COLOR_MODE = "colorMode";
-    static final String STATE_COLOR_MODE_SPEED = "colorModeSpeed";
+    private static final String STATE_ENTRAINMENT_MODE = "entrainmentMode";
+    private static final String STATE_COLOR_MODE = "colorMode";
+    private static final String STATE_COLOR_MODE_SPEED = "colorModeSpeed";
 
     private final MyPlantStateListener myPlantStateListener = new MyPlantStateListener();
 
@@ -100,7 +100,7 @@ public class PettPlantFragment extends AbstractBaseFragment implements PlantStat
         setupColorControls(view);
     }
 
-    public void setupEntrainmentControls(View view) {
+    private void setupEntrainmentControls(View view) {
         // Setup the Entrainment controls
         entrainmentSpinner = view.findViewById(R.id.spinner_entrainment);
         try {
@@ -127,7 +127,7 @@ public class PettPlantFragment extends AbstractBaseFragment implements PlantStat
         loopCheckbox.setOnClickListener(new EntrainmentLoopOnClickListener());
     }
 
-    public void setupColorControls(View view) {
+    private void setupColorControls(View view) {
 
         colorModeSpinner = view.findViewById(R.id.spinner_color_mode);
         try {
@@ -348,7 +348,7 @@ public class PettPlantFragment extends AbstractBaseFragment implements PlantStat
         pettPlantParams.saveData();
     }
 
-    public void showNoPlantConnectedAlert() {
+    private void showNoPlantConnectedAlert() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.no_plant_connected_title);
         builder.setMessage(R.string.no_plant_connected_message);

@@ -24,11 +24,11 @@ import com.biotronisis.pettplant.plant.processor.PlantState;
 
 public class MainActivity extends AbstractBaseActivity {
 
-    private static String TAG = "MainActivity";
+    private static final String TAG = "MainActivity";
 
     private boolean illBeBack = false;
 
-    private MyCommunicationManagerListener myCommunicationManagerListener =
+    private final MyCommunicationManagerListener myCommunicationManagerListener =
           new MyCommunicationManagerListener();
 
     @Override
@@ -244,7 +244,7 @@ public class MainActivity extends AbstractBaseActivity {
 
     }
 
-    private BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra(PettPlantService.EXTRA_EVENT_MESSAGE);

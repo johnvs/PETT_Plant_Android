@@ -69,11 +69,11 @@ public class PettPlantService extends Service {
 
     // Registry of listeners that want to be notified for the status of communications
     // *access synchronized on statusListeners*
-    public final Set<CommunicationManagerListener> statusListeners = new LinkedHashSet<>();
+    private final Set<CommunicationManagerListener> statusListeners = new LinkedHashSet<>();
 
     // registry of listeners that want to be notified for the status of communications
     // *access synchronized on plantStateListeners*
-    public final Set<PlantStateListener> plantStateListeners = new LinkedHashSet<>();
+    private final Set<PlantStateListener> plantStateListeners = new LinkedHashSet<>();
 
     private CommunicationManager communicationManager;
 
@@ -754,7 +754,7 @@ public class PettPlantService extends Service {
     //
     private class RunEntrainmentResponseCallback implements ResponseCallback<RunEntrainmentResponse> {
 
-        private RunEntrainmentCallback callback;
+        private final RunEntrainmentCallback callback;
 
         RunEntrainmentResponseCallback(RunEntrainmentCallback callback) {
             this.callback = callback;
@@ -779,7 +779,7 @@ public class PettPlantService extends Service {
 
     private class StopEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
 
-        private StopEntrainmentCallback callback;
+        private final StopEntrainmentCallback callback;
 
         StopEntrainmentResponseCallback(StopEntrainmentCallback callback) {
             this.callback = callback;
@@ -854,7 +854,7 @@ public class PettPlantService extends Service {
 
     private class LoopOnEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
 
-        private LoopOnEntrainmentCallback callback;
+        private final LoopOnEntrainmentCallback callback;
 
         LoopOnEntrainmentResponseCallback(LoopOnEntrainmentCallback callback) {
             this.callback = callback;
@@ -879,7 +879,7 @@ public class PettPlantService extends Service {
 
     private class LoopOffEntrainmentResponseCallback implements ResponseCallback<EmptyResponse> {
 
-        private LoopOffEntrainmentCallback callback;
+        private final LoopOffEntrainmentCallback callback;
 
         LoopOffEntrainmentResponseCallback(LoopOffEntrainmentCallback callback) {
             this.callback = callback;
@@ -904,7 +904,7 @@ public class PettPlantService extends Service {
 
     private class SetColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
 
-        private SetColorModeCallback callback;
+        private final SetColorModeCallback callback;
 
         SetColorModeResponseCallback(SetColorModeCallback callback) {
             this.callback = callback;
@@ -929,7 +929,7 @@ public class PettPlantService extends Service {
 
     private class RunColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
 
-        private RunColorModeCallback callback;
+        private final RunColorModeCallback callback;
 
         RunColorModeResponseCallback(RunColorModeCallback callback) {
             this.callback = callback;
@@ -954,7 +954,7 @@ public class PettPlantService extends Service {
 
     private class OffColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
 
-        private OffColorModeCallback callback;
+        private final OffColorModeCallback callback;
 
         OffColorModeResponseCallback(OffColorModeCallback callback) {
             this.callback = callback;
@@ -979,7 +979,7 @@ public class PettPlantService extends Service {
 
     private class PauseColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
 
-        private PauseColorModeCallback callback;
+        private final PauseColorModeCallback callback;
 
         PauseColorModeResponseCallback(PauseColorModeCallback callback) {
             this.callback = callback;
@@ -1004,7 +1004,7 @@ public class PettPlantService extends Service {
 
     private class ResumeColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
 
-        private ResumeColorModeCallback callback;
+        private final ResumeColorModeCallback callback;
 
         ResumeColorModeResponseCallback(ResumeColorModeCallback callback) {
             this.callback = callback;
@@ -1029,7 +1029,7 @@ public class PettPlantService extends Service {
 
     private class SetSpeedColorModeResponseCallback implements ResponseCallback<EmptyResponse> {
 
-        private SetSpeedColorModeCallback callback;
+        private final SetSpeedColorModeCallback callback;
 
         SetSpeedColorModeResponseCallback(SetSpeedColorModeCallback callback) {
             this.callback = callback;
