@@ -9,7 +9,7 @@ import android.view.MenuItem;
 public abstract class AbstractBaseActivity extends AppCompatActivity implements IntentParams {
 
     private boolean active;
-    protected boolean hasFragments;
+    private boolean hasFragments;
 
     public static String fragmentName = null;
 
@@ -18,7 +18,7 @@ public abstract class AbstractBaseActivity extends AppCompatActivity implements 
      *
      * @return activity name
      */
-    public abstract String getActivityName();
+    protected abstract String getActivityName();
 
     /**
      * The key used to display the help for this activity.
@@ -59,25 +59,25 @@ public abstract class AbstractBaseActivity extends AppCompatActivity implements 
         active = false;
     }
 
-    public boolean isActive() {
-        return active;
-    }
+//    public boolean isActive() {
+//        return active;
+//    }
 
-    private class HelpOnMenuItemClicked implements ActionMenuView.OnMenuItemClickListener {
-
-        @Override
-        public boolean onMenuItemClick(MenuItem item) {
-
-            if (!hasFragments) {
-                fragmentName = null;
-            }
-
-            Intent intent = HelpActivity.createIntent(AbstractBaseActivity.this, getActivityName(),
-                  fragmentName);
-            startActivity(intent);
-            return false;
-        }
-    }
+//    private class HelpOnMenuItemClicked implements ActionMenuView.OnMenuItemClickListener {
+//
+//        @Override
+//        public boolean onMenuItemClick(MenuItem item) {
+//
+//            if (!hasFragments) {
+//                fragmentName = null;
+//            }
+//
+//            Intent intent = HelpActivity.createIntent(AbstractBaseActivity.this, getActivityName(),
+//                  fragmentName);
+//            startActivity(intent);
+//            return false;
+//        }
+//    }
 
     public interface MyOnClickListener {
 
