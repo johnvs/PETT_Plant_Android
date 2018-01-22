@@ -90,4 +90,9 @@ public class PlantState implements Serializable {
               ", colorModeSpeed=" + colorModeSpeed +
               '}';
     }
+
+    public interface PlantStateGetter {
+        PlantState getPlantState();
+    }
+
 }
