@@ -37,9 +37,9 @@ public class ColorMode {
             return id >= 0 && id < Mode.values().length;
         }
 
-        public static Mode getDefault() {
-            return RAINBOW_LOOP_ALL;
-        }
+//        public static Mode getDefault() {
+//            return RAINBOW_LOOP_ALL;
+//        }
     }
 
     public enum State {
@@ -54,9 +54,9 @@ public class ColorMode {
             this.id = id;
         }
 
-        public int getValue() {
-            return id;
-        }
+//        public int getValue() {
+//            return id;
+//        }
 
         public int getId() {
             return id;
