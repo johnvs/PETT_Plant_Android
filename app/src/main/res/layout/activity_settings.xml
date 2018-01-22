@@ -95,7 +95,7 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/commDivder"
+        android:id="@+id/commDivider"
         android:layout_width="fill_parent"
         android:layout_height="2dp"
         android:layout_below="@id/currentCommLayout"
@@ -107,7 +107,7 @@
         style="@style/TitleTextView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/commDivder"
+        android:layout_below="@id/commDivider"
         android:layout_marginBottom="10dp"
         android:text="@string/scan_new_plant" />
 

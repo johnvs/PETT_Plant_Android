@@ -780,7 +780,7 @@ public class BluetoothCommAdapter implements ICommAdapter {
 
                             ErrorHandler errorHandler = ErrorHandler.getInstance();
                             if (errorHandler != null) {
-                                errorHandler.logError(Level.INFO, "BluetoothCommAdapter$ConectedThread.run():" +
+                                errorHandler.logError(Level.INFO, "BluetoothCommAdapter$ConnectedThread.run():" +
                                       " received " + numBytesRcvd + " bytes.", 0, 0);
                             } else {
                                 if (MyDebug.LOG) {
