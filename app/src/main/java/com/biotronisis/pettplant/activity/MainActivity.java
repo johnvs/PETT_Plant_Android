@@ -124,12 +124,8 @@ public class MainActivity extends AbstractBaseActivity {
 
         switch (item.getItemId()) {
             case R.id.action_settings: {
-                // Launch the SettingsActivity
                 illBeBack = true;
-
-                // If its null on return, we know we didn't get any new plantState in Settings
-                PlantState plantState = null;
-                Intent intent = SettingsActivity.createIntent(this, plantState);
+                Intent intent = SettingsActivity.createIntent(this, null);
                 startActivityForResult(intent, REQUEST_STATE);
                 return true;
             }
@@ -154,12 +150,13 @@ public class MainActivity extends AbstractBaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_STATE) {
             if (resultCode == RESULT_OK) {
-                PlantState plantState = (PlantState) data.getSerializableExtra(EXTRA_PLANT_STATE);
+                PlantState returnedPlantState = (PlantState) data.getSerializableExtra(EXTRA_PLANT_STATE);
 
-                PettPlantFragment pettPlantFragment = (PettPlantFragment) getSupportFragmentManager().
-                      findFragmentById(R.id.pett_plant_fragment);
-                if (plantState != null) {
-                    pettPlantFragment.updateState(plantState);
+                if (returnedPlantState != null) {
+                    PettPlantFragment pettPlantFragment = (PettPlantFragment) getSupportFragmentManager()
+                          .findFragmentById(R.id.pett_plant_fragment);
+
+                    pettPlantFragment.updateState(returnedPlantState);
                 }
             }
         }
@@ -193,7 +190,7 @@ public class MainActivity extends AbstractBaseActivity {
     private class MyCommunicationManagerListener implements CommunicationManager.CommunicationManagerListener {
 
         @Override
-        public void onDataRecieved() {
+        public void onDataReceived() {
         }
 
         @Override
