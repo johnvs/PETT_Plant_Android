@@ -34,22 +34,27 @@ import com.biotronisis.pettplant.util.Time;
 public class SettingsActivity extends AbstractBaseActivity {
 
     private static final String TAG = "SettingsActivity";
+    private static final String FRAGMENT_IS_ACTIVE = "fragment_is_active";
+    private int orientation;
 
     private TextView deviceNameTV;
     private TextView connectionTypeTV;
     private TextView connectionAddressTV;
     private TextView connectionStatusTV;
+    private Button bluetoothScanButton;
 
     private CommunicationParams communicationParams;
 
     private Context activityContext;
 
-    private MyCommunicationManagerListener myCommunicationManagerListener =
+    private final MyCommunicationManagerListener myCommunicationManagerListener =
           new MyCommunicationManagerListener();
 
     private PlantState plantState = null;
 
-    private MyPlantStateListener myPlantStateListener = new MyPlantStateListener(this);
+    private final MyPlantStateListener myPlantStateListener = new MyPlantStateListener(this);
+    private boolean bTScanFragDisplayed = false;
+    private boolean bTScanFragIsActive;
 
     @Override
     public String getActivityName() {
@@ -68,8 +73,8 @@ public class SettingsActivity extends AbstractBaseActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceSate) {
-        super.onCreate(savedInstanceSate);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         if (MyDebug.LOG) {
             Log.i(TAG, "------------ onCreate ------------");
@@ -77,7 +82,7 @@ public class SettingsActivity extends AbstractBaseActivity {
 
         setContentView(R.layout.activity_settings);
 
-        Button bluetoothScanButton = findViewById(R.id.bluetoothScanButton);
+        bluetoothScanButton = findViewById(R.id.bluetoothScanButton);
 
         // For future use
         Button usbScanButton = findViewById(R.id.usbScanButton);
@@ -111,10 +116,12 @@ public class SettingsActivity extends AbstractBaseActivity {
 
         bluetoothScanButton.setOnClickListener(new BluetoothScanClickListener());
 
-        Bundle extras = getIntent().getExtras();
+        bTScanFragIsActive = (savedInstanceState != null) &&
+              savedInstanceState.getBoolean(FRAGMENT_IS_ACTIVE, false);
+
         try {
             //noinspection ConstantConditions
-            plantState = (PlantState) extras.get(EXTRA_PLANT_STATE);
+            plantState = (PlantState) getIntent().getExtras().get(EXTRA_PLANT_STATE);
         } catch (Exception e) {
             Log.e(TAG, "Bundle#get() returned null in SettingsActivity#onCreate", e);
         }
@@ -123,12 +130,13 @@ public class SettingsActivity extends AbstractBaseActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
+        orientation = getResources().getConfiguration().orientation;
 
         String currentTime = Time.getCurrentTime();  //getCurrentTime();
         if (MyDebug.LOG) {
@@ -146,6 +154,13 @@ public class SettingsActivity extends AbstractBaseActivity {
                     new IntentFilter(PettPlantService.SERVICE_EVENT));
 
         registerBluetoothRcvr();
+
+        if (bTScanFragIsActive) {
+            bTScanFragIsActive = false;
+            // If the fragment was displayed during an orientation change,
+            // programmatically press the Bluetooth Scan button to display the fragment again
+            bluetoothScanButton.callOnClick();
+        }
 
     }
 
@@ -221,7 +236,6 @@ public class SettingsActivity extends AbstractBaseActivity {
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(pettPlantServiceEventReceiver);
         unregisterBluetoothRcvr();
-
     }
 
     @Override
@@ -233,6 +247,28 @@ public class SettingsActivity extends AbstractBaseActivity {
         }
 
 //      unregisterReceiver(bluetoothReceiver);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        if (MyDebug.LOG) {
+            Log.d(TAG, "------------ onSaveInstanceState ------------");
+        }
+
+        if ( (orientation != getResources().getConfiguration().orientation) &&
+              bTScanFragDisplayed ) {
+            // We are here because of an orientation change while the
+            // BluetoothScanFragment was displayed.
+            bTScanFragIsActive = true;
+        }
+
+        outState.putBoolean(FRAGMENT_IS_ACTIVE, bTScanFragIsActive);
+
+        getIntent().putExtra(EXTRA_PLANT_STATE, plantState);
+
+        // call superclass to save any view hierarchy
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -294,7 +330,7 @@ public class SettingsActivity extends AbstractBaseActivity {
     private class MyCommunicationManagerListener implements CommunicationManagerListener {
 
         @Override
-        public void onDataRecieved() {
+        public void onDataReceived() {
         }
 
         @Override
@@ -330,7 +366,7 @@ public class SettingsActivity extends AbstractBaseActivity {
         }
     }
 
-    private BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver pettPlantServiceEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra(PettPlantService.EXTRA_EVENT_MESSAGE);
@@ -359,6 +395,10 @@ public class SettingsActivity extends AbstractBaseActivity {
             }
         }
     };
+
+    public void setbTScanFragDisplayed(boolean value) {
+        bTScanFragDisplayed = value;
+    }
 
     private class BluetoothScanClickListener implements View.OnClickListener {
         public void onClick(View v) {
@@ -418,16 +458,16 @@ public class SettingsActivity extends AbstractBaseActivity {
                         communicationParams.setName(device.getName());
                         communicationParams.setAddress(device.getAddress());
                     }
-
                 }
             });
+            bTScanFragDisplayed = true;
             dialog.show(getSupportFragmentManager().beginTransaction(), "dialog");
         }
     }
 
     private class MyPlantStateListener implements PettPlantService.PlantStateListener {
 
-        private SettingsActivity outerClass;
+        private final SettingsActivity outerClass;
 
         MyPlantStateListener(SettingsActivity oClass) {
             outerClass = oClass;
